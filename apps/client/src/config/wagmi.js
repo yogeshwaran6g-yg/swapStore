@@ -23,11 +23,25 @@ createAppKit({
   metadata: {
     name: 'SwapStore',
     description: 'SwapStore Application',
-    url: 'https://swapstore.com', 
+    url: 'https://swapstore.com',
     icons: ['https://avatars.githubusercontent.com/u/179229932']
   },
   themeMode: 'dark',
+  themeVariables: {
+    "--w3m-font-family": "Roboto, sans-serif",
+    "--w3m-accent-color": "#F5841F",
+    // ...
+  },
   features: {
-    analytics: true
-  }
+    analytics: true,
+    email: false,
+    socials: false,
+    onramp: false,
+    swaps: false,
+    send: false,
+    receive: false,
+    history: false,
+    ens: false
+  },
+  enableEIP6963: true
 })
