@@ -1,0 +1,20 @@
+{
+  "name": "swap-store-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "fck.js",
+    "dev" :"node src/server.js"
+  },
+  "author": "YG",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.1.0",
+    "http": "0.0.1-security",
+    "morgan": "^1.11.0"
+  }
+}
