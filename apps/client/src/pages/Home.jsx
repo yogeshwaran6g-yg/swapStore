@@ -3,13 +3,19 @@ import { useAccount } from 'wagmi';
 import { Card } from '../components/ui/Card';
 import WalletConnect from '../components/WalletConnect';
 import UsdtBalance from '../components/UsdtBalance';
+import UsdcBalance from '../components/UsdcBalance';
+import DaiBalance from '../components/DaiBalance';
+
+// USDS and USDe components moved to components/_unused/ (unverified contracts)
+// import UsdsBalance from '../components/_unused/UsdsBalance';
+// import UsdeBalance from '../components/_unused/UsdeBalance';
 
 function Home() {
   const { isConnected, address } = useAccount();
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-950 p-4">
-      <div className="w-full max-w-xl">
+      <div className="w-full max-w-3xl">
         <div className="text-center mb-10">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 text-transparent bg-clip-text mb-4">
             SwapStore
@@ -47,8 +53,10 @@ function Home() {
               </div>
             )}
 
-            {/* USDT Balances */}
+            {/* Token Balances — Verified tokens only (BNB + Polygon) */}
             <UsdtBalance />
+            <UsdcBalance />
+            <DaiBalance />
           </div>
         </Card>
       </div>

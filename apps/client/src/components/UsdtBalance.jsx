@@ -1,85 +1,72 @@
 import React from 'react';
-import { useAccount, useReadContract } from 'wagmi';
+import { useAccount } from 'wagmi';
 import { formatUnits } from 'viem';
 import { polygon, bsc } from '@reown/appkit/networks';
-import { USDT_ADDRESSES, erc20Abi } from '../utils/constants';
-import { useTronBalance } from '../hooks/useTronBalance';
-
-
+import { USDT_ADDRESSES } from '../config/constants';
+import { useERC20Balance } from '../hooks/useERC20Balance';
+// import { useTronBalance } from '../hooks/useTronBalance';
+import { TokenBalanceCard } from './ui/TokenBalanceCard';
+import { TokenSection } from './ui/TokenSection';
 
 export default function UsdtBalance() {
   const { address, isConnected } = useAccount();
 
-  // Fetch Polygon USDT Balance
-  const { data: polygonBalance, isLoading: isLoadingPolygon } = useReadContract({
-    address: USDT_ADDRESSES.polygon,
-    abi: erc20Abi,
-    functionName: 'balanceOf',
-    args: [address],
+  // Fetch Polygon USDT Balance (6 decimals)
+  const {
+    formattedBalance: formattedPolygon,
+    isLoading: isLoadingPolygon,
+  } = useERC20Balance({
+    contractAddress: USDT_ADDRESSES.polygon,
     chainId: polygon.id,
-    query: {
-      enabled: isConnected && !!address,
-    }
+    decimals: 6,
+    walletAddress: address,
+    enabled: isConnected,
   });
 
-  // Fetch BSC USDT Balance
-  const { data: bscBalance, isLoading: isLoadingBsc } = useReadContract({
-    address: USDT_ADDRESSES.bsc,
-    abi: erc20Abi,
-    functionName: 'balanceOf',
-    args: [address],
+  // Fetch BNB Smart Chain USDT Balance (18 decimals for Binance-Peg BSC-USD)
+  const {
+    formattedBalance: formattedBnb,
+    isLoading: isLoadingBnb,
+  } = useERC20Balance({
+    contractAddress: USDT_ADDRESSES.bnb,
     chainId: bsc.id,
-    query: {
-      enabled: isConnected && !!address,
-    }
+    decimals: 18,
+    walletAddress: address,
+    enabled: isConnected,
   });
 
-  // Fetch TRON USDT Balance
-  const { data: tronBalance, isLoading: isLoadingTron } = useTronBalance(address, isConnected);
+  // // Fetch TRON USDT Balance (UNUSED)
+  // const { data: tronBalance, isLoading: isLoadingTron } = useTronBalance(address, isConnected);
+  // const formattedTron = tronBalance !== undefined ? formatUnits(BigInt(tronBalance), 6) : '0.00';
 
   if (!isConnected) return null;
 
-  const formattedPolygon = polygonBalance !== undefined ? formatUnits(polygonBalance, 6) : '0.00';
-  // Note: BSC USDT usually has 18 decimals, whereas Polygon/Ethereum USDT has 6. 
-  // Let's use 18 for BSC as it's the standard for Binance-Peg BSC-USD.
-  const formattedBsc = bscBalance !== undefined ? formatUnits(bscBalance, 18) : '0.00';
-  const formattedTron = tronBalance !== undefined ? formatUnits(BigInt(tronBalance), 6) : '0.00';
-
   return (
-    <div className="w-full mt-6 space-y-4">
-      <h3 className="text-xl font-medium text-white mb-4 border-b border-zinc-800 pb-2">USDT Balances</h3>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Polygon Balance */}
-        <div className="bg-zinc-800/50 p-4 rounded-lg flex flex-col items-center justify-center border border-purple-500/20">
-          <span className="text-zinc-400 text-sm mb-1">Polygon Network</span>
-          {isLoadingPolygon ? (
-            <div className="animate-pulse h-8 w-24 bg-zinc-700 rounded mt-1"></div>
-          ) : (
-            <span className="text-2xl font-bold text-white">{Number(formattedPolygon).toFixed(2)} <span className="text-purple-400 text-lg">USDT</span></span>
-          )}
-        </div>
-
-        {/* BSC Balance */}
-        <div className="bg-zinc-800/50 p-4 rounded-lg flex flex-col items-center justify-center border border-yellow-500/20">
-          <span className="text-zinc-400 text-sm mb-1">BNB Smart Chain</span>
-          {isLoadingBsc ? (
-            <div className="animate-pulse h-8 w-24 bg-zinc-700 rounded mt-1"></div>
-          ) : (
-            <span className="text-2xl font-bold text-white">{Number(formattedBsc).toFixed(2)} <span className="text-yellow-400 text-lg">USDT</span></span>
-          )}
-        </div>
-
-        {/* TRON Balance */}
-        <div className="bg-zinc-800/50 p-4 rounded-lg flex flex-col items-center justify-center border border-red-500/20">
-          <span className="text-zinc-400 text-sm mb-1">TRON Network</span>
-          {isLoadingTron ? (
-            <div className="animate-pulse h-8 w-24 bg-zinc-700 rounded mt-1"></div>
-          ) : (
-            <span className="text-2xl font-bold text-white">{Number(formattedTron).toFixed(2)} <span className="text-red-400 text-lg">USDT</span></span>
-          )}
-        </div>
-      </div>
-    </div>
+    <TokenSection title="USDT Balances" icon="💵">
+      <TokenBalanceCard
+        networkName="Polygon Network"
+        balance={formattedPolygon}
+        tokenSymbol="USDT"
+        isLoading={isLoadingPolygon}
+        accentColor="text-purple-400"
+        borderColor="border-purple-500/20"
+      />
+      <TokenBalanceCard
+        networkName="BNB Smart Chain"
+        balance={formattedBnb}
+        tokenSymbol="USDT"
+        isLoading={isLoadingBnb}
+        accentColor="text-yellow-400"
+        borderColor="border-yellow-500/20"
+      />
+      {/* <TokenBalanceCard
+        networkName="TRON Network"
+        balance={formattedTron}
+        tokenSymbol="USDT"
+        isLoading={isLoadingTron}
+        accentColor="text-red-400"
+        borderColor="border-red-500/20"
+      /> */}
+    </TokenSection>
   );
 }
