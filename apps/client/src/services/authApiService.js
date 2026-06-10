@@ -1,6 +1,6 @@
 import apiClient from '@/utils/axios';
 import { endpoints } from '@/config/constants';
-import {toast} from "hot-toast";
+import { toast } from "react-hot-toast";
 
 /**
  * Login or signup by wallet address.
@@ -9,11 +9,11 @@ import {toast} from "hot-toast";
  */
 
 export const walletLogin = async (address) => {
-  try{
+  try {
     const response = await apiClient.post(endpoints.AUTH.walletLogin, { address });
     return response;
-  }catch(err){
-    console.log("something went wrong, unable to login using wallet",err)
+  } catch (err) {
+    console.log("something went wrong, unable to login using wallet", err)
     toast.err("something went wrong, unable to login using wallet")
   }
 };
