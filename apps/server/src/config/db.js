@@ -10,6 +10,15 @@ const pool = mysql.createPool({
     port: env.dbPort
 })
 
+pool.getConnection()
+    .then(connection => {
+        console.log('✅ Database connected successfully');
+        connection.release();
+    })
+    .catch(err => {
+        console.error('❌ Database connection failed:', err.message);
+    });
+
 
 export const queryRunner = async function (query, values = []) {
     try {
