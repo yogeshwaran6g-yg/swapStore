@@ -1,4 +1,3 @@
-
 export const USDT_ADDRESSES = {
   bnb: '0x55d398326f99059fF775485246999027B3197955',
   polygon: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
@@ -44,3 +43,18 @@ export const erc20Abi = [
     type: 'function',
   },
 ];
+
+
+// ── API Endpoints ──────────────────────────────────────────
+export const endpoints = {
+  AUTH: {
+    walletLogin: '/api/v1/auth/walletLogin',
+    profile: '/api/v1/auth/profile',
+  },
+  RATES: {
+    list: '/api/v1/rates',
+  },
+  SWAP: {
+    submit: '/api/v1/auth/swap-form',
+  },
+};

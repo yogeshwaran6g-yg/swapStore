@@ -1,20 +1,27 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { config } from './config/wagmi';
-import Home from "./pages/Home";
+import AppRoutes from "./components/routes/AppRoutes";
+import { AuthProvider } from "./context/AuthContext";
 
-// Setup query client
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function App() {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Home />} />
-          </Routes>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
         </BrowserRouter>
       </QueryClientProvider>
     </WagmiProvider>

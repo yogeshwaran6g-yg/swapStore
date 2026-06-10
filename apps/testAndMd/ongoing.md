@@ -19,4 +19,11 @@ USDC
 DAI
 
 
-adjust the components to displa as per new requirement
+adjust the components to display the selected tokend  as per new requirement
+(ok)
+
+
+setup db and server to initiate user and form
+
+db done,set ip done ,fend core folders and context api service hook
+

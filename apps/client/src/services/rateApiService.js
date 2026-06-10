@@ -1,0 +1,17 @@
+import apiClient from '@/utils/axios';
+import { endpoints } from '@/config/constants';
+import {toast} from "hot-toast";
+/**
+ * Fetch all exchange rates.
+ * @returns {Promise<Record<string, number>>} e.g. { USDT: 85, USDC: 85, DAI: 85 }
+ */
+export const fetchRates = async () => {
+  try{
+
+    const response = await apiClient.get(endpoints.RATES.list);
+    return response;
+  }catch(err){
+    console.log("something went wrong unable to getRates",err.messaeg)
+    toast.err("something went wrong unable to getRates");
+  }
+};

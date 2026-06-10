@@ -4,6 +4,9 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import { createServer } from "http";
+import ratesRouter from './routes/rates.js';
+import userRoutes from './routes/userRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 const app = express();
 const server = createServer(app);
@@ -20,6 +23,10 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/", (_req, res) => {
   res.json({ message: "SwapStore API is running 🚀" });
 });
+
+app.use('/api/v1/rates', ratesRouter);
+app.use('/api/v1/auth', userRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", uptime: process.uptime() });
