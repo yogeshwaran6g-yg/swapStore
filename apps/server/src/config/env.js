@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
-
-
+dotenv.config();
 
 const env = {
     dbUrl  :process.env.DB_URL ||"",
