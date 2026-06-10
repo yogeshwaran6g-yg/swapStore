@@ -17,11 +17,15 @@ DB_PORT=3306
 
 
 
+
 wallet connect no issue check
-wallet login 
+wallet login
 swap form check
 db rates check
 authcontext (auto dissconet when no token ,after login get profile check) 
 protected routes check
 
 seed file check if not mean add
+
+
+<!-- 6a29505b-bac0-83e8-91a1-ab9dd41d35d2 -->

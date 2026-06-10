@@ -84,3 +84,19 @@ INSERT INTO exchange_rates (token_symbol, network, inr_rate) VALUES
 ('USDT', 'DEFAULT', 85.00),
 ('USDC', 'DEFAULT', 85.00),
 ('DAI', 'DEFAULT', 85.00);
+
+CREATE TABLE swap_orders (
+    uid BINARY(16) PRIMARY KEY,    
+    order_id BINARY(32) NOT NULL UNIQUE,
+    user_uid BINARY(16) NOT NULL,
+    token_address VARCHAR(100) NOT NULL,
+    amount DECIMAL(36, 18) NOT NULL,
+    network VARCHAR(50) NOT NULL,
+    status ENUM('pending', 'completed', 'failed') DEFAULT 'pending',
+    tx_hash VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_swap_user FOREIGN KEY (user_uid) REFERENCES users(uid) ON DELETE CASCADE,
+    KEY idx_swap_status (status),
+    KEY idx_swap_order_id (order_id)
+) ENGINE=InnoDB;

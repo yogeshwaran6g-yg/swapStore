@@ -139,3 +139,29 @@ export const loginOrSignupByWallet = async (walletAddress) => {
     return { success: false, error: error.message };
   }
 };
+
+export const createSwapOrder = async (userUid, { tokenAddress, amount, network }) => {
+  try {
+    const orderIdStr = uuidv4();
+    const hexOrderId = orderIdStr.replace(/-/g, '');
+    const orderIdBytes32 = '0x' + hexOrderId + '00000000000000000000000000000000'; // Make it 32 bytes for Solidity bytes32
+    
+    // We actually just need a unique 32-byte hex string. uuid without dashes is 32 chars (16 bytes). 
+    // Wait, uuid is 16 bytes. Solidity bytes32 is 32 bytes (64 hex chars).
+    // Let's use the uuid and pad it to 32 bytes (64 chars) for the frontend to use.
+    // However, the DB expects BINARY(16) for order_id. So we save the 16 byte UUID in DB,
+    // and the frontend can pad it to 32 bytes when calling the contract.
+    
+    await queryRunner(
+      `INSERT INTO swap_orders (uid, order_id, user_uid, token_address, amount, network, status)
+       VALUES (UNHEX(?), UNHEX(?), UNHEX(?), ?, ?, ?, 'pending')`,
+      [uuidv4().replace(/-/g, ''), hexOrderId, userUid, tokenAddress, amount, network]
+    );
+
+    // Return the bytes32 formatted orderId for the smart contract
+    return { success: true, orderId: orderIdBytes32 };
+  } catch (error) {
+    console.error('Error in createSwapOrder:', error);
+    return { success: false, error: error.message };
+  }
+};

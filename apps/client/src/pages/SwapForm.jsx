@@ -4,16 +4,21 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRates } from '@/hooks/useRates';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useSubmitSwap } from '@/hooks/useSubmitSwap';
+import { useSmartContractSwap } from '@/hooks/useSmartContractSwap';
+import { useAccount } from 'wagmi';
+import { USDT_ADDRESSES, USDC_ADDRESSES, DAI_ADDRESSES } from '@/config/constants';
 import { Card } from '@/components/ui/Card';
 
 function SwapForm() {
   const { isAuthenticated, address } = useAuth();
+  const { chain } = useAccount();
   const navigate = useNavigate();
 
   // React Query hooks
   const { rates, isLoading: loadingRates } = useRates();
   const { profile, isLoading: loadingProfile } = useUserProfile();
   const { mutateAsync: submitSwap, isPending: submitting, isSuccess: submitSuccess, reset: resetSubmit } = useSubmitSwap();
+  const { handleSwap, isProcessing } = useSmartContractSwap();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -91,14 +96,40 @@ function SwapForm() {
     e.preventDefault();
     if (!validateForm()) return;
 
+    let tokenAddress = '';
+    const networkName = chain?.id === 56 || chain?.name?.toLowerCase().includes('bsc') ? 'bnb' : 'polygon';
+    
+    if (formData.token === 'USDT') tokenAddress = USDT_ADDRESSES[networkName];
+    if (formData.token === 'USDC') tokenAddress = USDC_ADDRESSES[networkName];
+    if (formData.token === 'DAI') tokenAddress = DAI_ADDRESSES[networkName];
+
+    if (!tokenAddress) {
+      setErrors({ submit: 'Token address not configured for this network.' });
+      return;
+    }
+
     try {
-      await submitSwap({
+      const response = await submitSwap({
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
         account_no: formData.account_no,
         ifsc: formData.ifsc.toUpperCase(),
+        tokenAddress: tokenAddress,
+        amount: formData.amount,
+        network: chain?.name || 'Unknown'
       });
+
+      if (response && response.orderId) {
+        // Decide decimals based on token & network. (Simplification: DAI is 18, BSC USDT/USDC is 18, Polygon USDT/USDC is 6)
+        const tokenDecimals = formData.token === 'DAI' ? 18 : (networkName === 'bnb' ? 18 : 6); 
+
+        const swapResult = await handleSwap(response.orderId, tokenAddress, formData.amount, tokenDecimals);
+        
+        if (!swapResult.success) {
+           setErrors({ submit: 'Smart contract transaction failed or was cancelled.' });
+        }
+      }
     } catch (err) {
       console.error('Submission error:', err);
       setErrors({ submit: err?.message || 'Network error. Please try again.' });
@@ -292,10 +323,10 @@ function SwapForm() {
 
             <button 
               type="submit"
-              disabled={submitting}
+              disabled={submitting || isProcessing}
               className="w-full py-4 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold text-lg shadow-lg shadow-blue-500/25 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {submitting ? 'Processing...' : 'Confirm Details'}
+              {submitting || isProcessing ? 'Processing Transaction...' : 'Confirm Details'}
             </button>
             
           </form>

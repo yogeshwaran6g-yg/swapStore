@@ -43,7 +43,12 @@ app.use((err, _req, res, _next) => {
   res.status(err.status || 500).json({ error: err.message || "Internal Server Error" });
 });
 
+import { startContractListeners } from './services/contractListener.js';
+
 // ── Start server ───────────────────────────────────────────
 server.listen(PORT, () => {
   console.log(`✅ Server listening on http://localhost:${PORT}`);
+  
+  // Start Blockchain Event Listeners
+  startContractListeners();
 });

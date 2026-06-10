@@ -27,3 +27,6 @@ setup db and server to initiate user and form
 
 db done,set ip done ,fend core folders and context api service hook
 
+contract init
+db seed init
+
