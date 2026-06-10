@@ -21,16 +21,18 @@ export function TokenBalanceCard({
 }) {
   return (
     <div
-      className={`bg-zinc-800/50 p-4 rounded-lg flex flex-col items-center justify-center border ${borderColor} transition-all duration-300 hover:bg-zinc-800/80 hover:scale-[1.02]`}
+      className={`bg-white/[0.02] backdrop-blur-md p-5 rounded-2xl flex flex-col items-center justify-center border ${borderColor} transition-all duration-300 hover:bg-white/[0.05] hover:shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:-translate-y-1 group`}
     >
-      <span className="text-zinc-400 text-sm mb-1">{networkName}</span>
+      <span className="text-zinc-500 text-xs font-semibold uppercase tracking-widest mb-2 group-hover:text-zinc-400 transition-colors">{networkName}</span>
       {isLoading ? (
-        <div className="animate-pulse h-8 w-24 bg-zinc-700 rounded mt-1"></div>
+        <div className="animate-pulse h-10 w-28 bg-white/5 rounded-lg mt-1"></div>
       ) : (
-        <span className="text-2xl font-bold text-white">
-          {Number(balance).toFixed(2)}{' '}
-          <span className={`${accentColor} text-lg`}>{tokenSymbol}</span>
-        </span>
+        <div className="flex items-baseline gap-2">
+          <span className="text-3xl font-extrabold text-white tracking-tight">
+            {Number(balance).toFixed(2)}
+          </span>
+          <span className={`${accentColor} text-lg font-bold opacity-90`}>{tokenSymbol}</span>
+        </div>
       )}
     </div>
   );
