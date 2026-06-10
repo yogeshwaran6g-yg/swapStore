@@ -70,13 +70,13 @@ require(!processedRequestIds[requestId], "Request exists");
 processedRequestIds[requestId] = true;
 
 
-db changes
+changes
 1.the swap order is ok but the status need to update like user_crypto_payment_status (initited /created, success/completed/paid, failed)
 2. the admin payment id add feature and status update like admin_inr_payment_status()
 3.befoe update user crypto status check the tx hash that is actual admin wallet 
 
-2.the db stores the token address only wont stores the token symbol and also the for makes multiple submit make that to single update
-
+3.the db stores the token address only wont stores the token symbol and also the for makes multiple submit make that to single update
+4.remove etherium from the listner 
 
 
 We need to add a blockchain confirmation waiting period before marking a crypto deposit as received.
