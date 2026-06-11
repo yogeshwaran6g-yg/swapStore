@@ -15,6 +15,8 @@ function ProtectedRoute({ redirectTo = "/" }) {
     );
   }
 
+  
+
   return isAuthenticated ? <Outlet /> : <Navigate to={redirectTo} replace />;
 }
 

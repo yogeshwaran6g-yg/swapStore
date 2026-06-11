@@ -12,7 +12,7 @@ function AppRoutes() {
       <Route path="/" element={<Home />} />
 
       {/* Protected routes */}
-      <Route element={<ProtectedRoute />}>
+      <Route element={<ProtectedRoute  />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/swap" element={<SwapForm />} />
         <Route path="/kyc" element={<KYCForm />} />

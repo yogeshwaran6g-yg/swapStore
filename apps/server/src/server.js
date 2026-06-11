@@ -5,8 +5,9 @@ import cors from "cors";
 import morgan from "morgan";
 import { createServer } from "http";
 import ratesRouter from './routes/rates.js';
-import userRoutes from './routes/userRoutes.js';
+import userRoutes from './routes/authRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import swapRoutes from './routes/swapRoutes.js';
 
 const app = express();
 const server = createServer(app);
@@ -27,6 +28,7 @@ app.get("/", (_req, res) => {
 app.use('/api/v1/rates', ratesRouter);
 app.use('/api/v1/auth', userRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/swap', swapRoutes);
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", uptime: process.uptime() });
@@ -48,7 +50,7 @@ import { startContractListeners } from './services/contractListener.js';
 // ── Start server ───────────────────────────────────────────
 server.listen(PORT, () => {
   console.log(`✅ Server listening on http://localhost:${PORT}`);
-  
+
   // Start Blockchain Event Listeners
   startContractListeners();
 });

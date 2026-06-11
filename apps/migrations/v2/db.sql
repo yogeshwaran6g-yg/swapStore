@@ -4,22 +4,18 @@ CREATE TABLE users (
     email VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
     wallet_address VARCHAR(100),
-
     email_verified TINYINT(1) NOT NULL DEFAULT 0,
     phone_verified TINYINT(1) NOT NULL DEFAULT 0,
-
-    username VARCHAR(50),
-    
+    username VARCHAR(50),    
     kyc_status ENUM(
         'pending',
         'submitted',
         'approved',
         'rejected'
     ) DEFAULT 'pending',
-
     is_blocked TINYINT(1) NOT NULL DEFAULT 0,
     last_login_at TIMESTAMP NULL,
-
+    
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         ON UPDATE CURRENT_TIMESTAMP,
