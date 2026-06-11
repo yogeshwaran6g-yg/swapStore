@@ -9,9 +9,9 @@ export const fetchRates = async () => {
   try {
 
     const response = await apiClient.get(endpoints.RATES.list);
-    return response;
+    return response.rates;
   } catch (err) {
-    console.log("something went wrong unable to getRates", err.messaeg)
-    toast.err("something went wrong unable to getRates");
+    console.log("something went wrong unable to getRates", err.message)
+    toast.error("something went wrong unable to getRates");
   }
 };

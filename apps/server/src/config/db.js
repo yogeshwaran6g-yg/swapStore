@@ -7,8 +7,13 @@ const pool = mysql.createPool({
     user: env.dbUser,
     database: env.dbName,
     password: env.dbPassword,
-    port: env.dbPort
-})
+    port: env.dbPort,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 10000
+});
 
 pool.getConnection()
     .then(connection => {
@@ -23,10 +28,10 @@ pool.getConnection()
 export const queryRunner = async function (query, values = []) {
     try {
         const [rows] = await pool.query(query, values)
-        return rows?rows:null;
+        return rows ? rows : null;
 
     } catch (err) {
         console.log(err.message)
-        return null
+        throw err
     }
 }

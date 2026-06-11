@@ -1,17 +1,18 @@
 import { getExchangeRates, updateRate as updateRateService } from '../services/rateService.js';
+import { returnResponse } from '../utils/responseUtils.js';
 
 export const fetchRates = async (req, res) => {
   try {
     const result = await getExchangeRates();
 
     if (result.success) {
-      res.json(result.rates);
+      return returnResponse(res, 200, true, 'Rates fetched successfully', { rates: result.rates });
     } else {
-      res.status(500).json({ error: 'Failed to fetch exchange rates' });
+      return returnResponse(res, 500, false, 'Failed to fetch exchange rates', null, result.error);
     }
   } catch (error) {
     console.error('Error in fetchRates controller:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    return returnResponse(res, 500, false, 'Internal Server Error', null, error.message);
   }
 };
 
@@ -21,18 +22,18 @@ export const updateRate = async (req, res) => {
     const adminId = req.user?.id; // Set by adminAuthMiddleware
 
     if (!tokenSymbol || !inrRate) {
-      return res.status(400).json({ error: 'tokenSymbol and inrRate are required' });
+      return returnResponse(res, 400, false, 'tokenSymbol and inrRate are required');
     }
 
     const result = await updateRateService(tokenSymbol, network, inrRate, adminId);
 
     if (result.success) {
-      res.json({ message: 'Rate updated successfully' });
+      return returnResponse(res, 200, true, 'Rate updated successfully');
     } else {
-      res.status(500).json({ error: 'Failed to update rate' });
+      return returnResponse(res, 500, false, 'Failed to update rate', null, result.error);
     }
   } catch (error) {
     console.error('Error in updateRate controller:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    return returnResponse(res, 500, false, 'Internal Server Error', null, error.message);
   }
 };

@@ -5,13 +5,14 @@ import { useRates } from '@/hooks/useRates';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useSubmitSwap } from '@/hooks/useSubmitSwap';
 import { useSmartContractSwap } from '@/hooks/useSmartContractSwap';
-import { useAccount } from 'wagmi';
+import { useAccount, useSwitchChain } from 'wagmi';
 import { USDT_ADDRESSES, USDC_ADDRESSES, DAI_ADDRESSES } from '@/config/constants';
 import Navbar from '@/components/ui/Navbar';
 
 function SwapForm() {
   const { isAuthenticated, address } = useAuth();
   const { chain } = useAccount();
+  const { chains, switchChain, isPending: isSwitching } = useSwitchChain();
   const navigate = useNavigate();
 
   const { rates, isLoading: loadingRates } = useRates();
@@ -31,6 +32,30 @@ function SwapForm() {
 
   const [showBankForm, setShowBankForm] = useState(false);
   const [errors, setErrors] = useState({});
+
+  const networkName = chain?.id === 56 || chain?.name?.toLowerCase().includes('bsc') ? 'bnb' : 'polygon';
+
+  // Find all tokens that are supported on the current network
+  const availableTokens = React.useMemo(() => {
+    if (!rates) return ['USDT', 'USDC', 'DAI'];
+    const tokens = new Set();
+    Object.keys(rates).forEach(key => {
+      if (key.endsWith(`_${networkName}`)) {
+        tokens.add(key.split('_')[0]);
+      } else if (!key.includes('_')) {
+        tokens.add(key);
+      }
+    });
+    if (tokens.size === 0) return ['USDT', 'USDC', 'DAI'];
+    return Array.from(tokens);
+  }, [rates, networkName]);
+
+  // Ensure selected token is valid for network
+  useEffect(() => {
+    if (!availableTokens.includes(formData.token)) {
+      setFormData(prev => ({ ...prev, token: availableTokens[0] }));
+    }
+  }, [availableTokens, formData.token]);
 
   useEffect(() => {
     if (!isAuthenticated) navigate('/');
@@ -87,7 +112,6 @@ function SwapForm() {
     if (!validateForm()) return;
 
     let tokenAddress = '';
-    const networkName = chain?.id === 56 || chain?.name?.toLowerCase().includes('bsc') ? 'bnb' : 'polygon';
     
     if (formData.token === 'USDT') tokenAddress = USDT_ADDRESSES[networkName];
     if (formData.token === 'USDC') tokenAddress = USDC_ADDRESSES[networkName];
@@ -98,22 +122,28 @@ function SwapForm() {
       return;
     }
     try {
-      const response = await submitSwap({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        account_no: formData.account_no,
-        ifsc: formData.ifsc.toUpperCase(),
+      const payload = {
         tokenAddress: tokenAddress,
+        tokenSymbol: formData.token,
         amount: formData.amount,
         network: chain?.name || 'Unknown'
-      });
+      };
 
-      if (response && response.orderId) {
-        // Decide decimals based on token & network. (Simplification: DAI is 18, BSC USDT/USDC is 18, Polygon USDT/USDC is 6)
-        const tokenDecimals = formData.token === 'DAI' ? 18 : (networkName === 'bnb' ? 18 : 6); 
+      // Only send bank details if the user isn't an existing user OR they chose to fill the form
+      if (!isExistingUser || showBankForm) {
+        payload.name = formData.name;
+        payload.email = formData.email;
+        payload.phone = formData.phone;
+        payload.account_no = formData.account_no;
+        payload.ifsc = formData.ifsc.toUpperCase();
+      }
 
-        const swapResult = await handleSwap(response.orderId, tokenAddress, formData.amount, tokenDecimals);
+      const response = await submitSwap(payload);
+      
+      const orderId = response?.data?.orderId || response?.orderId;
+
+      if (orderId) {
+        const swapResult = await handleSwap(orderId, tokenAddress, formData.amount);
         
         if (!swapResult.success) {
            setErrors({ submit: 'Smart contract transaction failed or was cancelled.' });
@@ -124,7 +154,8 @@ function SwapForm() {
     }
   };
 
-  const currentRate = rates[formData.token] || 0;
+  const rateKey = rates[`${formData.token}_${networkName}`] !== undefined ? `${formData.token}_${networkName}` : formData.token;
+  const currentRate = rates[rateKey] || 0;
   const inrValue = (Number(formData.amount || 0) * currentRate).toFixed(2);
 
   if (submitSuccess) {
@@ -189,7 +220,30 @@ function SwapForm() {
                     <h3 className="text-xl font-bold text-white tracking-wide">Swap Details</h3>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div>
+                      <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Network</label>
+                      <div className="relative">
+                        <select 
+                          value={chain?.id || ''}
+                          onChange={(e) => switchChain({ chainId: Number(e.target.value) })}
+                          disabled={isSwitching}
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:bg-black/60 transition-all appearance-none"
+                        >
+                          {chains.map((c) => (
+                            <option key={c.id} value={c.id}>{c.name}</option>
+                          ))}
+                        </select>
+                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
+                          {isSwitching ? (
+                             <div className="w-4 h-4 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin"></div>
+                          ) : (
+                             <svg className="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
                     <div>
                       <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Select Asset</label>
                       <div className="relative">
@@ -199,9 +253,9 @@ function SwapForm() {
                           onChange={handleChange}
                           className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:bg-black/60 transition-all appearance-none"
                         >
-                          <option value="USDT">USDT (Tether)</option>
-                          <option value="USDC">USDC (USD Coin)</option>
-                          <option value="DAI">DAI (Dai Stablecoin)</option>
+                          {availableTokens.map(token => (
+                            <option key={token} value={token}>{token}</option>
+                          ))}
                         </select>
                         <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
                           <svg className="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>

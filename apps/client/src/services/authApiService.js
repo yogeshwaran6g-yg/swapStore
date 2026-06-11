@@ -13,7 +13,10 @@ export const walletLogin = async (address) => {
     const response = await apiClient.post(endpoints.AUTH.walletLogin, { address });
     return response;
   } catch (err) {
-    console.log("something went wrong, unable to login using wallet", err)
-    toast.err("something went wrong, unable to login using wallet")
+    const message = err?.response?.data?.error || 'Unable to login using wallet';
+    console.error("Wallet login failed:", message);
+    toast.error(message);
+    throw err;
   }
 };
+

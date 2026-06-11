@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import { queryRunner } from '../config/db.js';
 import env from '../config/env.js';
+import { returnServiceResponse } from '../utils/responseUtils.js';
 
 /**
  * Save bank details for an EXISTING user (already created via wallet login).
@@ -10,11 +11,15 @@ import env from '../config/env.js';
 export const saveBankDetails = async (userUid, { email, phone, account_no, name, ifsc }) => {
   try {
     // 1. Update the existing user's profile info
-    await queryRunner(
+    const updateResult = await queryRunner(
       `UPDATE users SET email = ?, phone = ?, username = ?, updated_at = CURRENT_TIMESTAMP
        WHERE uid = UNHEX(?)`,
       [email || null, phone, name, userUid]
     );
+
+    if (!updateResult || updateResult.affectedRows === 0) {
+      return returnServiceResponse(false, null, 'User not found for profile update');
+    }
 
     // 2. Check if bank account already exists for this user
     const existingBank = await queryRunner(
@@ -22,29 +27,37 @@ export const saveBankDetails = async (userUid, { email, phone, account_no, name,
       [userUid]
     );
 
-    if (existingBank && existingBank.length > 0) {
+    if (Array.isArray(existingBank) && existingBank.length > 0) {
       // Update existing bank details
-      await queryRunner(
+      const bankUpdate = await queryRunner(
         `UPDATE user_bank_accounts 
          SET account_holder_name = ?, account_number = ?, ifsc_code = ?, updated_at = CURRENT_TIMESTAMP
          WHERE user_uid = UNHEX(?)`,
         [name, account_no, ifsc, userUid]
       );
+
+      if (!bankUpdate || bankUpdate.affectedRows === 0) {
+        return returnServiceResponse(false, null, 'Failed to update bank details');
+      }
     } else {
       // Insert new bank account
       const bankIdStr = uuidv4();
       const hexBankId = bankIdStr.replace(/-/g, '');
-      await queryRunner(
+      const bankInsert = await queryRunner(
         `INSERT INTO user_bank_accounts (uid, user_uid, account_holder_name, account_number, ifsc_code, bank_name)
          VALUES (UNHEX(?), UNHEX(?), ?, ?, ?, ?)`,
         [hexBankId, userUid, name, account_no, ifsc, 'Unknown']
       );
+
+      if (!bankInsert || bankInsert.affectedRows === 0) {
+        return returnServiceResponse(false, null, 'Failed to insert bank details');
+      }
     }
 
-    return { success: true };
+    return returnServiceResponse(true);
   } catch (error) {
     console.error('Error in saveBankDetails service:', error);
-    return { success: false, error: error.message };
+    return returnServiceResponse(false, null, error.message);
   }
 };
 
@@ -60,13 +73,17 @@ export const getUserByWallet = async (walletAddress) => {
     `;
     const rows = await queryRunner(userQuery, [walletAddress]);
 
-    if (rows && rows.length > 0) {
-      return { success: true, user: rows[0] };
+    if (!Array.isArray(rows)) {
+      return returnServiceResponse(false, null, 'Invalid query result');
     }
-    return { success: true, user: null };
+
+    if (rows.length > 0) {
+      return returnServiceResponse(true, { user: rows[0] });
+    }
+    return returnServiceResponse(true, { user: null });
   } catch (error) {
     console.error('Error in getUserByWallet service:', error);
-    return { success: false, error: error.message };
+    return returnServiceResponse(false, null, error.message);
   }
 };
 
@@ -83,13 +100,14 @@ export const getUserByUid = async (uid) => {
     `;
     const rows = await queryRunner(userQuery, [uid]);
 
-    if (rows && rows.length > 0) {
-      return { success: true, user: rows[0] };
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return returnServiceResponse(false, null, 'User not found');
     }
-    return { success: true, user: null };
+
+    return returnServiceResponse(true, { user: rows[0] });
   } catch (error) {
     console.error('Error in getUserByUid service:', error);
-    return { success: false, error: error.message };
+    return returnServiceResponse(false, null, error.message);
   }
 };
 
@@ -101,67 +119,91 @@ export const loginOrSignupByWallet = async (walletAddress) => {
       WHERE u.wallet_address = ?
       LIMIT 1
     `;
-    let rows = await queryRunner(userQuery, [walletAddress]);
+    const rows = await queryRunner(userQuery, [walletAddress]);
+
+    if (!Array.isArray(rows)) {
+      return returnServiceResponse(false, null, 'Database query failed');
+    }
+
     let uidStr = '';
 
-    if (rows && rows.length > 0) {
-      // User exists, update last_login_at
+    if (rows.length > 0) {
       uidStr = rows[0].uid;
-      await queryRunner(
-                  `UPDATE users SET last_login_at = CURRENT_TIMESTAMP
-                   WHERE wallet_address = ?`, [walletAddress]);
+      const updateResult = await queryRunner(
+        `UPDATE users SET last_login_at = CURRENT_TIMESTAMP
+         WHERE wallet_address = ?`, [walletAddress]
+      );
+
+      if (!updateResult || updateResult.affectedRows === 0) {
+        return returnServiceResponse(false, null, 'Failed to update login timestamp');
+      }
     } else {
-      // Create new user
       const userIdStr = uuidv4();
       const hexUserId = userIdStr.replace(/-/g, '');
-      const insertQuery = `
-        INSERT INTO users (uid, email, wallet_address, last_login_at) 
-        VALUES (UNHEX(?), ?, ?, CURRENT_TIMESTAMP)
-      `;
-      // Provide a dummy email since it's NOT NULL and UNIQUE, but wait!
-      // In db.sql, email is NOT NULL and UNIQUE KEY uk_users_email.
-      // So we have to generate a dummy email if we don't have it.
-      const dummyEmail = `${userIdStr}@wallet.local`;
-      await queryRunner(insertQuery, [hexUserId, dummyEmail, walletAddress]);
+      const dummyEmail = `${walletAddress}@swapstore.local`;
+
+      const insertResult = await queryRunner(
+        `INSERT INTO users (uid, email, wallet_address, last_login_at) 
+         VALUES (UNHEX(?), ?, ?, CURRENT_TIMESTAMP)`,
+        [hexUserId, dummyEmail, walletAddress]
+      );
+
+      if (!insertResult || insertResult.affectedRows === 0) {
+        return returnServiceResponse(false, null, 'Failed to create new user');
+      }
+
       uidStr = hexUserId;
     }
 
-    // Generate JWT
     const token = jwt.sign(
       { uid: uidStr, wallet_address: walletAddress },
       env.jwtSecret,
       { expiresIn: '24h' }
     );
 
-    return { success: true, token, uid: uidStr };
+    return returnServiceResponse(true, { token, uid: uidStr });
   } catch (error) {
     console.error('Error in loginOrSignupByWallet:', error);
-    return { success: false, error: error.message };
+    return returnServiceResponse(false, null, error.message);
   }
 };
 
-export const createSwapOrder = async (userUid, { tokenAddress, amount, network }) => {
+export const createSwapOrder = async (userUid, { tokenAddress, amount, network, tokenSymbol }) => {
   try {
-    const orderIdStr = uuidv4();
-    const hexOrderId = orderIdStr.replace(/-/g, '');
-    const orderIdBytes32 = '0x' + hexOrderId + '00000000000000000000000000000000'; // Make it 32 bytes for Solidity bytes32
-    
-    // We actually just need a unique 32-byte hex string. uuid without dashes is 32 chars (16 bytes). 
-    // Wait, uuid is 16 bytes. Solidity bytes32 is 32 bytes (64 hex chars).
-    // Let's use the uuid and pad it to 32 bytes (64 chars) for the frontend to use.
-    // However, the DB expects BINARY(16) for order_id. So we save the 16 byte UUID in DB,
-    // and the frontend can pad it to 32 bytes when calling the contract.
-    
-    await queryRunner(
-      `INSERT INTO swap_orders (uid, order_id, user_uid, token_address, amount, network, status)
-       VALUES (UNHEX(?), UNHEX(?), UNHEX(?), ?, ?, ?, 'pending')`,
-      [uuidv4().replace(/-/g, ''), hexOrderId, userUid, tokenAddress, amount, network]
+    // 1. Check for rate limits (no more than 5 initiated orders in the last 48 hours)
+    const pendingOrders = await queryRunner(
+      `SELECT COUNT(*) as count FROM swap_orders 
+       WHERE user_uid = UNHEX(?) 
+         AND user_crypto_payment_status = 'initiated' 
+         AND created_at >= NOW() - INTERVAL 48 HOUR`,
+      [userUid]
     );
 
+    if (pendingOrders && pendingOrders[0].count >= 5) {
+      return returnServiceResponse(false, null, 'You have too many pending swap requests. Please complete or cancel them before creating a new one.');
+    }
+
+    // 2. Generate Order IDs
+    const orderIdStr = uuidv4();
+    const hexOrderId = orderIdStr.replace(/-/g, '');
+    const orderIdBytes32 = '0x' + hexOrderId + '00000000000000000000000000000000';
+    
+    // 3. Insert order with new schema
+    const insertResult = await queryRunner(
+      `INSERT INTO swap_orders (uid, order_id, user_uid, token_address, token_symbol, amount, network, user_crypto_payment_status, admin_inr_payment_status)
+       VALUES (UNHEX(?), UNHEX(?), UNHEX(?), ?, ?, ?, ?, 'initiated', 'pending')`,
+      [uuidv4().replace(/-/g, ''), hexOrderId, userUid, tokenAddress, tokenSymbol || null, amount, network]
+    );
+
+    if (!insertResult || insertResult.affectedRows === 0) {
+      return returnServiceResponse(false, null, 'Failed to insert swap order');
+    }
+
     // Return the bytes32 formatted orderId for the smart contract
-    return { success: true, orderId: orderIdBytes32 };
+    return returnServiceResponse(true, { orderId: orderIdBytes32 });
   } catch (error) {
     console.error('Error in createSwapOrder:', error);
-    return { success: false, error: error.message };
+    return returnServiceResponse(false, null, error.message);
   }
 };
+

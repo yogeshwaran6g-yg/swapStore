@@ -65,8 +65,8 @@ export const erc20Abi = [
 ];
 
 export const GATEWAY_ADDRESSES = {
-  bnb: import.meta.env.VITE_GATEWAY_BSC || '0x0000000000000000000000000000000000000001',
-  polygon: import.meta.env.VITE_GATEWAY_POLYGON || '0x0000000000000000000000000000000000000002',
+  bnb: import.meta.env.VITE_GATEWAY_BSC ||         '0xE6c3d9faeB15e97EA8d12434B638b11e17eB3425',
+  polygon: import.meta.env.VITE_GATEWAY_POLYGON || '0x901e857B3d9EB2B180970A1105330EF43F4a9eF2',
 };
 
 export const swapGatewayAbi = [
@@ -94,6 +94,6 @@ export const endpoints = {
     list: '/api/v1/rates',
   },
   SWAP: {
-    submit: '/api/v1/auth/swap-form',
+    submit: '/api/v1/swap/swap-form',
   },
 };

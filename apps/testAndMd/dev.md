@@ -72,11 +72,18 @@ processedRequestIds[requestId] = true;
 
 changes
 1.the swap order is ok but the status need to update like user_crypto_payment_status (initited /created, success/completed/paid, failed)
-2. the admin payment id add feature and status update like admin_inr_payment_status()
-3.befoe update user crypto status check the tx hash that is actual admin wallet 
+2. the admin payment status add new column in swap_order table update like admin_inr_payment_status()
+3.befoe update user crypto status check the tx hash that is actual contract admin wallet transfer or any other wallet or any other 
 
-3.the db stores the token address only wont stores the token symbol and also the for makes multiple submit make that to single update
-4.remove etherium from the listner 
+3.the db stores the token address only wont stores the token symbol and a
+<!-- 5.add bank_details staus on user table like kyc_bank_details  status () -->
+
+
+6.if the  user has more then 5 pending swaprequest with in two 48 hours reject them
+
+
+
+
 
 
 We need to add a blockchain confirmation waiting period before marking a crypto deposit as received.
@@ -165,3 +172,8 @@ completed:
 * Order is fully settled.
 
 This confirmation waiting period provides additional protection against blockchain reorganizations and prevents the platform from processing deposits that are not yet considered final.
+
+
+
+used ids()
+aiusageaiusage62@gmail.com

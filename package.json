@@ -6,7 +6,8 @@
   "scripts": {
     "client": "cd apps/client && pnpm dev",
     "server": "cd apps/server && pnpm dev",
-    "admin": "cd apps/admin && pnpm dev"
+    "admin": "cd apps/admin && pnpm dev",
+    "seed": "cd apps/server && node src/scripts/seed.js"
   },
   "keywords": [],
   "author": "",

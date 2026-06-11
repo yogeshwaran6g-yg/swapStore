@@ -1,4 +1,5 @@
 import { queryRunner } from '../config/db.js';
+import { returnServiceResponse } from '../utils/responseUtils.js';
 
 export const getExchangeRates = async () => {
   try {
@@ -12,17 +13,17 @@ export const getExchangeRates = async () => {
       });
     }
 
-    return { success: true, rates: rateMap };
+    return returnServiceResponse(true, { rates: rateMap });
   } catch (error) {
     console.error('Error fetching exchange rates from db:', error);
-    return { success: false, error: error.message };
+    return returnServiceResponse(false, null, error.message);
   }
 };
 
 export const updateRate = async (tokenSymbol, network, inrRate, adminId) => {
   try {
     const net = network || 'DEFAULT';
-    await queryRunner(
+    const result = await queryRunner(
       `INSERT INTO exchange_rates (token_symbol, network, inr_rate, admin_id, updated_at) 
        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP) 
        ON DUPLICATE KEY UPDATE 
@@ -32,9 +33,13 @@ export const updateRate = async (tokenSymbol, network, inrRate, adminId) => {
       [tokenSymbol, net, inrRate, adminId]
     );
 
-    return { success: true };
+    if (!result || result.affectedRows === 0) {
+      return returnServiceResponse(false, null, 'Failed to insert or update exchange rate');
+    }
+
+    return returnServiceResponse(true);
   } catch (error) {
     console.error('Error updating exchange rate:', error);
-    return { success: false, error: error.message };
+    return returnServiceResponse(false, null, error.message);
   }
 };

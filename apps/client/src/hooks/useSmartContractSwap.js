@@ -1,6 +1,6 @@
-import { useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi';
+import { useWriteContract, useAccount, usePublicClient } from 'wagmi';
 import { erc20Abi, swapGatewayAbi, GATEWAY_ADDRESSES } from '@/config/constants';
-import { parseUnits } from 'viem';
+import { parseUnits, formatUnits } from 'viem';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 
@@ -10,46 +10,88 @@ export function useSmartContractSwap() {
   const [isSwapping, setIsSwapping] = useState(false);
 
   const { writeContractAsync: writeContract } = useWriteContract();
+  const publicClient = usePublicClient();
 
   // Helper to get gateway address for current chain
   const getGatewayAddress = () => {
     if (!chain) return null;
     if (chain.id === 56 || chain.name.toLowerCase().includes('bsc') || chain.name.toLowerCase().includes('bnb')) return GATEWAY_ADDRESSES.bnb;
     if (chain.id === 137 || chain.name.toLowerCase().includes('polygon')) return GATEWAY_ADDRESSES.polygon;
-    return null; // Unsupported chain for now
+    return null;
   };
 
-  const handleSwap = async (orderIdBytes32, tokenAddress, amount, tokenDecimals) => {
+  const handleSwap = async (orderIdBytes32, tokenAddress, amount) => {
     const gatewayAddress = getGatewayAddress();
     if (!gatewayAddress) {
       toast.error('Unsupported network for swap');
       return { success: false };
     }
 
-    try {
-      const amountInWei = parseUnits(amount.toString(), tokenDecimals);
+    if (!publicClient) {
+      toast.error('Network client not ready. Please try again.');
+      return { success: false };
+    }
 
-      // 1. Approve Token
-      setIsApproving(true);
-      toast.loading('Approving tokens...', { id: 'approve' });
-      
-      const approveTxHash = await writeContract({
+    try {
+      // 1. Read decimals from the token contract
+      const tokenDecimals = await publicClient.readContract({
         address: tokenAddress,
         abi: erc20Abi,
-        functionName: 'approve',
-        args: [gatewayAddress, amountInWei],
+        functionName: 'decimals',
       });
 
-      toast.loading('Waiting for approval confirmation...', { id: 'approve' });
-      // We would ideally wait for receipt here, but viem handles it if we use public client.
-      // For simplicity in UI, we just wait a couple seconds or rely on the wallet to sequence it.
-      // In a production app, we should use publicClient.waitForTransactionReceipt
-      toast.success('Approved successfully!', { id: 'approve' });
-      setIsApproving(false);
+      const amountInWei = parseUnits(amount.toString(), tokenDecimals);
 
-      // 2. Execute Swap
+      // 2. Check user's token balance
+      const balance = await publicClient.readContract({
+        address: tokenAddress,
+        abi: erc20Abi,
+        functionName: 'balanceOf',
+        args: [address],
+      });
+
+      if (balance < amountInWei) {
+        const readableBalance = formatUnits(balance, tokenDecimals);
+        toast.error(
+          `Insufficient token balance. You have ${readableBalance} but need ${amount}.`,
+          { id: 'approve', duration: 5000 }
+        );
+        return { success: false };
+      }
+
+      // 3. Check existing allowance — skip approve if already sufficient
+      const currentAllowance = await publicClient.readContract({
+        address: tokenAddress,
+        abi: erc20Abi,
+        functionName: 'allowance',
+        args: [address, gatewayAddress],
+      });
+
+      if (currentAllowance < amountInWei) {
+        // Approve tokens
+        setIsApproving(true);
+        toast.loading('Approving tokens...', { id: 'approve' });
+
+        const approveTxHash = await writeContract({
+          address: tokenAddress,
+          abi: erc20Abi,
+          functionName: 'approve',
+          args: [gatewayAddress, amountInWei],
+        });
+
+        // Wait for approval to be confirmed on-chain
+        toast.loading('Waiting for approval confirmation...', { id: 'approve' });
+        await publicClient.waitForTransactionReceipt({ hash: approveTxHash });
+
+        toast.success('Approved successfully!', { id: 'approve' });
+        setIsApproving(false);
+      } else {
+        toast.success('Allowance already sufficient, skipping approval.', { id: 'approve', duration: 2000 });
+      }
+
+      // 4. Execute Swap
       setIsSwapping(true);
-      toast.loading('Executing swap initiation...', { id: 'swap' });
+      toast.loading('Executing swap...', { id: 'swap' });
 
       const swapTxHash = await writeContract({
         address: gatewayAddress,
@@ -58,9 +100,13 @@ export function useSmartContractSwap() {
         args: [orderIdBytes32, tokenAddress, amountInWei],
       });
 
-      toast.success('Swap transaction submitted!', { id: 'swap' });
+      // Wait for swap tx confirmation
+      toast.loading('Waiting for swap confirmation...', { id: 'swap' });
+      await publicClient.waitForTransactionReceipt({ hash: swapTxHash });
+
+      toast.success('Swap confirmed on-chain!', { id: 'swap' });
       setIsSwapping(false);
-      
+
       return { success: true, txHash: swapTxHash };
 
     } catch (error) {
