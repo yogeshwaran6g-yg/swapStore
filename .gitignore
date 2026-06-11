@@ -28,3 +28,6 @@ build/
 *.sln
 *.sw?
 *.local
+
+# PM2
+ecosystem.config.cjs
