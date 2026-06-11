@@ -132,8 +132,8 @@ module.exports = {
     {
       name: 'swapstore-client',
       cwd: '${ROOT_DIR}/apps/client',
-      script: 'node_modules/.bin/serve',
-      args: 'dist -l ${CLIENT_PORT} -s',
+      script: 'npx',
+      args: 'serve dist -l ${CLIENT_PORT} -s',
       env: {
         NODE_ENV: 'production',
       },
