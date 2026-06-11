@@ -42,6 +42,45 @@ export const erc20Abi = [
     outputs: [{ name: '', type: 'uint8' }],
     type: 'function',
   },
+  {
+    constant: false,
+    inputs: [
+      { name: 'spender', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ name: '', type: 'bool' }],
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' },
+    ],
+    name: 'allowance',
+    outputs: [{ name: '', type: 'uint256' }],
+    type: 'function',
+  },
+];
+
+export const GATEWAY_ADDRESSES = {
+  bnb: import.meta.env.VITE_GATEWAY_BSC || '0x0000000000000000000000000000000000000001',
+  polygon: import.meta.env.VITE_GATEWAY_POLYGON || '0x0000000000000000000000000000000000000002',
+};
+
+export const swapGatewayAbi = [
+  {
+    inputs: [
+      { internalType: 'bytes32', name: 'orderId', type: 'bytes32' },
+      { internalType: 'address', name: 'token', type: 'address' },
+      { internalType: 'uint256', name: 'amount', type: 'uint256' }
+    ],
+    name: 'swap',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
+  }
 ];
 
 

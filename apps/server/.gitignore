@@ -15,5 +15,7 @@ npm-debug.log*
 dist/
 build/
 
+package-lock.json
+
 # OS files
 .DS_Store
