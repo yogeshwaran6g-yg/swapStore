@@ -20,7 +20,7 @@ export const USDC_ADDRESSES = {
 
 
 export const DAI_ADDRESSES = {
-  bnb: '0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3',
+  bnb:     '0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3',
   polygon: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'
 };
 
@@ -95,5 +95,10 @@ export const endpoints = {
   },
   SWAP: {
     submit: '/api/v1/swap/swap-form',
+  },
+  LOAN: {
+    kyc: '/api/v1/loan/kyc',
+    request: '/api/v1/loan/request',
+    myLoans: '/api/v1/loan/my-loans',
   },
 };

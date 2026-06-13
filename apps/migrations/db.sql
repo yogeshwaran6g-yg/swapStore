@@ -98,3 +98,39 @@ CREATE TABLE IF NOT EXISTS swap_orders (
     KEY idx_swap_status (user_crypto_payment_status),
     KEY idx_swap_order_id (order_id)
 ) ENGINE=InnoDB;
+
+
+CREATE TABLE IF NOT EXISTS system_settings (
+    setting_key VARCHAR(50) PRIMARY KEY,
+    setting_value VARCHAR(255) NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+INSERT IGNORE INTO system_settings (setting_key, setting_value) VALUES ('loan_interest_rate', '5.0');
+
+CREATE TABLE IF NOT EXISTS kyc_documents (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_uid BINARY(16) NOT NULL,
+    document_type VARCHAR(50) NOT NULL,
+    document_url VARCHAR(255) NOT NULL,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_kyc_user FOREIGN KEY (user_uid) REFERENCES users(uid) ON DELETE CASCADE,
+    KEY idx_kyc_user (user_uid)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS loans (
+    uid BINARY(16) PRIMARY KEY,
+    user_uid BINARY(16) NOT NULL,
+    loan_id BINARY(32) UNIQUE,
+    principal_amount DECIMAL(36, 18) NOT NULL,
+    interest_rate DECIMAL(5, 2) NOT NULL,
+    status ENUM('pending', 'approved', 'rejected', 'closed') DEFAULT 'pending',
+    next_debit_date TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_loan_user FOREIGN KEY (user_uid) REFERENCES users(uid) ON DELETE CASCADE,
+    KEY idx_loan_user (user_uid),
+    KEY idx_loan_status (status)
+) ENGINE=InnoDB;

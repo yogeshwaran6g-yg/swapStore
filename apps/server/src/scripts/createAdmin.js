@@ -5,7 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
+dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
 
 async function createAdmin() {
   const connection = await mysql.createConnection({
@@ -17,18 +17,21 @@ async function createAdmin() {
   });
 
   const username = 'admin';
-  const password = 'password123';
+  const password = 'admin123';
   const hash = await bcrypt.hash(password, 10);
 
   try {
-    await connection.query('INSERT INTO admins (username, password_hash) VALUES (?, ?)', [username, hash]);
-    console.log('Admin user created successfully! Username: admin, Password: password123');
-  } catch (err) {
-    if (err.code === 'ER_DUP_ENTRY') {
-      console.log('Admin user already exists.');
+    // Check if exists first to update, or insert
+    const [rows] = await connection.query('SELECT id FROM admins WHERE username = ?', [username]);
+    if (rows.length > 0) {
+      await connection.query('UPDATE admins SET password_hash = ? WHERE username = ?', [hash, username]);
+      console.log('Admin user updated successfully! Username: admin, Password: admin123');
     } else {
-      console.error('Error creating admin user:', err);
+      await connection.query('INSERT INTO admins (username, password_hash) VALUES (?, ?)', [username, hash]);
+      console.log('Admin user created successfully! Username: admin, Password: admin123');
     }
+  } catch (err) {
+    console.error('Error creating/updating admin user:', err);
   }
 
   await connection.end();
