@@ -7,7 +7,6 @@ import WalletConnect from '@/components/WalletConnect';
 import UsdtBalance from '@/components/UsdtBalance';
 import UsdcBalance from '@/components/UsdcBalance';
 import DaiBalance from '@/components/DaiBalance';
-import Navbar from '@/components/ui/Navbar';
 
 function Home() {
   const { isConnected: isWalletConnected } = useAccount();
@@ -22,15 +21,15 @@ function Home() {
 
   return (
     <div className="w-full bg-[#06060c] text-white overflow-x-hidden">
-      
-        {/* --- HERO SECTION --- */}
-      <section 
+
+      {/* --- HERO SECTION --- */}
+      <section
         className="min-h-screen flex flex-col relative overflow-hidden"
-        style={{ 
-          backgroundImage: 'url(/bg-landing.png)', 
-          backgroundSize: 'cover', 
-          backgroundPosition: 'center', 
-          backgroundAttachment: 'fixed' 
+        style={{
+          backgroundImage: 'url(/bg-landing.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
         }}
       >
         {/* Dark overlay */}
@@ -43,10 +42,10 @@ function Home() {
         {/* Main Hero Container */}
         <div className="container mx-auto px-6 lg:px-12 relative z-10 flex-1 flex flex-col justify-center pt-32 pb-12">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            
+
             {/* Left Column */}
             <div className="flex flex-col text-left space-y-8">
-              
+
               {/* Badge */}
               <div className="inline-block px-4 py-1.5 rounded-full border border-purple-500/30 text-[#ff4dff] text-xs font-bold tracking-widest uppercase w-max bg-purple-500/10">
                 NEXT-GEN DEFI PROTOCOL
@@ -56,7 +55,7 @@ function Home() {
               <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-[5.5rem] font-bold tracking-tight leading-[1.05]">
                 Swap Tokens <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0099ff] to-[#4da6ff]">
-                  Without 
+                  Without
                 </span>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-white ml-3 sm:ml-4">
                   Limits.
@@ -65,7 +64,7 @@ function Home() {
 
               {/* Subtitle */}
               <p className="text-zinc-400 text-lg sm:text-xl font-light leading-relaxed max-w-lg">
-                Access deep liquidity, track your multi-chain assets instantly, and execute lightning-fast trades. <br/>
+                Access deep liquidity, track your multi-chain assets instantly, and execute lightning-fast trades. <br />
                 Welcome to the future of decentralized finance.
               </p>
 
@@ -74,8 +73,8 @@ function Home() {
                 <div className="w-full sm:w-auto [&>button]:w-full [&>button]:py-3.5 [&>button]:px-8 [&>button]:rounded-xl [&>button]:bg-gradient-to-r [&>button]:from-[#7b3fe4] [&>button]:to-[#9853f0] [&>button]:text-white [&>button]:font-bold [&>button]:text-base [&>button]:shadow-[0_0_20px_rgba(123,63,228,0.4)]">
                   <WalletConnect />
                 </div>
-                
-                <button 
+
+                <button
                   onClick={() => navigate('/swap')}
                   className="w-full sm:w-auto py-3.5 px-8 rounded-xl bg-transparent border border-white/10 hover:bg-white/5 text-white font-semibold text-base transition-colors flex items-center justify-center gap-3 group"
                 >
@@ -106,12 +105,12 @@ function Home() {
 
             {/* Right Column: 3D Graphic and Portfolio */}
             <div className="relative w-full h-full min-h-[400px] flex items-center justify-center lg:justify-end">
-              
+
               {/* Floating 3D Graphic */}
               <div className={`absolute inset-0 flex items-center justify-center lg:justify-end transition-all duration-1000 ease-in-out pointer-events-none ${isWalletConnected ? 'opacity-20 scale-90 translate-x-8' : 'opacity-100 scale-100'}`}>
-                <img 
-                  src="/hero-graphic.png" 
-                  alt="DeFi Graphic" 
+                <img
+                  src="/hero-graphic.png"
+                  alt="DeFi Graphic"
                   className="w-full max-w-[550px] xl:max-w-[700px] object-contain animate-[pulse_4s_ease-in-out_infinite] mix-blend-screen lg:-translate-x-8"
                   style={{ filter: 'drop-shadow(0 0 40px rgba(123,63,228,0.4))' }}
                 />
@@ -124,7 +123,7 @@ function Home() {
         <div className="container mx-auto px-6 lg:px-12 relative z-10 pb-8">
           <div className="w-full backdrop-blur-xl bg-[#0a0a14]/60 border border-white/10 rounded-[20px] p-5 sm:p-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-0 lg:divide-x divide-white/5">
-              
+
               {/* Stat 1 */}
               <div className="flex flex-col justify-center px-2 lg:px-6">
                 <div className="flex items-center gap-3 mb-2">
@@ -193,7 +192,7 @@ function Home() {
             <h2 className="text-3xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-zinc-400 text-transparent bg-clip-text">Why Choose SwapStore?</h2>
             <p className="text-zinc-400 text-lg max-w-2xl mx-auto">Experience the most advanced decentralized trading infrastructure designed for both beginners and pros.</p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 hover:bg-white/[0.04] transition-colors">
               <div className="w-14 h-14 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-6 border border-blue-500/30">
@@ -202,7 +201,7 @@ function Home() {
               <h3 className="text-xl font-bold mb-3">Lightning Fast</h3>
               <p className="text-zinc-400 leading-relaxed">Our optimized routing engine ensures your trades are executed instantly with the lowest possible slippage.</p>
             </div>
-            
+
             <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 hover:bg-white/[0.04] transition-colors">
               <div className="w-14 h-14 bg-purple-500/20 rounded-2xl flex items-center justify-center mb-6 border border-purple-500/30">
                 <svg className="w-7 h-7 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -210,7 +209,7 @@ function Home() {
               <h3 className="text-xl font-bold mb-3">Bank-Grade Security</h3>
               <p className="text-zinc-400 leading-relaxed">We never hold your funds. You remain in complete control of your private keys and assets at all times.</p>
             </div>
-            
+
             <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 hover:bg-white/[0.04] transition-colors">
               <div className="w-14 h-14 bg-green-500/20 rounded-2xl flex items-center justify-center mb-6 border border-green-500/30">
                 <svg className="w-7 h-7 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -229,7 +228,7 @@ function Home() {
             <div className="flex-1 space-y-8">
               <h2 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 text-transparent bg-clip-text">Start Trading in Seconds</h2>
               <p className="text-zinc-400 text-lg">No KYC, no hidden fees, and no waiting. Just connect your wallet and you are ready to explore the decentralized ecosystem.</p>
-              
+
               <div className="space-y-6">
                 <div className="flex gap-4">
                   <div className="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold flex-shrink-0 border border-blue-500/30">1</div>
@@ -254,7 +253,7 @@ function Home() {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex-1 relative">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-[3rem] blur-[80px] opacity-20"></div>
               <div className="bg-zinc-900/60 border border-white/10 p-8 rounded-[3rem] backdrop-blur-xl relative z-10 shadow-2xl">
@@ -281,7 +280,7 @@ function Home() {
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg shadow-lg shadow-blue-500/20"></div>
               <span className="text-xl font-bold tracking-wider">SwapStore</span>
             </div>
-            
+
             <div className="flex gap-8 text-sm text-zinc-500">
               <a href="#" className="hover:text-white transition-colors">Documentation</a>
               <a href="#" className="hover:text-white transition-colors">Terms of Service</a>

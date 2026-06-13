@@ -177,3 +177,17 @@ This confirmation waiting period provides additional protection against blockcha
 
 used ids()
 aiusageaiusage62@gmail.com
+
+
+
+
+
+
+loan
+transaction
+
+loan eligibility
+loan history 
+loan interest deduct 
+
+

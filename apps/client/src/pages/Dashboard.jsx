@@ -1,6 +1,5 @@
 import React from 'react';
 import { useAccount } from 'wagmi';
-import Navbar from '@/components/ui/Navbar';
 import UsdtBalance from '@/components/UsdtBalance';
 import UsdcBalance from '@/components/UsdcBalance';
 import DaiBalance from '@/components/DaiBalance';
@@ -29,7 +28,7 @@ const Dashboard = () => {
       <div className="absolute top-[-20%] right-[-10%] w-[50rem] h-[50rem] bg-indigo-600 rounded-full mix-blend-screen filter blur-[250px] opacity-20 pointer-events-none"></div>
       <div className="absolute bottom-[-20%] left-[-10%] w-[50rem] h-[50rem] bg-purple-600 rounded-full mix-blend-screen filter blur-[250px] opacity-10 pointer-events-none"></div>
 
-      <Navbar />
+      
       
       {/* Main Content Area */}
       <div className="container mx-auto px-6 lg:px-12 pt-36 pb-20 relative z-10 animate-fade-in">

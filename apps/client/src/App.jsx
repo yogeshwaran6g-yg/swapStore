@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { config } from './config/wagmi';
 import AppRoutes from "./components/routes/AppRoutes";
 import { AuthProvider } from "./context/AuthContext";
+import { LoanProvider } from "./context/LoanContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,7 +21,9 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <AuthProvider>
-            <AppRoutes />
+            <LoanProvider>
+              <AppRoutes />
+            </LoanProvider>
           </AuthProvider>
         </BrowserRouter>
       </QueryClientProvider>

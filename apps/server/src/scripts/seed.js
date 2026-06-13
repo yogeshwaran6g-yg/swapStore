@@ -31,17 +31,14 @@ const seed = async () => {
         // 3. Execute insert values
         console.log('Inserting default exchange rates...');
         await queryRunner(`
-            INSERT IGNORE INTO exchange_rates (token_symbol, network, inr_rate) VALUES
-            ('USDT', 'DEFAULT', 85.00),
-            ('USDC', 'DEFAULT', 85.00),
-            ('DAI', 'DEFAULT', 85.00),
-            ('USDT', 'bnb', 85.50),
-            ('USDC', 'bnb', 85.50),
-            ('DAI', 'bnb', 85.50),
-            ('USDT', 'polygon', 86.00),
-            ('USDC', 'polygon', 86.00),
-            ('DAI', 'polygon', 86.00)
-            ON DUPLICATE KEY UPDATE inr_rate = VALUES(inr_rate);
+            INSERT IGNORE INTO exchange_rates (token_symbol, network, inr_rate, is_active) VALUES
+            ('USDT', 'bnb', 85.50, 1),
+            ('USDC', 'bnb', 85.50, 1),
+            ('DAI', 'bnb', 85.50, 1),
+            ('USDT', 'polygon', 86.00, 1),
+            ('USDC', 'polygon', 86.00, 1),
+            ('DAI', 'polygon', 86.00, 1)
+            ON DUPLICATE KEY UPDATE inr_rate = VALUES(inr_rate), is_active = VALUES(is_active);
         `);
         console.log('Seed data inserted successfully.');
 

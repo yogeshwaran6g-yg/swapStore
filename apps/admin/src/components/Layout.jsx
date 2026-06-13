@@ -1,82 +1,98 @@
 import React from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, IndianRupee, LogOut, Menu, 
-  Users, FileText, Shield, Briefcase, UserCheck, 
-  Package, CreditCard, Activity, Award, Network,
-  Settings, Wallet, Box, Plane
+import {
+  LayoutDashboard, IndianRupee, LogOut, Menu, ArrowRightLeft, FileCheck, Landmark
 } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 const Layout = () => {
-  const navigate = useNavigate();
+  const { logout, admin } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    navigate('/login');
+    logout();
   };
 
   const navItemClass = ({ isActive }) =>
-    `flex items-center space-x-3 px-4 py-2.5 mx-2 rounded-xl transition-all duration-200 text-sm font-medium ${
-      isActive
-        ? 'bg-blue-50/80 text-blue-600'
-        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+    `flex items-center space-x-3 px-4 py-3 mx-2 rounded-xl transition-all duration-200 text-sm font-bold ${isActive
+      ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+      : 'text-zinc-500 hover:bg-zinc-800/50 hover:text-zinc-300 border border-transparent'
     }`;
 
-  const DummyLink = ({ icon: Icon, text }) => (
-    <div className="flex items-center space-x-3 px-4 py-2.5 mx-2 rounded-xl text-slate-500 text-sm font-medium cursor-not-allowed opacity-70">
-      <Icon size={18} strokeWidth={1.5} />
-      <span>{text}</span>
-    </div>
-  );
-
   return (
-    <div className="flex h-screen bg-[#f4f7fb] text-slate-800 font-sans overflow-hidden">
+    <div className="flex h-screen bg-zinc-950 text-zinc-100 font-sans overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-[260px] bg-white border-r border-slate-100 flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-10 flex-shrink-0">
-        <div className="h-16 flex items-center px-6">
-          <div className="flex items-center">
-            <span className="text-xl font-bold tracking-tight text-slate-800">SWAPSTORE</span>
+      <aside className="w-[260px] bg-zinc-900/80 border-r border-zinc-800/50 flex flex-col z-10 flex-shrink-0 backdrop-blur-xl">
+        <div className="h-16 flex items-center px-6 border-b border-zinc-800/50">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+              <span className="text-zinc-950 font-black text-lg">S</span>
+            </div>
+            <span className="text-xl font-extrabold tracking-tight text-zinc-100">SWAPSTORE</span>
           </div>
         </div>
-        
-        <nav className="flex-1 overflow-y-auto py-4 space-y-1 scrollbar-hide">
+
+        <nav className="flex-1 overflow-y-auto py-6 space-y-2 scrollbar-hide">
           <NavLink to="/dashboard" className={navItemClass}>
-            <LayoutDashboard size={18} strokeWidth={1.5} />
+            <LayoutDashboard size={18} strokeWidth={2} />
             <span>Dashboard</span>
           </NavLink>
           <NavLink to="/rates" className={navItemClass}>
-            <IndianRupee size={18} strokeWidth={1.5} />
+            <IndianRupee size={18} strokeWidth={2} />
             <span>Exchange Rates</span>
           </NavLink>
+          <NavLink to="/swaps" className={navItemClass}>
+            <ArrowRightLeft size={18} strokeWidth={2} />
+            <span>Swap Orders</span>
+          </NavLink>
+          <NavLink to="/kyc" className={navItemClass}>
+            <FileCheck size={18} strokeWidth={2} />
+            <span>KYC Management</span>
+          </NavLink>
+          <NavLink to="/loans" className={navItemClass}>
+            <Landmark size={18} strokeWidth={2} />
+            <span>Loan Management</span>
+          </NavLink>
         </nav>
+
+        <div className="p-4 border-t border-zinc-800/50">
+          <div className="bg-zinc-800/30 rounded-xl p-4 flex items-center space-x-3 border border-zinc-800/50">
+            <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 font-bold border border-zinc-700">
+              A
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <p className="text-sm font-bold text-zinc-200 truncate">{admin?.username || 'Admin'}</p>
+              <p className="text-xs text-amber-500 font-medium tracking-wide">● Online</p>
+            </div>
+          </div>
+        </div>
       </aside>
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
         {/* Top Navbar */}
-        <header className="h-16 bg-white border-b border-slate-100 flex items-center justify-between px-6 shadow-[0_4px_24px_rgba(0,0,0,0.02)] z-10 flex-shrink-0">
-          <button className="text-slate-500 hover:text-slate-800 transition-colors">
-            <Menu size={22} strokeWidth={1.5} />
+        <header className="h-16 bg-zinc-900/50 border-b border-zinc-800/50 flex items-center justify-between px-6 z-10 flex-shrink-0 backdrop-blur-md">
+          <button className="text-zinc-500 hover:text-amber-500 transition-colors bg-zinc-800/50 p-2 rounded-lg">
+            <Menu size={20} strokeWidth={2} />
           </button>
-          
+
           <div className="flex items-center space-x-4">
-            <div className="text-right mr-2 hidden md:block">
-              <p className="text-xs font-bold text-slate-800">ADMIN</p>
-              <p className="text-[10px] font-bold text-emerald-500 tracking-wide">STATUS: ACTIVE</p>
-            </div>
-            <button 
+            <button
               onClick={handleLogout}
-              className="p-2 text-slate-400 hover:text-red-500 bg-slate-50 hover:bg-red-50 rounded-lg transition-colors"
+              className="flex items-center space-x-2 px-3 py-2 text-zinc-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors border border-transparent hover:border-rose-500/20"
               title="Logout"
             >
-              <LogOut size={18} strokeWidth={2} />
+              <LogOut size={16} strokeWidth={2.5} />
+              <span className="text-sm font-bold">Logout</span>
             </button>
           </div>
         </header>
 
         {/* Scrollable Main Content */}
-        <main className="flex-1 overflow-y-auto p-8 scroll-smooth">
-          <Outlet />
+        <main className="flex-1 overflow-y-auto p-8 scroll-smooth relative">
+          <div className="absolute top-0 left-0 w-full h-96 bg-amber-500/5 blur-[120px] pointer-events-none"></div>
+          <div className="relative z-10">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

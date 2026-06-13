@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useSubmitSwap } from '@/hooks/useSubmitSwap';
-import Navbar from '@/components/ui/Navbar';
 
 export default function KYCForm() {
   const { isAuthenticated } = useAuth();
@@ -77,8 +76,7 @@ export default function KYCForm() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-[#06060c] text-white overflow-hidden relative">
-        <Navbar />
+      <div className="min-h-screen bg-[#06060c] text-white overflow-hidden relative">        
         <div className="container mx-auto px-6 lg:px-12 pt-36 pb-20 relative z-10 flex flex-col items-center justify-center animate-fade-in">
           <div className="backdrop-blur-xl bg-[#0a0a14]/60 border border-green-500/20 rounded-[2rem] p-10 max-w-lg w-full text-center shadow-[0_0_40px_rgba(34,197,94,0.1)]">
              <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -104,7 +102,7 @@ export default function KYCForm() {
       <div className="absolute top-[-10%] right-[-10%] w-[40rem] h-[40rem] bg-indigo-600 rounded-full mix-blend-screen filter blur-[250px] opacity-20 pointer-events-none"></div>
       <div className="absolute bottom-[-10%] left-[-10%] w-[40rem] h-[40rem] bg-purple-600 rounded-full mix-blend-screen filter blur-[250px] opacity-10 pointer-events-none"></div>
 
-      <Navbar />
+
 
       <div className="container mx-auto px-6 lg:px-12 pt-36 pb-20 relative z-10 animate-fade-in flex justify-center">
         <div className="w-full max-w-3xl">
