@@ -32,6 +32,8 @@ function SwapForm() {
   const [showBankForm, setShowBankForm] = useState(false);
   const [errors, setErrors] = useState({});
 
+  const [isSwapComplete, setIsSwapComplete] = useState(false);
+
   const networkName = chain?.id === 56 || chain?.name?.toLowerCase().includes('bsc') ? 'bnb' : 'polygon';
 
   // Find all tokens that are supported on the current network
@@ -50,7 +52,7 @@ function SwapForm() {
   useEffect(() => {
     if (availableTokens.length > 0 && !availableTokens.includes(formData.token)) {
       setFormData(prev => ({ ...prev, token: availableTokens[0] }));
-    } else if (availableTokens.length === 0) {
+    } else if (availableTokens.length === 0 && formData.token !== '') {
       setFormData(prev => ({ ...prev, token: '' }));
     }
   }, [availableTokens, formData.token]);
@@ -150,7 +152,11 @@ function SwapForm() {
 
         if (!swapResult.success) {
           setErrors({ submit: 'Smart contract transaction failed or was cancelled.' });
+        } else {
+          setIsSwapComplete(true);
         }
+      } else {
+        setErrors({ submit: 'Failed to retrieve order ID from server.' });
       }
     } catch (err) {
       setErrors({ submit: err?.message || 'Network error or exchange rate unavailable.' });
@@ -161,7 +167,7 @@ function SwapForm() {
   const currentRate = rates ? (rates[rateKey] || 0) : 0;
   const inrValue = (Number(formData.amount || 0) * currentRate).toFixed(2);
 
-  if (submitSuccess) {
+  if (isSwapComplete) {
     return (
       <div className="min-h-screen bg-[#06060c] text-white overflow-hidden relative">
         <div className="container mx-auto px-6 lg:px-12 pt-36 pb-20 relative z-10 flex flex-col items-center justify-center animate-fade-in">
@@ -172,7 +178,7 @@ function SwapForm() {
             <h2 className="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Swap Initiated!</h2>
             <p className="text-zinc-400 mb-8">Your swap request and bank details have been successfully submitted.</p>
             <button
-              onClick={() => { resetSubmit(); navigate('/dashboard'); }}
+              onClick={() => { resetSubmit(); setIsSwapComplete(false); navigate('/dashboard'); }}
               className="w-full py-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold transition-colors"
             >
               Return to Dashboard
