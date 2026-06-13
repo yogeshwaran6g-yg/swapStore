@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS system_settings (
 
 INSERT IGNORE INTO system_settings (setting_key, setting_value) VALUES ('loan_interest_rate', '5.0');
 
-CREATE TABLE IF NOT EXISTS kyc_documents (
+CREATE TABLE IF NOT EXISTS user_kyc_documents (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_uid BINARY(16) NOT NULL,
     document_type VARCHAR(50) NOT NULL,

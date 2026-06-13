@@ -21,9 +21,9 @@ export const getTokenBalance = async (walletAddress, tokenAddress, network) => {
   try {
     const chainConfig = network === 'bsc' ? bsc : polygon;
     const rpcUrl = network === 'bsc' ? process.env.BSC_RPC_URL : process.env.POLYGON_RPC_URL;
-    
+
     if (!rpcUrl) return 0;
-    
+
     const publicClient = createPublicClient({
       chain: chainConfig,
       transport: http(rpcUrl),
@@ -35,7 +35,7 @@ export const getTokenBalance = async (walletAddress, tokenAddress, network) => {
       functionName: 'balanceOf',
       args: [walletAddress]
     });
-    
+
     const decimals = await publicClient.readContract({
       address: tokenAddress,
       abi: ERC20_ABI,
@@ -64,7 +64,7 @@ export const getSystemSettings = async (key) => {
 export const uploadKyc = async (userUid, fileUrl, documentType) => {
   try {
     const result = await queryRunner(
-      `INSERT INTO kyc_documents (user_uid, document_type, document_url, status) VALUES (UNHEX(?), ?, ?, 'pending')`,
+      `INSERT INTO user_kyc_documents (user_uid, document_type, document_url, status) VALUES (UNHEX(?), ?, ?, 'pending')`,
       [userUid, documentType, fileUrl]
     );
 
@@ -98,7 +98,7 @@ export const requestLoan = async (userUid, principalAmount, walletAddress, token
     const hexLoanId = loanIdStr.replace(/-/g, '');
     const loanIdBytes32 = '0x' + hexLoanId + '00000000000000000000000000000000';
     const interestRate = await getSystemSettings('loan_interest_rate') || 5.0; // default 5%
-    
+
     const insertResult = await queryRunner(
       `INSERT INTO loans (uid, user_uid, loan_id, principal_amount, interest_rate, status) VALUES (UNHEX(?), UNHEX(?), UNHEX(?), ?, ?, 'pending')`,
       [uuidv4().replace(/-/g, ''), userUid, hexLoanId, principalAmount, interestRate]

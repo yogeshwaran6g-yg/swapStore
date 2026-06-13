@@ -5,7 +5,7 @@ export const handleKycUpload = async (req, res) => {
   try {
     const userUid = req.user?.uid;
     if (!userUid) return rtnRes(res, 401, 'Unauthorized');
-    
+
     // Using multer, the file is in req.file
     if (!req.file) {
       return rtnRes(res, 400, 'No document uploaded');
@@ -70,7 +70,7 @@ export const getPendingKyc = async (req, res) => {
     const { queryRunner } = await import('../config/db.js');
     const documents = await queryRunner(
       `SELECT k.id, HEX(k.user_uid) as user_uid, k.document_type, k.document_url, k.status, k.uploaded_at, u.email, u.username
-       FROM kyc_documents k
+       FROM user_kyc_documents k
        JOIN users u ON k.user_uid = u.uid
        WHERE k.status = 'pending'`
     );
@@ -84,17 +84,17 @@ export const approveKyc = async (req, res) => {
   try {
     if (req.user?.role !== 'admin') return rtnRes(res, 403, 'Forbidden: Admins only');
     const { id } = req.params;
-    const { status } = req.body; 
+    const { status } = req.body;
     if (!['approved', 'rejected'].includes(status)) {
       return rtnRes(res, 400, 'Invalid status');
     }
 
     const { queryRunner } = await import('../config/db.js');
-    const docResult = await queryRunner(`SELECT HEX(user_uid) as user_uid FROM kyc_documents WHERE id = ?`, [id]);
+    const docResult = await queryRunner(`SELECT HEX(user_uid) as user_uid FROM user_kyc_documents WHERE id = ?`, [id]);
     if (!docResult || docResult.length === 0) return rtnRes(res, 404, 'KYC Document not found');
     const userUid = docResult[0].user_uid;
 
-    await queryRunner(`UPDATE kyc_documents SET status = ? WHERE id = ?`, [status, id]);
+    await queryRunner(`UPDATE user_kyc_documents SET status = ? WHERE id = ?`, [status, id]);
     await queryRunner(`UPDATE users SET kyc_status = ? WHERE uid = UNHEX(?)`, [status, userUid]);
 
     return rtnRes(res, 200, `KYC ${status} successfully`);
@@ -122,8 +122,8 @@ export const getPendingLoans = async (req, res) => {
 export const approveLoan = async (req, res) => {
   try {
     if (req.user?.role !== 'admin') return rtnRes(res, 403, 'Forbidden: Admins only');
-    const { uid } = req.params; 
-    
+    const { uid } = req.params;
+
     const { queryRunner } = await import('../config/db.js');
     const updateResult = await queryRunner(
       `UPDATE loans 

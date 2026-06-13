@@ -25,7 +25,7 @@ const migrate = async () => {
 
         try {
             await queryRunner(`
-                CREATE TABLE IF NOT EXISTS kyc_documents (
+                CREATE TABLE IF NOT EXISTS user_kyc_documents (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     user_uid BINARY(16) NOT NULL,
                     document_type VARCHAR(50) NOT NULL,
@@ -37,9 +37,9 @@ const migrate = async () => {
                     KEY idx_kyc_user (user_uid)
                 ) ENGINE=InnoDB;
             `);
-            console.log("Created kyc_documents table");
+            console.log("Created user_kyc_documents table");
         } catch (e) {
-            console.error("Error creating kyc_documents:", e);
+            console.error("Error creating user_kyc_documents:", e);
         }
 
         try {

@@ -5,6 +5,8 @@ import Dashboard from "../../pages/Dashboard";
 import ExchangeRates from "../../pages/ExchangeRates";
 import SwapOrders from "../../pages/SwapOrders";
 import Login from "../../pages/Login";
+import KycManagement from "../../pages/KycManagement";
+import LoanManagement from "../../pages/LoanManagement";
 
 function AppRoutes() {
   return (
@@ -18,6 +20,8 @@ function AppRoutes() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/rates" element={<ExchangeRates />} />
           <Route path="/swaps" element={<SwapOrders />} />
+          <Route path="/kyc" element={<KycManagement />} />
+          <Route path="/loans" element={<LoanManagement />} />
         </Route>
       </Route>
 

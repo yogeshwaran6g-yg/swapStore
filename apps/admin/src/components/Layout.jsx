@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, IndianRupee, LogOut, Menu, ArrowRightLeft
+  LayoutDashboard, IndianRupee, LogOut, Menu, ArrowRightLeft, FileCheck, Landmark
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
@@ -43,6 +43,14 @@ const Layout = () => {
           <NavLink to="/swaps" className={navItemClass}>
             <ArrowRightLeft size={18} strokeWidth={2} />
             <span>Swap Orders</span>
+          </NavLink>
+          <NavLink to="/kyc" className={navItemClass}>
+            <FileCheck size={18} strokeWidth={2} />
+            <span>KYC Management</span>
+          </NavLink>
+          <NavLink to="/loans" className={navItemClass}>
+            <Landmark size={18} strokeWidth={2} />
+            <span>Loan Management</span>
           </NavLink>
         </nav>
 

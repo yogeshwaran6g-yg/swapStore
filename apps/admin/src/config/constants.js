@@ -10,6 +10,12 @@ const endpoints = {
     },
     SWAPS: {
         ADMIN: "/api/v1/admin/swaps"
+    },
+    LOANS: {
+        ADMIN: "/api/v1/admin/loans"
+    },
+    KYC: {
+        ADMIN: "/api/v1/admin/kyc"
     }
 
 }

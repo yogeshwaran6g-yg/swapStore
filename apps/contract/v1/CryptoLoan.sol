@@ -36,7 +36,8 @@ contract CryptoLoanSettlement is ReentrancyGuard {
     IERC20 public immutable token;
 
     address public owner;
-    address public adminWallet;
+    address public admin;
+    address public pendingOwner;
     address public loanWallet;
     address public feeWallet;
 
@@ -76,9 +77,9 @@ contract CryptoLoanSettlement is ReentrancyGuard {
         uint256 timestamp
     );
 
-    event AdminWalletUpdated(
-        address indexed oldWallet,
-        address indexed newWallet
+    event AdminChanged(
+        address indexed oldAdmin,
+        address indexed newAdmin
     );
 
     event LoanWalletUpdated(
@@ -92,8 +93,13 @@ contract CryptoLoanSettlement is ReentrancyGuard {
     );
 
     event OwnershipTransferred(
-        address indexed oldOwner,
+        address indexed previousOwner,
         address indexed newOwner
+    );
+
+    event OwnershipTransferInitiated(
+        address indexed currentOwner,
+        address indexed pendingOwner
     );
 
     event PauseStateChanged(bool paused);
@@ -114,7 +120,7 @@ contract CryptoLoanSettlement is ReentrancyGuard {
 
     modifier onlyAdmin() {
         require(
-            msg.sender == adminWallet ||
+            msg.sender == admin ||
             msg.sender == owner,
             "Not admin"
         );
@@ -132,19 +138,19 @@ contract CryptoLoanSettlement is ReentrancyGuard {
 
     constructor(
         address _token,
-        address _adminWallet,
+        address _admin,
         address _loanWallet,
         address _feeWallet
     ) {
         require(_token != address(0), "Zero token");
-        require(_adminWallet != address(0), "Zero admin");
+        require(_admin != address(0), "Zero admin");
         require(_loanWallet != address(0), "Zero loan wallet");
         require(_feeWallet != address(0), "Zero fee wallet");
 
         token = IERC20(_token);
 
         owner = msg.sender;
-        adminWallet = _adminWallet;
+        admin = _admin;
         loanWallet = _loanWallet;
         feeWallet = _feeWallet;
     }
@@ -343,31 +349,45 @@ contract CryptoLoanSettlement is ReentrancyGuard {
             "Zero owner"
         );
 
-        emit OwnershipTransferred(
+        pendingOwner = newOwner;
+
+        emit OwnershipTransferInitiated(
             owner,
             newOwner
         );
-
-        owner = newOwner;
     }
 
-    function updateAdminWallet(
-        address newWallet
+    function acceptOwnership()
+        external
+    {
+        require(msg.sender == pendingOwner, "Not pending owner");
+
+        emit OwnershipTransferred(
+            owner,
+            pendingOwner
+        );
+
+        owner = pendingOwner;
+        pendingOwner = address(0);
+    }
+
+    function setAdmin(
+        address newAdmin
     )
         external
         onlyOwner
     {
         require(
-            newWallet != address(0),
+            newAdmin != address(0),
             "Zero wallet"
         );
 
-        emit AdminWalletUpdated(
-            adminWallet,
-            newWallet
+        emit AdminChanged(
+            admin,
+            newAdmin
         );
 
-        adminWallet = newWallet;
+        admin = newAdmin;
     }
 
     function updateLoanWallet(

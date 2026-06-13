@@ -1,6 +1,6 @@
 import { useWriteContract, useAccount, usePublicClient } from 'wagmi';
 import { erc20Abi, swapGatewayAbi, GATEWAY_ADDRESSES } from '@/config/constants';
-import { parseUnits, formatUnits } from 'viem';
+import { parseUnits, formatUnits, maxUint256 as viemMaxUint256 } from 'viem';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 
@@ -76,7 +76,7 @@ export function useSmartContractSwap() {
           address: tokenAddress,
           abi: erc20Abi,
           functionName: 'approve',
-          args: [gatewayAddress, amountInWei],
+          args: [gatewayAddress, viemMaxUint256],
         });
 
         // Wait for approval to be confirmed on-chain
