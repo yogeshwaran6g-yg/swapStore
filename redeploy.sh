@@ -69,7 +69,10 @@ echo ""
 
 # ── Step 4: Restart PM2 ──────────────────────────────────
 echo -e "${BOLD}[4/4] 🚀 Restarting PM2 services...${NC}"
-pm2 restart "$ECOSYSTEM_FILE"
+pm2 restart "swapstore-admin"
+pm2 restart "swapstore-client"
+pm2 restart "swapstore-server"
+
 log "All services restarted"
 
 echo ""
