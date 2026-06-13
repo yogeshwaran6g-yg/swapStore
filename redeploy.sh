@@ -61,9 +61,9 @@ echo ""
 
 # ── Step 3: Build Client & Admin ──────────────────────────
 echo -e "${BOLD}[3/4] 🔨 Building apps...${NC}"
-pnpm --filter client build
+pnpm --filter client build:staging
 log "Client built"
-pnpm --filter admin build
+pnpm --filter admin build:staging
 log "Admin built"
 echo ""
 
