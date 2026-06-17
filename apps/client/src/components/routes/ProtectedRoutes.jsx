@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import GlobalApprovalGuard from "@/components/GlobalApprovalGuard";
 
 function ProtectedRoute({ redirectTo = "/" }) {
   const { isAuthenticated, loading } = useAuth();
@@ -15,9 +16,13 @@ function ProtectedRoute({ redirectTo = "/" }) {
     );
   }
 
-  
-
-  return isAuthenticated ? <Outlet /> : <Navigate to={redirectTo} replace />;
+  return isAuthenticated ? (
+    // <GlobalApprovalGuard>
+    <Outlet />
+    // </GlobalApprovalGuard>
+  ) : (
+    <Navigate to={redirectTo} replace />
+  );
 }
 
 export default ProtectedRoute;

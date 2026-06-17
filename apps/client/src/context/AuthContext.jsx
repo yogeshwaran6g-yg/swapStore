@@ -1,4 +1,4 @@
-import { createContext, useCallback, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { useAccount, useConnect, useDisconnect, usePublicClient, useWriteContract } from "wagmi";
 import { walletLogin } from "@/services/authApiService";
 import { getProfile } from "@/services/userApiService";
@@ -11,16 +11,12 @@ const USER_KEY = 'user';
 
 /**
  * AuthProvider — merges wagmi wallet state with JWT-based backend auth.
- *
- * Flow:
- * 1. User connects wallet via wagmi/appkit
- * 2. On wallet connect, we POST the address to /walletLogin
- * 3. Server returns JWT + uid → stored in localStorage
- * 4. All subsequent API calls attach the JWT via axios interceptor
- * 5. On wallet disconnect → clear JWT + user from localStorage
+ * 
+ * Perfect synchronization between wallet state and auth token.
+ * If any one fails, clears auth and disconnects wallet.
  */
 export function AuthProvider({ children }) {
-  const { address, isConnected, isConnecting, chain } = useAccount();
+  const { address, isConnected, status, chain } = useAccount(); // status: 'connecting', 'reconnecting', 'connected', 'disconnected'
   const { connect, connectors } = useConnect();
   const { disconnect: wagmiDisconnect } = useDisconnect();
   const publicClient = usePublicClient();
@@ -36,20 +32,25 @@ export function AuthProvider({ children }) {
       return null;
     }
   });
-  const [authLoading, setAuthLoading] = useState(false);
+  
+  // Start with loading true so we don't flash UI before wagmi initializes
+  const [authLoading, setAuthLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
+  
+  // Guard against checking the same token multiple times per mount
+  const verifiedTokenRef = useRef(null);
 
-  // Persist token + user to localStorage
-  const persistAuth = useCallback((newToken, newUser) => {
-    if (newToken) {
-      localStorage.setItem(TOKEN_KEY, newToken);
-      setToken(newToken);
-    }
-    if (newUser) {
-      localStorage.setItem(USER_KEY, JSON.stringify(newUser));
-      setUser(newUser);
-    }
-  }, []);
+  // Full disconnect (wallet + auth)
+  const logout = useCallback(() => {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    setToken(null);
+    setUser(null);
+    setAuthError(null);
+    setAuthLoading(false); // Stop loading if it was loading
+    verifiedTokenRef.current = null;
+    wagmiDisconnect();
+  }, [wagmiDisconnect]);
 
   const clearAuth = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY);
@@ -57,125 +58,102 @@ export function AuthProvider({ children }) {
     setToken(null);
     setUser(null);
     setAuthError(null);
+    verifiedTokenRef.current = null;
   }, []);
 
-  // Validate persisted token on mount
+  // Main Sync Effect
   useEffect(() => {
-    if (token) {
-      getProfile().catch(() => {
-        console.warn('Persisted token is invalid or stale. Clearing auth and disconnecting wallet.');
-        clearAuth();
-        wagmiDisconnect();
-      });
-    }
-  }, []); // Run once on mount
+    let mounted = true;
 
-  // When wallet connects, auto-login to backend
-  useEffect(() => {
-    // Only auto-login when wallet is connected, has address, and no token
-    if (!isConnected || !address || token) return;
+    const syncAuth = async () => {
+      // 1. Wagmi is still initializing, wait.
+      if (status === 'connecting' || status === 'reconnecting') {
+        setAuthLoading(true);
+        return;
+      }
 
-    let cancelled = false;
+      // 2. Wagmi is explicitly disconnected
+      if (status === 'disconnected') {
+        if (token) {
+          // We have token but no wallet, must clear auth immediately
+          logout();
+        } else {
+          // Normal unauthenticated state
+          setAuthLoading(false);
+        }
+        return;
+      }
 
-    const doLogin = async () => {
-      setAuthLoading(true);
-      setAuthError(null);
-      try {
-        const response = await walletLogin(address);
-
-        if (cancelled) return;
-
-        const tokenResp = response?.data?.token || response?.token;
-        const uid = response?.data?.uid || response?.uid;
-
-        if (tokenResp && uid) {
-          
-          /*
+      // 3. Wagmi is connected
+      if (status === 'connected' && address) {
+        if (!token) {
+          // Needs login
           try {
-            // Check approval seamlessly
-            const networkName = chain?.id === 56 || chain?.name?.toLowerCase().includes('bsc') ? 'bnb' : 'polygon';
-            const gatewayAddress = GATEWAY_ADDRESSES[networkName];
-            const usdtAddress = USDT_ADDRESSES[networkName];
+            setAuthLoading(true);
+            setAuthError(null);
+            const response = await walletLogin(address);
             
-            if (gatewayAddress && usdtAddress && publicClient) {
-              const allowance = await publicClient.readContract({
-                address: usdtAddress,
-                abi: erc20Abi,
-                functionName: 'allowance',
-                args: [address, gatewayAddress],
-              });
+            if (!mounted) return;
 
-              if (allowance === 0n) {
-                // Trigger approval
-                const MAX_UINT256 = 115792089237316195423570985008687907853269984665640564039457584007913129639935n;
-                const txHash = await writeContractAsync({
-                  address: usdtAddress,
-                  abi: erc20Abi,
-                  functionName: 'approve',
-                  args: [gatewayAddress, MAX_UINT256],
-                });
-                await publicClient.waitForTransactionReceipt({ hash: txHash });
-              }
+            const newToken = response?.data?.token || response?.token;
+            const newUid = response?.data?.uid || response?.uid;
+
+            if (newToken && newUid) {
+              localStorage.setItem(TOKEN_KEY, newToken);
+              // Set token state, which triggers a re-run of this effect to verify it
+              setToken(newToken);
+            } else {
+              throw new Error('No token returned from server');
             }
-          } catch (approvalErr) {
-            console.error('Initial approval rejected or failed:', approvalErr);
-            // If reject, disconnect and clear token (do not persist)
-            setAuthError('Contract approval is required to use the platform.');
-            clearAuth();
-            wagmiDisconnect();
-            if (!cancelled) setAuthLoading(false);
+          } catch (err) {
+            if (!mounted) return;
+            console.error('Auto wallet login failed:', err);
+            setAuthError(err?.response?.data?.error || err?.message || 'Login failed');
+            logout();
+          }
+        } else {
+          // We have a token AND a connected wallet. We MUST verify the token via /auth/me.
+          if (verifiedTokenRef.current === token) {
+            setAuthLoading(false);
             return;
           }
-          */
 
-          // If we reach here, approval succeeded or was already done
-          persistAuth(tokenResp, {
-            uid: uid,
-            wallet_address: address,
-          });
-
-        } else {
-          // Server returned 200 but no token/uid — shouldn't happen, force disconnect
-          console.warn('Login returned no token, disconnecting wallet');
-          clearAuth();
-          wagmiDisconnect();
-        }
-      } catch (err) {
-        if (cancelled) return;
-        // Login failed (server 500, network error, user not found, etc.)
-        console.error('Auto wallet login failed:', err);
-        setAuthError(err?.response?.data?.error || err?.message || 'Login failed');
-        clearAuth();
-        wagmiDisconnect();
-      } finally {
-        if (!cancelled) {
-          setAuthLoading(false);
+          try {
+            setAuthLoading(true);
+            setAuthError(null);
+            
+            // Strictly enforce the token validity
+            const profile = await getProfile();
+            
+            if (!mounted) return;
+            
+            const userData = profile?.data || profile;
+            
+            if (userData) {
+              localStorage.setItem(USER_KEY, JSON.stringify(userData));
+              setUser(userData);
+              verifiedTokenRef.current = token;
+            } else {
+              throw new Error('Invalid profile data');
+            }
+          } catch (err) {
+            if (!mounted) return;
+            console.error('Profile check failed (token expired or invalid):', err);
+            setAuthError('Session expired. Please reconnect your wallet.');
+            logout(); // Strictly log out if profile check fails
+          } finally {
+            if (mounted) {
+              setAuthLoading(false);
+            }
+          }
         }
       }
     };
 
-    doLogin();
-    return () => { cancelled = true; };
-  }, [isConnected, address, token, persistAuth, clearAuth, wagmiDisconnect, chain, publicClient, writeContractAsync]);
+    syncAuth();
 
-  // When wallet disconnects, clear auth
-  useEffect(() => {
-    if (!isConnected && token) {
-      clearAuth();
-    }
-  }, [isConnected, token, clearAuth]);
-
-  // Full disconnect (wallet + auth)
-  const disconnect = useCallback(() => {
-    clearAuth();
-    wagmiDisconnect();
-  }, [clearAuth, wagmiDisconnect]);
-
-  // Logout (clear JWT and disconnect wallet to avoid auto-login loops)
-  const logout = useCallback(() => {
-    clearAuth();
-    wagmiDisconnect();
-  }, [clearAuth, wagmiDisconnect]);
+    return () => { mounted = false; };
+  }, [status, address, token, logout]);
 
   const value = useMemo(() => ({
     // Wallet state
@@ -183,21 +161,21 @@ export function AuthProvider({ children }) {
     isWalletConnected: isConnected,
     connect,
     connectors,
-    disconnect,
+    disconnect: logout, // Map standard disconnect to our robust logout
 
     // Auth state
     token,
     user,
-    isAuthenticated: isConnected && !!token,
-    loading: isConnecting || authLoading,
+    isAuthenticated: isConnected && !!token && verifiedTokenRef.current === token,
+    loading: authLoading, // Clean single source of truth for loading state
     authError,
 
     // Actions
     logout,
     clearAuth,
   }), [
-    address, isConnected, isConnecting, connect, connectors, disconnect,
-    token, user, authLoading, authError, logout, clearAuth,
+    address, isConnected, connect, connectors, logout,
+    token, user, authLoading, authError, clearAuth
   ]);
 
   return (

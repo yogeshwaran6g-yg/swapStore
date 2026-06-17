@@ -7,7 +7,9 @@
     "client": "cd apps/client && pnpm dev",
     "server": "cd apps/server && pnpm dev",
     "admin": "cd apps/admin && pnpm dev",
-    "seed": "cd apps/server && node src/scripts/seed.js"
+    "seed": "cd apps/server && node src/scripts/seed.js",
+    "truncate": "cd apps/server && node src/scripts/truncate.js",
+    "drop": "cd apps/server && node src/scripts/drop.js"
   },
   "keywords": [],
   "author": "",

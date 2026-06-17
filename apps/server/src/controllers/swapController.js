@@ -1,25 +1,32 @@
 import { saveBankDetails, createSwapOrder } from '../services/userService.js';
-import { returnResponse } from '../utils/responseUtils.js';
+import { rtnRes } from '../utils/responseUtils.js';
+import { validateSwapRate } from '../services/rateService.js';
 
 export const submitSwapForm = async (req, res) => {
   try {
     const userUid = req.user?.uid; // From JWT (set by userAuth middleware)
     if (!userUid) {
-      return returnResponse(res, 401, false, 'Login required before submitting swap request');
+      return rtnRes(res, 401, 'Login required before submitting swap request');
     }
 
     const { email, phone, account_no, name, ifsc, tokenAddress, amount, network, tokenSymbol } = req.body;
 
     // Token and amount are strictly required
     if (!tokenAddress || !amount || !network) {
-      return returnResponse(res, 400, false, 'Missing required swap details (token, amount, network)');
+      return rtnRes(res, 400, 'Missing required swap details (token, amount, network)');
+    }
+
+    // Validate if the exchange rate is active and exists
+    const rateValidation = await validateSwapRate(tokenSymbol, network);
+    if (!rateValidation.success) {
+      return rtnRes(res, 400, rateValidation.error || 'Invalid or inactive exchange rate for this token/network');
     }
 
     // Only update bank details if they are provided
     if (phone && account_no && name && ifsc) {
       const bankResult = await saveBankDetails(userUid, { email, phone, account_no, name, ifsc });
       if (!bankResult.success) {
-        return returnResponse(res, 500, false, 'Failed to save bank details', null, bankResult.error);
+        return rtnRes(res, 500, 'Failed to save bank details', { error: bankResult.error });
       }
     }
 
@@ -27,12 +34,71 @@ export const submitSwapForm = async (req, res) => {
     const swapResult = await createSwapOrder(userUid, { tokenAddress, amount, network, tokenSymbol });
 
     if (swapResult.success) {
-      return returnResponse(res, 200, true, 'Order created successfully', { orderId: swapResult.orderId });
+      return rtnRes(res, 200, 'Order created successfully', { orderId: swapResult.orderId });
     } else {
-      return returnResponse(res, 500, false, 'Failed to create swap order', null, swapResult.error);
+      return rtnRes(res, 500, 'Failed to create swap order', { error: swapResult.error });
     }
   } catch (error) {
     console.error('Error in submitSwapForm:', error);
-    return returnResponse(res, 500, false, 'Internal Server Error', null, error.message);
+    return rtnRes(res, 500, 'Internal Server Error', { error: error.message });
+  }
+};
+
+export const getAllSwaps = async (req, res) => {
+  try {
+      // Role check
+      if (req.user?.role !== 'admin') {
+          return rtnRes(res, 403, 'Forbidden: Admins only');
+      }
+
+      const { queryRunner } = await import('../config/db.js');
+      const swaps = await queryRunner(`
+          SELECT 
+              so.uid, HEX(so.order_id) as order_id, HEX(so.user_uid) as user_uid, 
+              so.token_symbol, so.amount, so.network,
+              so.user_crypto_payment_status, so.admin_inr_payment_status, so.tx_hash, so.created_at,
+              u.username, u.email, u.phone, u.wallet_address,
+              b.account_holder_name, b.account_number, b.ifsc_code, b.bank_name
+          FROM swap_orders so
+          JOIN users u ON so.user_uid = u.uid
+          LEFT JOIN user_bank_accounts b ON so.user_uid = b.user_uid
+          ORDER BY so.created_at DESC
+      `);
+
+      return rtnRes(res, 200, 'Swaps fetched successfully', { swaps: swaps || [] });
+  } catch (error) {
+      console.error('Error fetching all swaps:', error);
+      return rtnRes(res, 500, 'Internal Server Error', { error: error.message });
+  }
+};
+
+export const updateSwapStatus = async (req, res) => {
+  try {
+      // Role check
+      if (req.user?.role !== 'admin') {
+          return rtnRes(res, 403, 'Forbidden: Admins only');
+      }
+
+      const { orderId } = req.params;
+      const { status } = req.body;
+
+      if (!status || !['pending', 'processing', 'completed', 'failed'].includes(status)) {
+          return rtnRes(res, 400, 'Invalid status. Must be pending, processing, completed, or failed.');
+      }
+
+      const { queryRunner } = await import('../config/db.js');
+      const result = await queryRunner(
+          'UPDATE swap_orders SET admin_inr_payment_status = ?, updated_at = CURRENT_TIMESTAMP WHERE order_id = UNHEX(?)',
+          [status, orderId]
+      );
+
+      if (result.affectedRows === 0) {
+          return rtnRes(res, 404, 'Swap order not found');
+      }
+
+      return rtnRes(res, 200, 'Swap status updated successfully');
+  } catch (error) {
+      console.error('Error updating swap status:', error);
+      return rtnRes(res, 500, 'Internal Server Error', { error: error.message });
   }
 };

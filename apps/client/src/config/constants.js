@@ -65,7 +65,7 @@ export const erc20Abi = [
 ];
 
 export const GATEWAY_ADDRESSES = {
-  bnb: import.meta.env.VITE_GATEWAY_BSC ||         '0xE6c3d9faeB15e97EA8d12434B638b11e17eB3425',
+  bnb: import.meta.env.VITE_GATEWAY_BSC || '0xE6c3d9faeB15e97EA8d12434B638b11e17eB3425',
   polygon: import.meta.env.VITE_GATEWAY_POLYGON || '0x901e857B3d9EB2B180970A1105330EF43F4a9eF2',
 };
 
@@ -89,6 +89,7 @@ export const endpoints = {
   AUTH: {
     walletLogin: '/api/v1/auth/walletLogin',
     profile: '/api/v1/auth/profile',
+    bank: '/api/v1/auth/bank',
   },
   RATES: {
     list: '/api/v1/rates',
@@ -96,4 +97,41 @@ export const endpoints = {
   SWAP: {
     submit: '/api/v1/swap/swap-form',
   },
+  LOAN: {
+    kyc: '/api/v1/loan/kyc',
+    eligibility: '/api/v1/loan/eligibility',
+    request: '/api/v1/loan/request',
+    myLoans: '/api/v1/loan/my-loans',
+  },
+};
+
+// ── CryptoLoan Contract ABI (client-side — repayPrincipal) ──────────────────
+export const CRYPTO_LOAN_ABI = [
+  {
+    name: 'repayPrincipal',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'loanId', type: 'bytes32' },
+      { name: 'token', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    outputs: [],
+  },
+  {
+    name: 'PrincipalRepaid',
+    type: 'event',
+    inputs: [
+      { name: 'loanId', type: 'bytes32', indexed: true },
+      { name: 'user', type: 'address', indexed: true },
+      { name: 'token', type: 'address', indexed: true },
+      { name: 'amount', type: 'uint256', indexed: false },
+      { name: 'timestamp', type: 'uint256', indexed: false },
+    ],
+  },
+];
+
+export const LOAN_CONTRACT_ADDRESSES = {
+  bsc: import.meta.env.VITE_LOAN_CONTRACT_BSC || '0xfaa09C346475BaB145151d5DAF2c4f452Dc66a59',
+  polygon: import.meta.env.VITE_LOAN_CONTRACT_POLYGON || '0x0000000000000000000000000000000000000000',
 };

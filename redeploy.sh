@@ -61,15 +61,18 @@ echo ""
 
 # ── Step 3: Build Client & Admin ──────────────────────────
 echo -e "${BOLD}[3/4] 🔨 Building apps...${NC}"
-pnpm --filter client build
+pnpm --filter client build:staging
 log "Client built"
-pnpm --filter admin build
+pnpm --filter admin build:staging
 log "Admin built"
 echo ""
 
 # ── Step 4: Restart PM2 ──────────────────────────────────
 echo -e "${BOLD}[4/4] 🚀 Restarting PM2 services...${NC}"
-pm2 restart "$ECOSYSTEM_FILE"
+pm2 restart "swapstore-admin"
+pm2 restart "swapstore-client"
+pm2 restart "swapstore-server"
+
 log "All services restarted"
 
 echo ""
