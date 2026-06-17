@@ -7,6 +7,10 @@ import SwapOrders from "../../pages/SwapOrders";
 import Login from "../../pages/Login";
 import KycManagement from "../../pages/KycManagement";
 import LoanManagement from "../../pages/LoanManagement";
+import UserManagement from "../../pages/UserManagement";
+import UserDetails from "../../pages/UserDetails";
+import SettingsManagement from "../../pages/SettingsManagement";
+import CronManagement from "../../pages/CronManagement";
 
 function AppRoutes() {
   return (
@@ -22,6 +26,10 @@ function AppRoutes() {
           <Route path="/swaps" element={<SwapOrders />} />
           <Route path="/kyc" element={<KycManagement />} />
           <Route path="/loans" element={<LoanManagement />} />
+          <Route path="/users" element={<UserManagement />} />
+          <Route path="/users/:uid" element={<UserDetails />} />
+          <Route path="/settings" element={<SettingsManagement />} />
+          <Route path="/cron" element={<CronManagement />} />
         </Route>
       </Route>
 

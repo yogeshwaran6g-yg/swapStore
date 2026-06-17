@@ -7,17 +7,21 @@ const kycColumns = [
   {
     accessorKey: 'id',
     header: 'ID',
-    cell: ({ getValue }) => <span className="text-zinc-300 font-mono text-sm">{getValue()}</span>,
+    cell: ({ getValue }) => (
+      <span className="text-zinc-300 font-mono text-xs bg-zinc-950/60 px-2 py-1 rounded-lg border border-zinc-800/80 shadow-sm">
+        {getValue()}
+      </span>
+    ),
   },
   {
     accessorKey: 'email',
     header: 'User Email',
-    cell: ({ getValue }) => <span className="text-zinc-300">{getValue()}</span>,
+    cell: ({ getValue }) => <span className="text-zinc-300 text-sm">{getValue()}</span>,
   },
   {
     accessorKey: 'document_type',
     header: 'Doc Type',
-    cell: ({ getValue }) => <span className="text-zinc-300">{getValue()}</span>,
+    cell: ({ getValue }) => <span className="text-zinc-300 text-sm capitalize">{getValue()?.replace('_', ' ')}</span>,
   },
   {
     accessorKey: 'document_url',
@@ -27,9 +31,9 @@ const kycColumns = [
         href={getValue()} 
         target="_blank" 
         rel="noopener noreferrer"
-        className="flex items-center space-x-1 text-blue-400 hover:text-blue-300 text-sm font-medium"
+        className="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700/60 hover:bg-zinc-700 hover:text-white rounded-lg text-xs font-semibold transition-all"
       >
-        <FileText size={14} />
+        <FileText size={12} />
         <span>View</span>
       </a>
     ),
@@ -39,13 +43,15 @@ const kycColumns = [
     header: 'Status',
     cell: ({ getValue }) => {
       const status = getValue();
+      const styles = {
+        pending: 'bg-amber-500/10 text-amber-400 border-amber-500/25',
+        approved: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',
+        rejected: 'bg-rose-500/10 text-rose-400 border-rose-500/25',
+      };
+      const displayStatus = status ? status.toLowerCase() : 'unknown';
       return (
-        <span className={`px-2 py-1 rounded-md text-xs font-bold ${
-          status === 'pending' ? 'bg-amber-500/10 text-amber-500' :
-          status === 'approved' ? 'bg-emerald-500/10 text-emerald-500' :
-          'bg-rose-500/10 text-rose-500'
-        }`}>
-          {status.toUpperCase()}
+        <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border uppercase tracking-wider ${styles[displayStatus] || 'bg-zinc-800 text-zinc-400 border-zinc-700'}`}>
+          {displayStatus}
         </span>
       );
     },
@@ -58,19 +64,19 @@ const kycColumns = [
       if (status !== 'pending') return null;
 
       return (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2.5">
           <button
             onClick={() => table.options.meta.updateStatus(id, 'approved')}
-            className="flex items-center space-x-1 px-2 py-1 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 rounded-lg transition-colors font-bold text-xs"
+            className="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/25 rounded-lg transition-all font-bold text-xs cursor-pointer"
           >
-            <CheckCircle size={14} />
+            <CheckCircle size={13} />
             <span>Approve</span>
           </button>
           <button
             onClick={() => table.options.meta.updateStatus(id, 'rejected')}
-            className="flex items-center space-x-1 px-2 py-1 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 rounded-lg transition-colors font-bold text-xs"
+            className="flex items-center space-x-1.5 px-3 py-1.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/25 rounded-lg transition-all font-bold text-xs cursor-pointer"
           >
-            <XCircle size={14} />
+            <XCircle size={13} />
             <span>Reject</span>
           </button>
         </div>
@@ -87,7 +93,7 @@ const KycManagement = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="w-full space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-extrabold text-zinc-100 tracking-tight">KYC Management</h1>

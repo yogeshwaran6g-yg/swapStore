@@ -22,7 +22,11 @@ const RateEditor = ({ getValue, row: { original }, column: { id }, table }) => {
     );
   }
 
-  return <span className="font-semibold text-lg text-zinc-100">₹ {initialValue}</span>;
+  return (
+    <span className="font-extrabold text-sm text-zinc-100 bg-zinc-950/60 px-2.5 py-1 rounded-lg border border-zinc-800/80 shadow-sm">
+      ₹ {initialValue}
+    </span>
+  );
 };
 
 const ActionCell = ({ row: { original }, table }) => {
@@ -112,7 +116,7 @@ export const columns = [
     accessorKey: 'network',
     header: 'Network',
     cell: (info) => (
-      <span className="px-2.5 py-1 bg-zinc-800 text-zinc-300 rounded-md text-xs font-medium border border-zinc-700">
+      <span className="px-2.5 py-1 bg-zinc-950/60 text-zinc-300 rounded-lg text-xs font-medium border border-zinc-800/80 shadow-sm">
         {info.getValue()}
       </span>
     ),
@@ -137,7 +141,11 @@ export const columns = [
           </div>
         );
       }
-      return <span className="font-semibold text-lg text-zinc-100">₹ {getValue()}</span>;
+      return (
+        <span className="font-extrabold text-sm text-zinc-100 bg-zinc-950/60 px-2.5 py-1 rounded-lg border border-zinc-800/80 shadow-sm">
+          ₹ {getValue()}
+        </span>
+      );
     },
   },
   {
@@ -150,10 +158,10 @@ export const columns = [
       return (
         <button
           onClick={() => toggleRateActive && toggleRateActive(original, !isActive)}
-          className={`px-3 py-1 text-xs font-bold rounded-full border transition-colors ${
+          className={`px-2.5 py-0.5 text-xs font-bold rounded-full border transition-all ${
             isActive 
               ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20' 
-              : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-zinc-700'
+              : 'bg-zinc-850 text-zinc-400 border-zinc-700/60 hover:bg-zinc-800 hover:text-zinc-200'
           }`}
         >
           {isActive ? 'Active' : 'Inactive'}
@@ -165,14 +173,14 @@ export const columns = [
     accessorKey: 'updated_at',
     header: 'Last Updated',
     cell: (info) => (
-      <span className="text-sm text-zinc-500">
+      <span className="text-xs text-zinc-500">
         {new Date(info.getValue()).toLocaleString()}
       </span>
     ),
   },
   {
     id: 'actions',
-    header: () => <div className="text-right">Actions</div>,
+    header: 'Actions',
     cell: ActionCell,
   },
 ];

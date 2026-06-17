@@ -17,10 +17,7 @@ const Navbar = () => {
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'Swap', path: '/swap' },
     { name: 'Loan', path: '/loan' },
-    // { name: 'Tokens', path: '/tokens' },
-    // { name: 'Pools', path: '/pools' },
-    { name: 'KYC', path: '/kyc' },
-    // { name: 'Analytics', path: '/analytics' },
+    { name: 'Profile', path: '/profile' },
   ];
 
   return (

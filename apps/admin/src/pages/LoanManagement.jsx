@@ -1,51 +1,70 @@
 import React, { useMemo } from 'react';
-import { RefreshCw, CheckCircle } from 'lucide-react';
+import { RefreshCw, CheckCircle, Wallet } from 'lucide-react';
 import { useLoans } from '../hooks/useLoans';
 import { DataTable } from '../components/common/DataTable';
+import { useWriteContract } from 'wagmi';
+import { parseUnits } from 'viem';
+import { CRYPTO_LOAN_ABI, CONTRACT_ADDRESSES } from '../config/contracts';
+import { useAppKitAccount } from '@reown/appkit/react';
+import toast from 'react-hot-toast';
 
 const loanColumns = [
   {
     accessorKey: 'uid',
     header: 'Loan UID',
-    cell: ({ getValue }) => <span className="text-zinc-300 font-mono text-sm">{getValue()?.slice(0, 10)}...</span>,
+    cell: ({ getValue }) => (
+      <span className="text-zinc-300 font-mono text-xs bg-zinc-950/60 px-2 py-1 rounded-lg border border-zinc-800/80 shadow-sm">
+        {getValue()?.slice(0, 8)}...
+      </span>
+    ),
   },
   {
     accessorKey: 'loan_id',
     header: 'Loan ID',
-    cell: ({ getValue }) => <span className="text-zinc-300 font-mono text-sm">{getValue()?.slice(0, 10)}...</span>,
+    cell: ({ getValue }) => (
+      <span className="text-zinc-300 font-mono text-xs bg-zinc-950/60 px-2 py-1 rounded-lg border border-zinc-800/80 shadow-sm">
+        {getValue()?.slice(0, 8)}...
+      </span>
+    ),
   },
   {
     accessorKey: 'email',
     header: 'User Email',
-    cell: ({ getValue }) => <span className="text-zinc-300">{getValue()}</span>,
+    cell: ({ getValue }) => <span className="text-zinc-300 text-sm">{getValue()}</span>,
   },
   {
     accessorKey: 'wallet_address',
     header: 'Wallet Address',
-    cell: ({ getValue }) => <span className="text-zinc-400 font-mono text-xs">{getValue()?.slice(0, 8)}...{getValue()?.slice(-6)}</span>,
+    cell: ({ getValue }) => (
+      <span className="text-zinc-300 font-mono text-xs bg-zinc-950/60 px-2 py-1 rounded-lg border border-zinc-800/80 shadow-sm">
+        {getValue()?.slice(0, 6)}...{getValue()?.slice(-4)}
+      </span>
+    ),
   },
   {
     accessorKey: 'principal_amount',
     header: 'Principal',
-    cell: ({ getValue }) => <span className="text-amber-500 font-bold">{getValue()}</span>,
+    cell: ({ getValue }) => <span className="text-amber-400 font-extrabold text-sm tracking-wide">{getValue()}</span>,
   },
   {
     accessorKey: 'interest_rate',
     header: 'Rate',
-    cell: ({ getValue }) => <span className="text-zinc-300">{getValue()}%</span>,
+    cell: ({ getValue }) => <span className="text-zinc-300 text-sm">{getValue()}%</span>,
   },
   {
     accessorKey: 'status',
     header: 'Status',
     cell: ({ getValue }) => {
       const status = getValue();
+      const styles = {
+        pending: 'bg-amber-500/10 text-amber-400 border-amber-500/25',
+        approved: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',
+        rejected: 'bg-rose-500/10 text-rose-400 border-rose-500/25',
+      };
+      const displayStatus = status ? status.toLowerCase() : 'unknown';
       return (
-        <span className={`px-2 py-1 rounded-md text-xs font-bold ${
-          status === 'pending' ? 'bg-amber-500/10 text-amber-500' :
-          status === 'approved' ? 'bg-emerald-500/10 text-emerald-500' :
-          'bg-rose-500/10 text-rose-500'
-        }`}>
-          {status.toUpperCase()}
+        <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border uppercase tracking-wider ${styles[displayStatus] || 'bg-zinc-800 text-zinc-400 border-zinc-700'}`}>
+          {displayStatus}
         </span>
       );
     },
@@ -54,16 +73,16 @@ const loanColumns = [
     id: 'actions',
     header: 'Actions',
     cell: ({ row, table }) => {
-      const { status, uid } = row.original;
+      const { status } = row.original;
       if (status !== 'pending') return null;
 
       return (
         <button
-          onClick={() => table.options.meta.approveLoan(uid)}
-          className="flex items-center space-x-1 px-3 py-1 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 rounded-lg transition-colors font-bold text-sm"
+          onClick={() => table.options.meta.handleApprove(row.original)}
+          className="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/25 rounded-lg transition-all font-bold text-xs cursor-pointer"
         >
-          <CheckCircle size={14} />
-          <span>Approve</span>
+          <CheckCircle size={13} />
+          <span>Approve & Disburse</span>
         </button>
       );
     },
@@ -71,33 +90,79 @@ const loanColumns = [
 ];
 
 const LoanManagement = () => {
-  const { loans, loading, fetchLoans, approveLoan } = useLoans();
+  const { loans, loading, fetchLoans } = useLoans();
+  const { writeContractAsync } = useWriteContract();
+  const { isConnected } = useAppKitAccount();
+
+  const handleApprove = async (loan) => {
+    console.log(loan);
+    if (!isConnected) {
+      toast.error('Please connect your admin wallet first using the top right button.');
+      return;
+    }
+
+    // Automatically setting fee to 0 to disburse the full requested amount
+    const feeStr = "0";
+    const feeValue = 0;
+
+    try {
+      toast.loading("Sending transaction...", { id: 'tx' });
+      const loanIdBytes32 = loan.loan_id.startsWith('0x') ? loan.loan_id : `0x${loan.loan_id}`;
+      const walletAddr = loan.wallet_address.startsWith('0x') ? loan.wallet_address : `0x${loan.wallet_address}`;
+
+      const principalWei = parseUnits(loan.principal_amount.toString(), 18);
+      const feeWei = parseUnits(feeStr, 18);
+      const contractAddress = CONTRACT_ADDRESSES[loan.network?.toLowerCase()] || CONTRACT_ADDRESSES.bsc;
+      console.log(loanIdBytes32,
+        walletAddr,
+        loan.token_address,      // ERC-20 token address (v2 param)
+        principalWei,
+        feeWei)
+      const txHash = await writeContractAsync({
+        address: contractAddress,
+        abi: CRYPTO_LOAN_ABI,
+        functionName: 'issueLoan',
+        args: [
+          loanIdBytes32,
+          walletAddr,
+          loan.token_address,      // ERC-20 token address (v2 param)
+          principalWei,
+          feeWei
+        ]
+      });
+
+      toast.success("Transaction submitted! The blockchain listener will update the loan status shortly.", { id: 'tx' });
+    } catch (err) {
+      console.error(err);
+      toast.error(err.shortMessage || err.message || "Transaction failed", { id: 'tx' });
+    }
+  };
 
   const meta = {
-    approveLoan,
+    handleApprove,
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="w-full space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-extrabold text-zinc-100 tracking-tight">Loan Management</h1>
-          <p className="mt-1 text-zinc-400">Review and approve user loan requests</p>
+          <p className="mt-1 text-zinc-400">Review, approve and disburse user loan requests</p>
         </div>
       </div>
 
       <div className="flex items-center justify-between mb-4 mt-8">
-         <h2 className="text-lg font-bold text-zinc-100 flex items-center">
-            <div className="w-2 h-2 rounded-full bg-amber-500 mr-3 animate-pulse"></div>
-            Pending Loans
-         </h2>
-         <button
-            onClick={fetchLoans}
-            className="p-2 text-zinc-400 hover:text-amber-500 transition-colors rounded-lg hover:bg-amber-500/10"
-            title="Refresh Loans"
-         >
-            <RefreshCw size={20} className={loading ? 'animate-spin text-amber-500' : ''} />
-         </button>
+        <h2 className="text-lg font-bold text-zinc-100 flex items-center">
+          <div className="w-2 h-2 rounded-full bg-amber-500 mr-3 animate-pulse"></div>
+          Pending Loans
+        </h2>
+        <button
+          onClick={fetchLoans}
+          className="p-2 text-zinc-400 hover:text-amber-500 transition-colors rounded-lg hover:bg-amber-500/10"
+          title="Refresh Loans"
+        >
+          <RefreshCw size={20} className={loading ? 'animate-spin text-amber-500' : ''} />
+        </button>
       </div>
 
       {loading && loans.length === 0 ? (
@@ -108,7 +173,60 @@ const LoanManagement = () => {
           </div>
         </div>
       ) : (
-        <DataTable data={loans} columns={loanColumns} meta={meta} />
+        <DataTable
+          data={loans}
+          columns={loanColumns}
+          meta={meta}
+          renderSubComponent={(loan) => (
+            <div className="p-6 bg-[#0a0a0f] shadow-inner border-y border-zinc-800/50">
+              <h4 className="text-amber-500 font-semibold mb-4 text-sm uppercase tracking-wider flex items-center space-x-2">
+                <span>Interest Ledger History</span>
+                <span className="text-zinc-500 text-xs normal-case">(Loan: {loan.loan_id.substring(0, 8)}...)</span>
+              </h4>
+              {loan.ledger && loan.ledger.length > 0 ? (
+                <table className="min-w-full divide-y divide-zinc-800/50 bg-zinc-950/50 rounded-xl overflow-hidden border border-zinc-800/50">
+                  <thead className="bg-zinc-900/50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400 uppercase">Period Start</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400 uppercase">Period End</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400 uppercase">Interest</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400 uppercase">Status</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400 uppercase">Collected At</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-800/50">
+                    {loan.ledger.map((entry) => (
+                      <tr key={entry.id} className="hover:bg-zinc-900/30">
+                        <td className="px-4 py-3 whitespace-nowrap text-xs text-zinc-300">
+                          {new Date(entry.period_start).toLocaleDateString()}
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-xs text-zinc-300">
+                          {new Date(entry.period_end).toLocaleDateString()}
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-xs font-mono text-zinc-100">
+                          ${Number(entry.interest_amount).toLocaleString()}
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-xs">
+                          <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${entry.collection_status === 'collected' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                            entry.collection_status === 'pending' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
+                              'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                            }`}>
+                            {entry.collection_status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-xs text-zinc-400">
+                          {entry.collected_at ? new Date(entry.collected_at).toLocaleDateString() : '-'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p className="text-zinc-500 text-sm">No interest ledger records generated for this loan yet.</p>
+              )}
+            </div>
+          )}
+        />
       )}
     </div>
   );

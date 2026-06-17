@@ -3,7 +3,7 @@ import ProtectedRoute from "@/components/routes/ProtectedRoutes";
 import Home from "@/pages/Home";
 import Dashboard from "@/pages/Dashboard";
 import SwapForm from "@/pages/SwapForm";
-import KYCForm from "@/pages/KYCForm";
+import Profile from "@/pages/Profile";
 import { LoanDashboard } from "@/components/loan/LoanDashboard";
 import Layout from "@/components/Layout";
 
@@ -18,7 +18,7 @@ function AppRoutes() {
           <Route element={<ProtectedRoute  />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/swap" element={<SwapForm />} />
-            <Route path="/kyc" element={<KYCForm />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/loan" element={<LoanDashboard />} />
           </Route>
         </Route>

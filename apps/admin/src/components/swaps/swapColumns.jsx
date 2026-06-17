@@ -26,8 +26,8 @@ const Truncate = ({ value, maxLen = 12, color = 'text-zinc-300' }) => {
   if (!value) return <span className="text-zinc-600 italic text-xs">—</span>;
   const display = value.length > maxLen ? `${value.substring(0, maxLen)}…` : value;
   return (
-    <span className="inline-flex items-center">
-      <span className={`font-mono text-xs tracking-wide ${color}`}>{display}</span>
+    <span className="inline-flex items-center space-x-1.5">
+      <span className={`font-mono text-xs bg-zinc-950/60 px-2 py-1 rounded-lg border border-zinc-800/80 shadow-sm ${color}`}>{display}</span>
       <CopyBtn text={value} />
     </span>
   );
@@ -42,18 +42,18 @@ const getBscScanUrl = (hash, network) => {
 export const swapColumns = [
   {
     accessorKey: 'user_uid',
-    header: () => <span className="text-violet-400">User ID</span>,
-    cell: (info) => <Truncate value={info.getValue()} maxLen={10} color="text-violet-300" />,
+    header: 'User ID',
+    cell: (info) => <Truncate value={info.getValue()} maxLen={10} color="text-zinc-300" />,
   },
   {
     accessorKey: 'wallet_address',
-    header: () => <span className="text-sky-400">Wallet</span>,
-    cell: (info) => <Truncate value={info.getValue()} maxLen={10} color="text-sky-300" />,
+    header: 'Wallet',
+    cell: (info) => <Truncate value={info.getValue()} maxLen={10} color="text-zinc-300" />,
   },
   {
     accessorKey: 'order_id',
-    header: () => <span className="text-amber-400">Swap Order ID</span>,
-    cell: (info) => <Truncate value={info.getValue()} maxLen={12} color="text-amber-300/80" />,
+    header: 'Swap Order ID',
+    cell: (info) => <Truncate value={info.getValue()} maxLen={12} color="text-zinc-300" />,
   },
   {
     accessorKey: 'created_at',
@@ -74,7 +74,7 @@ export const swapColumns = [
     cell: ({ row: { original } }) => {
       const symbol = original.token_symbol || '—';
       const network = original.network || '';
-      const networkColor = network.toLowerCase() === 'polygon' ? 'text-purple-400 bg-purple-500/10 border-purple-500/20' : 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20';
+      const networkColor = network.toLowerCase() === 'polygon' ? 'text-purple-400 bg-purple-500/10 border-purple-500/20' : 'text-amber-400 bg-amber-500/10 border-amber-500/20';
       return (
         <div className="flex flex-col gap-1">
           <span className="font-extrabold text-sm text-zinc-100 tracking-wide">{symbol}</span>
@@ -92,17 +92,17 @@ export const swapColumns = [
   },
   {
     accessorKey: 'tx_hash',
-    header: () => <span className="text-teal-400">Tx Hash</span>,
+    header: 'Tx Hash',
     cell: ({ row: { original } }) => {
       const hash = original.tx_hash;
-      if (!hash) return <span className="text-zinc-600 italic text-xs">Pending</span>;
+      if (!hash) return <span className="text-zinc-500 italic text-xs bg-zinc-950/40 px-2 py-1 rounded-lg border border-zinc-850">Pending</span>;
       const url = getBscScanUrl(hash, original.network);
       return (
-        <span className="inline-flex items-center gap-1">
-          <span className="font-mono text-xs text-teal-300/80 tracking-wide">{hash.substring(0, 10)}…</span>
+        <span className="inline-flex items-center space-x-1.5">
+          <span className="font-mono text-xs bg-zinc-950/60 px-2 py-1 rounded-lg border border-zinc-800/80 text-zinc-300 tracking-wide">{hash.substring(0, 10)}…</span>
           <CopyBtn text={hash} />
           {url && (
-            <a href={url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="p-0.5 rounded hover:bg-teal-500/10 text-zinc-500 hover:text-teal-400 transition-all" title="View on Explorer">
+            <a href={url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="p-1 rounded-lg border border-zinc-800 hover:bg-zinc-800 text-zinc-500 hover:text-amber-500 transition-all" title="View on Explorer">
               <ExternalLink size={12} />
             </a>
           )}
@@ -162,7 +162,7 @@ export const swapColumns = [
       return (
         <button
           onClick={() => onViewBank && onViewBank(original)}
-          className="px-3 py-1.5 text-[11px] font-bold rounded-lg bg-gradient-to-r from-amber-500/10 to-orange-500/10 text-amber-400 border border-amber-500/20 hover:from-amber-500/20 hover:to-orange-500/20 hover:text-amber-300 transition-all"
+          className="px-3 py-1.5 text-[11px] font-bold rounded-lg bg-zinc-800 text-zinc-300 border border-zinc-700/60 hover:bg-zinc-700 hover:text-white transition-all"
         >
           Bank Info
         </button>

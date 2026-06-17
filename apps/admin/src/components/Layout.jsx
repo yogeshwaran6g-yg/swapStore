@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, IndianRupee, LogOut, Menu, ArrowRightLeft, FileCheck, Landmark
+  LayoutDashboard, IndianRupee, LogOut, Menu, ArrowRightLeft, FileCheck, Landmark, Users, Settings, Clock
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
@@ -52,6 +52,18 @@ const Layout = () => {
             <Landmark size={18} strokeWidth={2} />
             <span>Loan Management</span>
           </NavLink>
+          <NavLink to="/users" className={navItemClass}>
+            <Users size={18} strokeWidth={2} />
+            <span>User Management</span>
+          </NavLink>
+          <NavLink to="/settings" className={navItemClass}>
+            <Settings size={18} strokeWidth={2} />
+            <span>System Settings</span>
+          </NavLink>
+          <NavLink to="/cron" className={navItemClass}>
+            <Clock size={18} strokeWidth={2} />
+            <span>Cron Jobs</span>
+          </NavLink>
         </nav>
 
         <div className="p-4 border-t border-zinc-800/50">
@@ -76,6 +88,7 @@ const Layout = () => {
           </button>
 
           <div className="flex items-center space-x-4">
+            <appkit-button />
             <button
               onClick={handleLogout}
               className="flex items-center space-x-2 px-3 py-2 text-zinc-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors border border-transparent hover:border-rose-500/20"
@@ -88,9 +101,9 @@ const Layout = () => {
         </header>
 
         {/* Scrollable Main Content */}
-        <main className="flex-1 overflow-y-auto p-8 scroll-smooth relative">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 scroll-smooth relative w-full">
           <div className="absolute top-0 left-0 w-full h-96 bg-amber-500/5 blur-[120px] pointer-events-none"></div>
-          <div className="relative z-10">
+          <div className="relative z-10 w-full">
             <Outlet />
           </div>
         </main>

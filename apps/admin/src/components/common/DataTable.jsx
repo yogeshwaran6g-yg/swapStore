@@ -1,11 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
   flexRender,
 } from '@tanstack/react-table';
 
-export const DataTable = ({ data, columns, meta }) => {
+export const DataTable = ({ data, columns, meta, renderSubComponent }) => {
+  const [expandedRows, setExpandedRows] = useState({});
+
+  const toggleRow = (id) => {
+    setExpandedRows(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
   const table = useReactTable({
     data,
     columns,
@@ -45,16 +53,25 @@ export const DataTable = ({ data, columns, meta }) => {
               </tr>
             ) : (
               table.getRowModel().rows.map((row) => (
-                <tr
-                  key={row.id}
-                  className="hover:bg-zinc-800/50 transition-colors border-b border-zinc-800/50 last:border-0"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-6 py-4">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
-                </tr>
+                <React.Fragment key={row.id}>
+                  <tr
+                    onClick={() => renderSubComponent ? toggleRow(row.id) : null}
+                    className={`transition-colors border-b border-zinc-800/50 last:border-0 ${renderSubComponent ? 'cursor-pointer hover:bg-zinc-800/50' : 'hover:bg-zinc-800/50'}`}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} className="px-6 py-4">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                  {renderSubComponent && expandedRows[row.id] && (
+                    <tr className="bg-zinc-950/40">
+                      <td colSpan={columns.length} className="p-0 border-b border-zinc-800/50">
+                        {renderSubComponent(row.original)}
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))
             )}
           </tbody>

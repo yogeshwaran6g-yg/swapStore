@@ -191,3 +191,26 @@ loan history
 loan interest deduct 
 
 
+loan interest history
+loan due status 
+
+
+1. kyc complete
+2. eligibility check based on token along network (admin managable multiplier )
+1.1 loan paymen token must need to go laon collector wallet 
+2.  interest goest to interest collector wallet 
+
+
+3.1 loan
+3.2 loan due status
+3.3 loan interest payment  history and etc
+3.4 deduct the fees
+3.loan  repayment (uloads)
+
+admin feature of collect specific user  interest and all users interest button
+auto repayment and auto interest
+
+
+
+swap with network token balance of users 
+the user kyc status from user table wot updates

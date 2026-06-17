@@ -2,19 +2,22 @@ import { apiClient } from "../utils/axios.js";
 import endpoints from "../config/constants.js";
 
 export const loanService = {
-  getPendingLoans: async () => {
+  getAllLoans: async () => {
     try {
       const response = await apiClient.get(endpoints.LOANS.ADMIN);
       return response?.data?.loans || [];
     } catch (err) {
-      console.log("err from loanService getPendingLoans ", err.message);
+      console.log("err from loanService getAllLoans ", err.message);
       throw err;
     }
   },
 
-  approveLoan: async (uid) => {
+  approveLoan: async ({ uid, txHash, fee }) => {
     try {
-      const response = await apiClient.post(`${endpoints.LOANS.ADMIN}/${uid}/approve`);
+      const response = await apiClient.post(`${endpoints.LOANS.ADMIN}/${uid}/approve`, {
+        disbursementTxHash: txHash,
+        disbursementFee: fee
+      });
       return response;
     } catch (err) {
       console.log("err from loanService approveLoan ", err.message);

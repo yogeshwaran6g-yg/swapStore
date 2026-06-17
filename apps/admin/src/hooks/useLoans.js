@@ -7,7 +7,7 @@ export const useLoans = () => {
 
   const { data: loans = [], isLoading, error, refetch } = useQuery({
     queryKey: ['loans'],
-    queryFn: loanService.getPendingLoans,
+    queryFn: loanService.getAllLoans,
   });
 
   const approveLoanMutation = useMutation({
@@ -26,6 +26,6 @@ export const useLoans = () => {
     loading: isLoading,
     error,
     fetchLoans: refetch,
-    approveLoan: (uid) => approveLoanMutation.mutateAsync(uid),
+    approveLoan: (payload) => approveLoanMutation.mutateAsync(payload),
   };
 };

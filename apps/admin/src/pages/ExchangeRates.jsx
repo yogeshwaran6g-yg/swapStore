@@ -58,7 +58,7 @@ const ExchangeRates = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="w-full space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-extrabold text-zinc-100 tracking-tight">Exchange Rates</h1>

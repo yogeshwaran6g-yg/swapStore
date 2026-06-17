@@ -51,3 +51,41 @@ export const getAdminProfile = async (req, res) => {
     return rtnRes(res, 500, 'Internal Server Error');
   }
 };
+
+export const getAllSettings = async (req, res) => {
+  try {
+    const rows = await queryRunner('SELECT setting_key, setting_value FROM system_settings');
+    const settings = rows.reduce((acc, row) => {
+      acc[row.setting_key] = row.setting_value;
+      return acc;
+    }, {});
+    return rtnRes(res, 200, 'Settings fetched successfully', { settings });
+  } catch (error) {
+    console.error('Error fetching settings:', error);
+    return rtnRes(res, 500, 'Internal Server Error');
+  }
+};
+
+export const updateSettings = async (req, res) => {
+  try {
+    const { settings } = req.body;
+    if (!settings || typeof settings !== 'object') {
+      return rtnRes(res, 400, 'Invalid settings data');
+    }
+
+    // Update settings one by one
+    for (const [key, value] of Object.entries(settings)) {
+      // Basic validation: setting value string
+      const strValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
+      await queryRunner(
+        'INSERT INTO system_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = ?',
+        [key, strValue, strValue]
+      );
+    }
+
+    return rtnRes(res, 200, 'Settings updated successfully');
+  } catch (error) {
+    console.error('Error updating settings:', error);
+    return rtnRes(res, 500, 'Internal Server Error');
+  }
+};
