@@ -40,20 +40,7 @@ export const userColumns = [
       <CopyableCell value={getValue()} displayValue={getValue()?.slice(0, 8) + '...'} />
     ),
   },
-  {
-    accessorKey: 'username',
-    header: 'Username',
-    cell: ({ getValue, row }) => (
-      <Link to={`/users/${row.original.uid}`} className="text-zinc-200 font-bold hover:text-amber-500 transition-colors text-sm">
-        {getValue() || '-'}
-      </Link>
-    ),
-  },
-  {
-    accessorKey: 'email',
-    header: 'Email',
-    cell: ({ getValue }) => <span className="text-zinc-400 text-sm">{getValue()}</span>,
-  },
+
   {
     accessorKey: 'wallet_address',
     header: 'Wallet',

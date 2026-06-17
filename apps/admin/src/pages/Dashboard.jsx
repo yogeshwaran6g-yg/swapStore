@@ -1,62 +1,66 @@
 import React from 'react';
-import { Activity, Shield, Users, ArrowRightLeft } from 'lucide-react';
+import { Users, UserPlus, ArrowRightLeft, RefreshCw, Banknote, Clock } from 'lucide-react';
 
 const StatCard = ({ title, value, icon: Icon, colorClass }) => (
-  <div className="bg-zinc-900/80 p-6 rounded-[24px] shadow-lg border border-zinc-800/50 flex items-center justify-between backdrop-blur-md hover:border-zinc-700 transition-colors">
+  <div className="bg-zinc-900/80 p-4 sm:p-6 rounded-2xl sm:rounded-[24px] shadow-lg border border-zinc-800/50 flex items-center justify-between backdrop-blur-md hover:border-zinc-700 transition-colors">
     <div>
-      <h3 className="text-xs font-bold tracking-[0.15em] text-zinc-500 uppercase mb-2">{title}</h3>
-      <p className="text-3xl font-extrabold text-zinc-100">{value}</p>
+      <h3 className="text-[10px] sm:text-xs font-bold tracking-[0.1em] sm:tracking-[0.15em] text-zinc-500 uppercase mb-1 sm:mb-2">{title}</h3>
+      <p className="text-2xl sm:text-3xl font-extrabold text-zinc-100">{value}</p>
     </div>
-    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${colorClass}`}>
-      <Icon size={28} strokeWidth={2} />
+    <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 ml-4 ${colorClass}`}>
+      <Icon className="w-6 h-6 sm:w-7 sm:h-7" strokeWidth={2} />
     </div>
   </div>
 );
 
 const Dashboard = () => {
   return (
-    <div className="w-full space-y-8">
+    <div className="w-full space-y-6 sm:space-y-8">
       <div>
-        <h1 className="text-3xl font-extrabold text-zinc-100 tracking-tight">Dashboard Overview</h1>
-        <p className="text-zinc-400 mt-2 text-lg">Welcome back. Here is what's happening with SwapStore.</p>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-100 tracking-tight">Dashboard Overview</h1>
+        <p className="text-sm sm:text-lg text-zinc-400 mt-1 sm:mt-2">Here is the latest data for SwapStore.</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <StatCard 
           title="Total Users" 
-          value="1,248" 
+          value="0" 
           icon={Users} 
-          colorClass="bg-amber-500/10 text-amber-500 border border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.15)]"
+          colorClass="bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]"
         />
         <StatCard 
-          title="Active Swaps" 
-          value="156" 
+          title="Today Users" 
+          value="0" 
+          icon={UserPlus} 
+          colorClass="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.15)]"
+        />
+        <StatCard 
+          title="Total Swaps" 
+          value="0" 
           icon={ArrowRightLeft} 
-          colorClass="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+          colorClass="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
         />
         <StatCard 
-          title="System Health" 
-          value="99.9%" 
-          icon={Activity} 
+          title="Today Swaps" 
+          value="0" 
+          icon={RefreshCw} 
+          colorClass="bg-green-500/10 text-green-400 border border-green-500/20 shadow-[0_0_15px_rgba(34,197,94,0.15)]"
+        />
+        <StatCard 
+          title="Total Loans" 
+          value="0" 
+          icon={Banknote} 
           colorClass="bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.15)]"
         />
         <StatCard 
-          title="Security Alerts" 
+          title="Today Loans" 
           value="0" 
-          icon={Shield} 
-          colorClass="bg-zinc-800 text-zinc-400 border border-zinc-700"
+          icon={Clock} 
+          colorClass="bg-pink-500/10 text-pink-400 border border-pink-500/20 shadow-[0_0_15px_rgba(236,72,153,0.15)]"
         />
-      </div>
-
-      <div className="mt-12 bg-zinc-900/50 rounded-3xl p-8 border border-zinc-800/50 backdrop-blur-xl">
-        <h2 className="text-xl font-bold text-zinc-100 mb-6">Recent Activity</h2>
-        <div className="text-center py-12 text-zinc-500">
-           <p className="font-medium">No recent activity to display.</p>
-        </div>
       </div>
     </div>
   );
 };
 
 export default Dashboard;
-

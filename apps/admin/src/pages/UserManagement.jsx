@@ -37,11 +37,11 @@ const UserManagement = () => {
   };
 
   return (
-    <div className="w-full space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="w-full space-y-6 text-sm">
+      <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-zinc-100 tracking-tight">User Management</h1>
-          <p className="mt-1 text-zinc-400">Manage user accounts and access permissions</p>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-zinc-100 tracking-tight">User Management</h1>
+          <p className="mt-1 text-xs sm:text-sm text-zinc-400">Manage user accounts and access permissions</p>
         </div>
       </div>
 
@@ -56,7 +56,7 @@ const UserManagement = () => {
             placeholder="Search by Email, Username or UID..."
             value={filterQuery}
             onChange={(e) => setFilterQuery(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-zinc-700 rounded-lg leading-5 bg-zinc-950 text-zinc-300 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition-colors"
+            className="block w-full pl-10 pr-3 py-1.5 text-xs sm:text-sm border border-zinc-700 rounded-lg leading-5 bg-zinc-950 text-zinc-300 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 transition-colors"
           />
         </div>
       </div>

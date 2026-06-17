@@ -21,11 +21,23 @@ export const useLoans = () => {
     }
   });
 
+  const rejectLoanMutation = useMutation({
+    mutationFn: loanService.rejectLoan,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['loans'] });
+      toast.success('Loan rejected successfully');
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.error || error?.message || 'Failed to reject loan');
+    }
+  });
+
   return {
     loans,
     loading: isLoading,
     error,
     fetchLoans: refetch,
     approveLoan: (payload) => approveLoanMutation.mutateAsync(payload),
+    rejectLoan: (uid) => rejectLoanMutation.mutateAsync(uid),
   };
 };

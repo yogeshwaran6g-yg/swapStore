@@ -31,7 +31,7 @@ export const DataTable = ({ data, columns, meta, renderSubComponent }) => {
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="px-6 py-4 text-zinc-500 text-xs uppercase tracking-wider font-bold"
+                    className="px-4 py-3 sm:px-6 sm:py-4 text-zinc-500 text-xs uppercase tracking-wider font-bold whitespace-nowrap"
                   >
                     {header.isPlaceholder
                       ? null
@@ -59,7 +59,7 @@ export const DataTable = ({ data, columns, meta, renderSubComponent }) => {
                     className={`transition-colors border-b border-zinc-800/50 last:border-0 ${renderSubComponent ? 'cursor-pointer hover:bg-zinc-800/50' : 'hover:bg-zinc-800/50'}`}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className="px-6 py-4">
+                      <td key={cell.id} className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}
