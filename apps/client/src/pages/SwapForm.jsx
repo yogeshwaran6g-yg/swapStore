@@ -7,6 +7,7 @@ import { useSubmitSwap } from '@/hooks/useSubmitSwap';
 import { useSmartContractSwap } from '@/hooks/useSmartContractSwap';
 import { useAccount, useSwitchChain } from 'wagmi';
 import { USDT_ADDRESSES, USDC_ADDRESSES, DAI_ADDRESSES } from '@/config/constants';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 
 function SwapForm() {
   const { isAuthenticated, address } = useAuth();
@@ -33,6 +34,7 @@ function SwapForm() {
   const [errors, setErrors] = useState({});
 
   const [isSwapComplete, setIsSwapComplete] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const networkName = chain?.id === 56 || chain?.name?.toLowerCase().includes('bsc') ? 'bnb' : 'polygon';
 
@@ -95,7 +97,7 @@ function SwapForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSwapClick = async (e) => {
+  const handlePreSwapClick = (e) => {
     e.preventDefault();
 
     if (!formData.token || !availableTokens.includes(formData.token)) {
@@ -115,6 +117,12 @@ function SwapForm() {
     }
 
     if (!validateForm()) return;
+
+    setIsConfirmModalOpen(true);
+  };
+
+  const executeSwap = async () => {
+    setIsConfirmModalOpen(false);
 
     let tokenAddress = '';
 
@@ -388,7 +396,7 @@ function SwapForm() {
 
                 <button
                   type="button"
-                  onClick={handleSwapClick}
+                  onClick={handlePreSwapClick}
                   disabled={submitting || isProcessing}
                   className="w-full py-5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-bold text-xl shadow-[0_0_20px_rgba(123,63,228,0.2)] hover:shadow-[0_0_40px_rgba(123,63,228,0.4)] transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
@@ -397,6 +405,15 @@ function SwapForm() {
 
               </form>
             )}
+            <ConfirmModal 
+              isOpen={isConfirmModalOpen}
+              onClose={() => setIsConfirmModalOpen(false)}
+              onConfirm={executeSwap}
+              title="Confirm Swap"
+              message={`Are you sure you want to swap ${formData.amount} ${formData.token} for ₹${inrValue}?`}
+              confirmText="Yes, Swap Now"
+              isLoading={submitting || isProcessing}
+            />
           </div>
         </div>
       </div>

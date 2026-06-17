@@ -88,7 +88,7 @@ const Layout = () => {
           </button>
 
           <div className="flex items-center space-x-4">
-            <appkit-button />
+            <appkit-button balance="hide" />
             <button
               onClick={handleLogout}
               className="flex items-center space-x-2 px-3 py-2 text-zinc-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors border border-transparent hover:border-rose-500/20"

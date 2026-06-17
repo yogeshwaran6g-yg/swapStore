@@ -3,6 +3,8 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
+import path from "path";
+import { fileURLToPath } from "url";
 import { createServer } from "http";
 import ratesRouter from './routes/rates.js';
 import userRoutes from './routes/authRoutes.js';
@@ -13,6 +15,8 @@ import loanRoutes from './routes/loanRoutes.js';
 const app = express();
 const server = createServer(app);
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 const PORT = process.env.PORT || 3000;
 
 // ── Middleware ──────────────────────────────────────────────
@@ -20,6 +24,7 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 // ── Routes ─────────────────────────────────────────────────
 app.get("/", (_req, res) => {

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useSettings, useUpdateSettings } from '../hooks/useSettings';
 import toast from 'react-hot-toast';
 import { Plus, Trash2, Save, Settings2 } from 'lucide-react';
+import { ConfirmModal } from '../components/common/ConfirmModal';
 
 const SETTING_KEYS = [
   { key: 'loan_interest_rate', label: 'Interest Rate (%)', type: 'number' },
@@ -16,6 +17,7 @@ const SettingsManagement = () => {
   const [selectedKey, setSelectedKey] = useState(SETTING_KEYS[0].key);
   const [currentValue, setCurrentValue] = useState('');
   const [tiers, setTiers] = useState([]);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   // When selected key or settingsData changes, populate the input state
   useEffect(() => {
@@ -33,25 +35,34 @@ const SettingsManagement = () => {
     }
   }, [selectedKey, settingsData]);
 
-  const handleSave = async (e) => {
+  const handlePreSave = (e) => {
     e.preventDefault();
-    let finalValue = currentValue;
 
     if (selectedKey === 'loan_eligibility_tiers') {
-      // Validate tiers
       for (const tier of tiers) {
         if (!tier.token || !tier.network || tier.min_balance === '' || tier.max_loan === '') {
           toast.error("Please fill all fields in the eligibility tiers");
           return;
         }
       }
-      finalValue = JSON.stringify(tiers);
     } else {
-      if (finalValue === '') {
+      if (currentValue === '') {
         toast.error("Value cannot be empty");
         return;
       }
     }
+
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleSave = async () => {
+    let finalValue = currentValue;
+
+    if (selectedKey === 'loan_eligibility_tiers') {
+      finalValue = JSON.stringify(tiers);
+    }
+
+    setIsConfirmModalOpen(false);
 
     try {
       await updateSettings({ [selectedKey]: finalValue });
@@ -222,7 +233,7 @@ const SettingsManagement = () => {
 
           <div className="pt-6 flex justify-end">
             <button
-              onClick={handleSave}
+              onClick={handlePreSave}
               disabled={saving}
               className="flex items-center space-x-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold rounded-xl shadow-lg disabled:opacity-50 transition-all w-full sm:w-auto"
             >
@@ -232,6 +243,15 @@ const SettingsManagement = () => {
           </div>
         </div>
       </div>
+      
+      <ConfirmModal 
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleSave}
+        title="Confirm Setting Update"
+        message={`Are you sure you want to update the ${selectedSettingConfig?.label}? This may affect system calculations and logic globally.`}
+        confirmText="Update Setting"
+      />
     </div>
   );
 };

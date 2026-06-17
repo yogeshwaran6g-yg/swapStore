@@ -23,7 +23,7 @@ createAppKit({
   metadata: {
     name: 'SwapStore Admin',
     description: 'SwapStore Admin Dashboard',
-    url: window.location.origin.includes("localhost") ? 'http:localhost:5174' : 'https://ygdev.dpdns.org',
+    url: window.location.origin,
     icons: ['https://avatars.githubusercontent.com/u/179229932']
   },
   themeMode: 'dark',

@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useAccount, useReadContract } from 'wagmi';
 import { useRequestLoan, useLoanEligibility } from '../../hooks/useLoanQueries';
 import { erc20Abi, USDT_ADDRESSES, USDC_ADDRESSES, DAI_ADDRESSES } from '../../config/constants';
+import { ConfirmModal } from '../ui/ConfirmModal';
 
 export const LoanRequestForm = () => {
   const { address } = useAccount();
@@ -12,6 +13,7 @@ export const LoanRequestForm = () => {
   const [tokenSymbol, setTokenSymbol] = useState('USDT');
   const [network, setNetwork] = useState('bsc');
   const [eligibilityChecked, setEligibilityChecked] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   useEffect(() => {
     setEligibilityChecked(false);
@@ -83,6 +85,11 @@ export const LoanRequestForm = () => {
       return;
     }
 
+    setIsConfirmModalOpen(true);
+  };
+
+  const executeLoanRequest = () => {
+    setIsConfirmModalOpen(false);
     submitLoanRequest({
       principalAmount: requestedAmount,
       tokenAddress: tokenAddr,
@@ -184,6 +191,15 @@ export const LoanRequestForm = () => {
             </button>
           )}
         </form>
+        <ConfirmModal 
+          isOpen={isConfirmModalOpen}
+          onClose={() => setIsConfirmModalOpen(false)}
+          onConfirm={executeLoanRequest}
+          title="Confirm Loan Request"
+          message={`Are you sure you want to request a loan of ${requestedAmount} ${tokenSymbol} on ${network.toUpperCase()}?`}
+          confirmText="Yes, Request Loan"
+          isLoading={isPending}
+        />
       </div>
     </div>
   );

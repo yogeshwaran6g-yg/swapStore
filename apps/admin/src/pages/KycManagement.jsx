@@ -1,7 +1,10 @@
 import React from 'react';
 import { RefreshCw, CheckCircle, XCircle, FileText } from 'lucide-react';
 import { useKyc } from '../hooks/useKyc';
+import { resolveDocumentUrl } from '../utils/documentUrl';
 import { DataTable } from '../components/common/DataTable';
+import { ConfirmModal } from '../components/common/ConfirmModal';
+import { useState } from 'react';
 
 const kycColumns = [
   {
@@ -28,7 +31,7 @@ const kycColumns = [
     header: 'Document',
     cell: ({ getValue }) => (
       <a 
-        href={getValue()} 
+        href={resolveDocumentUrl(getValue())} 
         target="_blank" 
         rel="noopener noreferrer"
         className="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-zinc-800 text-zinc-300 border border-zinc-700/60 hover:bg-zinc-700 hover:text-white rounded-lg text-xs font-semibold transition-all"
@@ -66,14 +69,14 @@ const kycColumns = [
       return (
         <div className="flex items-center space-x-2.5">
           <button
-            onClick={() => table.options.meta.updateStatus(id, 'approved')}
+            onClick={() => table.options.meta.handlePreUpdateStatus(id, 'approved')}
             className="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/25 rounded-lg transition-all font-bold text-xs cursor-pointer"
           >
             <CheckCircle size={13} />
             <span>Approve</span>
           </button>
           <button
-            onClick={() => table.options.meta.updateStatus(id, 'rejected')}
+            onClick={() => table.options.meta.handlePreUpdateStatus(id, 'rejected')}
             className="flex items-center space-x-1.5 px-3 py-1.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/25 rounded-lg transition-all font-bold text-xs cursor-pointer"
           >
             <XCircle size={13} />
@@ -88,8 +91,19 @@ const kycColumns = [
 const KycManagement = () => {
   const { documents, loading, fetchKyc, updateStatus } = useKyc();
 
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, id: null, status: null });
+
+  const handlePreUpdateStatus = (id, status) => {
+    setConfirmModal({ isOpen: true, id, status });
+  };
+
+  const handleUpdateStatus = async () => {
+    await updateStatus(confirmModal.id, confirmModal.status);
+    setConfirmModal({ isOpen: false, id: null, status: null });
+  };
+
   const meta = {
-    updateStatus,
+    handlePreUpdateStatus,
   };
 
   return (
@@ -125,6 +139,16 @@ const KycManagement = () => {
       ) : (
         <DataTable data={documents} columns={kycColumns} meta={meta} />
       )}
+      
+      <ConfirmModal 
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ isOpen: false, id: null, status: null })}
+        onConfirm={handleUpdateStatus}
+        title={confirmModal.status === 'approved' ? "Confirm KYC Approval" : "Confirm KYC Rejection"}
+        message={confirmModal.status === 'approved' ? "Are you sure you want to approve this KYC document?" : "Are you sure you want to reject this KYC document?"}
+        confirmText={confirmModal.status === 'approved' ? "Approve" : "Reject"}
+        isDestructive={confirmModal.status === 'rejected'}
+      />
     </div>
   );
 };
