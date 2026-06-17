@@ -133,7 +133,7 @@ export const swapColumns = [
     header: 'INR Payout',
     cell: ({ getValue, row: { original }, table }) => {
       const status = getValue();
-      const updateStatus = table.options.meta?.updateStatus;
+      const updateStatus = table.options.meta?.handlePreUpdateStatus;
       const styles = {
         completed: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',
         processing: 'bg-amber-500/10 text-amber-400 border-amber-500/25',

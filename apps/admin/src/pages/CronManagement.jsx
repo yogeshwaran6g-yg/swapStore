@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Play, Clock, RefreshCw, Users, Zap, ChevronDown, ChevronUp, AlertTriangle, CheckCircle2, XCircle, Loader2, Info } from 'lucide-react';
 import { useCron } from '../hooks/useCron';
 import toast from 'react-hot-toast';
+import { ConfirmModal } from '../components/common/ConfirmModal';
 
 const statusStyles = {
   completed: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/25', icon: CheckCircle2 },
@@ -26,15 +27,10 @@ const CronManagement = () => {
 
   const [selectedUserUid, setSelectedUserUid] = useState('');
   const [expandedRow, setExpandedRow] = useState(null);
-  const [confirmAll, setConfirmAll] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const handleRunAll = async () => {
-    if (!confirmAll) {
-      setConfirmAll(true);
-      setTimeout(() => setConfirmAll(false), 4000);
-      return;
-    }
-    setConfirmAll(false);
+    setIsConfirmModalOpen(false);
     try {
       await runInterestCollection({});
     } catch (err) {
@@ -144,23 +140,14 @@ const CronManagement = () => {
               Processes interest collection for <strong>every active/approved loan</strong> where the next debit date has passed.
             </p>
             <button
-              onClick={handleRunAll}
+              onClick={() => setIsConfirmModalOpen(true)}
               disabled={isRunning}
-              className={`w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${
-                confirmAll
-                  ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30 hover:bg-rose-500/30'
-                  : 'bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/25'
-              }`}
+              className={`w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/25`}
             >
               {isRunning ? (
                 <>
                   <Loader2 size={16} className="animate-spin" />
                   <span>Running...</span>
-                </>
-              ) : confirmAll ? (
-                <>
-                  <AlertTriangle size={16} />
-                  <span>Click again to confirm</span>
                 </>
               ) : (
                 <>
@@ -169,6 +156,15 @@ const CronManagement = () => {
                 </>
               )}
             </button>
+            <ConfirmModal 
+              isOpen={isConfirmModalOpen}
+              onClose={() => setIsConfirmModalOpen(false)}
+              onConfirm={handleRunAll}
+              title="Confirm Run All"
+              message="Are you sure you want to run interest collection for ALL users? This action cannot be undone."
+              confirmText="Run All Users"
+              isLoading={isRunning}
+            />
           </div>
 
           {/* Run for Specific User */}

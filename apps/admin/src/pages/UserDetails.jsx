@@ -3,8 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, User, Mail, Phone, Wallet, ShieldCheck, ShieldAlert, AlertCircle, Building, CheckCircle2, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { apiClient } from '../utils/axios';
+import { resolveDocumentUrl } from '../utils/documentUrl';
 import endpoints from '../config/constants';
 import toast from 'react-hot-toast';
+import { ConfirmModal } from '../components/common/ConfirmModal';
 
 const UserDetails = () => {
   const { uid } = useParams();
@@ -15,6 +17,7 @@ const UserDetails = () => {
   const [userData, setUserData] = useState(null);
   const [activeTab, setActiveTab] = useState('kyc'); // 'kyc' or 'bank'
   const [isTogglingBlock, setIsTogglingBlock] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -36,7 +39,13 @@ const UserDetails = () => {
     }
   }, [uid]);
 
+  const handlePreToggleBlock = () => {
+    if (!userData) return;
+    setIsConfirmModalOpen(true);
+  };
+
   const handleToggleBlock = async () => {
+    setIsConfirmModalOpen(false);
     if (!userData) return;
     try {
       setIsTogglingBlock(true);
@@ -167,7 +176,7 @@ const UserDetails = () => {
 
             <div className="mt-8 pt-6 border-t border-zinc-800">
               <button
-                onClick={handleToggleBlock}
+                onClick={handlePreToggleBlock}
                 disabled={isTogglingBlock}
                 className={`w-full flex items-center justify-center px-4 py-3 rounded-xl text-sm font-bold transition-all border ${
                   userData.is_blocked 
@@ -283,7 +292,7 @@ const UserDetails = () => {
                               {doc.status}
                             </span>
                             <a 
-                              href={doc.document_url} 
+                              href={resolveDocumentUrl(doc.document_url)} 
                               target="_blank" 
                               rel="noreferrer"
                               className="text-xs font-bold bg-zinc-800 text-zinc-300 border border-zinc-700/60 hover:bg-zinc-700 hover:text-white px-4 py-2 rounded-lg transition-all"
@@ -366,6 +375,15 @@ const UserDetails = () => {
 
         </div>
       </div>
+      <ConfirmModal 
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleToggleBlock}
+        title={userData?.is_blocked ? "Confirm Unblock User" : "Confirm Block User"}
+        message={userData?.is_blocked ? "Are you sure you want to unblock this user? Their access will be restored." : "Are you sure you want to block this user? They will not be able to log in or perform any actions."}
+        confirmText={userData?.is_blocked ? "Unblock User" : "Block User"}
+        isDestructive={!userData?.is_blocked}
+      />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { RefreshCw, Search } from 'lucide-react';
 import { useUsers } from '../hooks/useUsers';
 import { DataTable } from '../components/common/DataTable';
 import { userColumns } from '../components/users/userColumns';
+import { ConfirmModal } from '../components/common/ConfirmModal';
 
 const UserManagement = () => {
   const { users, loading, fetchUsers, toggleBlock } = useUsers();
@@ -20,8 +21,19 @@ const UserManagement = () => {
     });
   }, [users, filterQuery]);
 
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, userUid: null, blockState: null });
+
+  const handleToggleBlock = (uid, isBlocked) => {
+    setConfirmModal({ isOpen: true, userUid: uid, blockState: isBlocked });
+  };
+
+  const executeBlock = async () => {
+    await toggleBlock(confirmModal.userUid, confirmModal.blockState);
+    setConfirmModal({ isOpen: false, userUid: null, blockState: null });
+  };
+
   const meta = {
-    toggleBlock,
+    toggleBlock: handleToggleBlock,
   };
 
   return (
@@ -73,6 +85,16 @@ const UserManagement = () => {
       ) : (
         <DataTable data={filteredUsers} columns={userColumns} meta={meta} />
       )}
+
+      <ConfirmModal 
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ isOpen: false, userUid: null, blockState: null })}
+        onConfirm={executeBlock}
+        title={confirmModal.blockState ? "Confirm Block User" : "Confirm Unblock User"}
+        message={confirmModal.blockState ? "Are you sure you want to block this user? They will not be able to log in or perform any actions." : "Are you sure you want to unblock this user? Their access will be restored."}
+        confirmText={confirmModal.blockState ? "Block User" : "Unblock User"}
+        isDestructive={confirmModal.blockState}
+      />
     </div>
   );
 };

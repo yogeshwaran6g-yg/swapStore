@@ -6,6 +6,7 @@ import { useUpdateBankDetails } from '@/hooks/useUpdateBankDetails';
 import { useUpdateProfile } from '@/hooks/useUpdateProfile';
 import { useUploadKyc } from '@/hooks/useUploadKyc';
 import toast from 'react-hot-toast';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 
 export default function Profile() {
   const { isAuthenticated } = useAuth();
@@ -37,6 +38,8 @@ export default function Profile() {
   const [kycFile, setKycFile] = useState(null);
   const [kycType, setKycType] = useState('id_card');
 
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: null });
+
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/');
@@ -60,8 +63,13 @@ export default function Profile() {
   }, [profile]);
 
   // Handle Profile Save
-  const handleSaveProfile = async (e) => {
+  const handlePreSaveProfile = (e) => {
     e.preventDefault();
+    setConfirmModal({ isOpen: true, type: 'profile' });
+  };
+
+  const handleSaveProfile = async () => {
+    setConfirmModal({ isOpen: false, type: null });
     try {
       await saveProfileInfo(profileData);
       
@@ -81,9 +89,14 @@ export default function Profile() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSaveBank = async (e) => {
+  const handlePreSaveBank = (e) => {
     e.preventDefault();
     if (!validateBankForm()) return;
+    setConfirmModal({ isOpen: true, type: 'bank' });
+  };
+
+  const handleSaveBank = async () => {
+    setConfirmModal({ isOpen: false, type: null });
     try {
       await saveBankDetails({
         name: bankData.name,
@@ -99,12 +112,17 @@ export default function Profile() {
   };
 
   // Handle KYC Upload
-  const handleKycUpload = async (e) => {
+  const handlePreKycUpload = (e) => {
     e.preventDefault();
     if (!kycFile) {
       toast.error('Please select a file to upload');
       return;
     }
+    setConfirmModal({ isOpen: true, type: 'kyc' });
+  };
+
+  const handleKycUpload = async () => {
+    setConfirmModal({ isOpen: false, type: null });
     try {
       const formData = new FormData();
       formData.append('documentType', kycType);
@@ -163,7 +181,7 @@ export default function Profile() {
             <div className="p-8 md:p-12">
               {/* Profile Tab */}
               {activeTab === 'profile' && (
-                <form onSubmit={handleSaveProfile} className="space-y-8 animate-fade-in">
+                <form onSubmit={handlePreSaveProfile} className="space-y-8 animate-fade-in">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
                       <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Username</label>
@@ -208,7 +226,7 @@ export default function Profile() {
 
               {/* Bank Details Tab */}
               {activeTab === 'bank' && (
-                <form onSubmit={handleSaveBank} className="space-y-8 animate-fade-in">
+                <form onSubmit={handlePreSaveBank} className="space-y-8 animate-fade-in">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
                       <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Account Holder Name <span className="text-red-500">*</span></label>
@@ -273,7 +291,7 @@ export default function Profile() {
 
               {/* KYC Tab */}
               {activeTab === 'kyc' && (
-                <form onSubmit={handleKycUpload} className="space-y-8 animate-fade-in">
+                <form onSubmit={handlePreKycUpload} className="space-y-8 animate-fade-in">
                   <div>
                     <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Document Type <span className="text-red-500">*</span></label>
                     <select 
@@ -324,6 +342,28 @@ export default function Profile() {
                 </form>
               )}
             </div>
+
+            <ConfirmModal 
+              isOpen={confirmModal.isOpen}
+              onClose={() => setConfirmModal({ isOpen: false, type: null })}
+              onConfirm={() => {
+                if (confirmModal.type === 'profile') handleSaveProfile();
+                if (confirmModal.type === 'bank') handleSaveBank();
+                if (confirmModal.type === 'kyc') handleKycUpload();
+              }}
+              title={
+                confirmModal.type === 'profile' ? "Confirm Profile Update" :
+                confirmModal.type === 'bank' ? "Confirm Bank Details" :
+                "Confirm Document Upload"
+              }
+              message={
+                confirmModal.type === 'profile' ? "Are you sure you want to update your profile information?" :
+                confirmModal.type === 'bank' ? "Are you sure you want to update your bank details? Please ensure the account number and IFSC are correct." :
+                "Are you sure you want to upload this KYC document for verification?"
+              }
+              confirmText="Confirm"
+              isLoading={savingProfile || submittingBank || uploadingKyc}
+            />
 
           </div>
         </div>

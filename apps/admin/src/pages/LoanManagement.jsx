@@ -7,6 +7,8 @@ import { parseUnits } from 'viem';
 import { CRYPTO_LOAN_ABI, CONTRACT_ADDRESSES } from '../config/contracts';
 import { useAppKitAccount } from '@reown/appkit/react';
 import toast from 'react-hot-toast';
+import { ConfirmModal } from '../components/common/ConfirmModal';
+import { useState } from 'react';
 
 const loanColumns = [
   {
@@ -78,7 +80,7 @@ const loanColumns = [
 
       return (
         <button
-          onClick={() => table.options.meta.handleApprove(row.original)}
+          onClick={() => table.options.meta.handlePreApprove(row.original)}
           className="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/25 rounded-lg transition-all font-bold text-xs cursor-pointer"
         >
           <CheckCircle size={13} />
@@ -91,11 +93,21 @@ const loanColumns = [
 
 const LoanManagement = () => {
   const { loans, loading, fetchLoans } = useLoans();
-  const { writeContractAsync } = useWriteContract();
+  const { writeContractAsync, isPending: isConfirming } = useWriteContract();
   const { isConnected } = useAppKitAccount();
 
-  const handleApprove = async (loan) => {
-    console.log(loan);
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, loan: null });
+
+  const handlePreApprove = (loan) => {
+    setConfirmModal({ isOpen: true, loan });
+  };
+
+  const handleApprove = async () => {
+    const loan = confirmModal.loan;
+    if (!loan) return;
+    
+    setConfirmModal({ isOpen: false, loan: null });
+
     if (!isConnected) {
       toast.error('Please connect your admin wallet first using the top right button.');
       return;
@@ -139,7 +151,7 @@ const LoanManagement = () => {
   };
 
   const meta = {
-    handleApprove,
+    handlePreApprove,
   };
 
   return (
@@ -228,6 +240,15 @@ const LoanManagement = () => {
           )}
         />
       )}
+      
+      <ConfirmModal 
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ isOpen: false, loan: null })}
+        onConfirm={handleApprove}
+        title="Confirm Loan Approval"
+        message={`Are you sure you want to approve this loan and disburse ${confirmModal.loan?.principal_amount} to ${confirmModal.loan?.wallet_address}?`}
+        confirmText="Approve & Disburse"
+      />
     </div>
   );
 };

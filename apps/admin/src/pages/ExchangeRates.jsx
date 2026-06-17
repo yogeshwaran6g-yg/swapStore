@@ -5,6 +5,7 @@ import { AddRateForm } from '../components/exchange/AddRateForm';
 import { DataTable } from '../components/common/DataTable';
 import { columns } from '../components/exchange/columns/exchangeRateColumns';
 import { toast } from "react-hot-toast";
+import { ConfirmModal } from '../components/common/ConfirmModal';
 
 
 const ExchangeRates = () => {
@@ -16,13 +17,20 @@ const ExchangeRates = () => {
   const [filterToken, setFilterToken] = useState('');
   const [filterNetwork, setFilterNetwork] = useState('');
 
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, rateObj: null });
+
   const handleAdd = async (token, network, rate) => {
     await addRate(token, network, rate, true);
     setIsAdding(false);
   };
 
-  const handleSave = async (rateObj) => {
-    await updateRate(rateObj, editValue, undefined);
+  const handlePreSave = (rateObj) => {
+    setConfirmModal({ isOpen: true, rateObj });
+  };
+
+  const handleSave = async () => {
+    await updateRate(confirmModal.rateObj, editValue, undefined);
+    setConfirmModal({ isOpen: false, rateObj: null });
     setEditingId(null);
   };
 
@@ -53,7 +61,7 @@ const ExchangeRates = () => {
     setEditingId,
     editValue,
     setEditValue,
-    handleSave,
+    handleSave: handlePreSave,
     toggleRateActive,
   };
 
@@ -135,6 +143,15 @@ const ExchangeRates = () => {
       ) : (
         <DataTable data={filteredRates} columns={columns} meta={meta} />
       )}
+      
+      <ConfirmModal 
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ isOpen: false, rateObj: null })}
+        onConfirm={handleSave}
+        title="Confirm Rate Update"
+        message={`Are you sure you want to update the exchange rate for ${confirmModal.rateObj?.token_symbol} on ${confirmModal.rateObj?.network} to ${editValue}?`}
+        confirmText="Save Rate"
+      />
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { useSwaps } from '../hooks/useSwaps';
 import { DataTable } from '../components/common/DataTable';
 import { swapColumns } from '../components/swaps/swapColumns';
 import { BankDetailsModal } from '../components/swaps/BankDetailsModal';
+import { ConfirmModal } from '../components/common/ConfirmModal';
 
 const SwapOrders = () => {
   const { swaps, loading, fetchSwaps, updateStatus } = useSwaps();
@@ -13,9 +14,15 @@ const SwapOrders = () => {
   
   const [selectedBankDetails, setSelectedBankDetails] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, orderId: null, newStatus: null });
 
-  const handleUpdateStatus = async (orderId, newStatus) => {
-    await updateStatus(orderId, newStatus);
+  const handlePreUpdateStatus = (orderId, newStatus) => {
+    setConfirmModal({ isOpen: true, orderId, newStatus });
+  };
+
+  const handleUpdateStatus = async () => {
+    await updateStatus(confirmModal.orderId, confirmModal.newStatus);
+    setConfirmModal({ isOpen: false, orderId: null, newStatus: null });
   };
 
   const handleViewBankDetails = (swapData) => {
@@ -34,7 +41,7 @@ const SwapOrders = () => {
   }, [swaps, filterOrderId, filterUser]);
 
   const meta = {
-    updateStatus: handleUpdateStatus,
+    handlePreUpdateStatus,
     onViewBankDetails: handleViewBankDetails,
   };
 
@@ -100,11 +107,19 @@ const SwapOrders = () => {
         <DataTable data={filteredSwaps} columns={swapColumns} meta={meta} />
       )}
 
-      {/* Bank Details Modal */}
       <BankDetailsModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         bankDetails={selectedBankDetails} 
+      />
+
+      <ConfirmModal 
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ isOpen: false, orderId: null, newStatus: null })}
+        onConfirm={handleUpdateStatus}
+        title="Confirm Status Update"
+        message={`Are you sure you want to change the INR payout status to ${confirmModal.newStatus?.toUpperCase()}?`}
+        confirmText="Update Status"
       />
     </div>
   );
