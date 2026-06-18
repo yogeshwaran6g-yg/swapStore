@@ -86,7 +86,7 @@ function Home() {
             </div>
 
             {/* Mobile Hero Image (Hidden on Desktop) */}
-            <div className="flex lg:hidden relative w-full h-[350px] sm:h-[450px] items-center justify-center my-2">
+            <div className="flex lg:hidden relative w-full h-[280px] sm:h-[400px] items-center justify-center mb-0 mt-4">
               {/* Ambient Purple Light */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#A99CFF] blur-[80px] opacity-40 rounded-full pointer-events-none z-0"></div>
 
@@ -116,7 +116,7 @@ function Home() {
             </div>
 
             {/* Subheading */}
-            <p className="text-[#475569] text-lg lg:text-xl font-medium leading-relaxed max-w-[550px] mx-auto lg:mx-0">
+            <p className="text-[#475569] text-lg lg:text-xl font-medium leading-relaxed max-w-[550px] mx-auto lg:mx-0 -mt-4 lg:mt-0 relative z-20">
               Trade USDT, USDC, DAI, Polygon & BNB in seconds. Access crypto-backed loans instantly with secure approvals. Enjoy seamless cash processing with absolutely <span className="font-bold text-[#0E1B4D]">zero risk of bank account freezes</span>.
             </p>
 
@@ -245,7 +245,7 @@ function Home() {
       </div>
 
       {/* --- FEATURES/SERVICES SECTION --- */}
-      <section id="services" className="max-w-[1400px] mx-auto px-1 sm:px-8 mt-12 relative z-20 scroll-mt-24">
+      <section id="services" className="max-w-[1400px] mx-auto px-1 sm:px-8 mt-6 sm:mt-12 relative z-20 scroll-mt-24">
         <div className="bg-white rounded-[32px] p-8 lg:p-12 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-gray-100/50 grid md:grid-cols-2 lg:grid-cols-4 gap-8">
 
           {/* Feature 1 */}
@@ -296,7 +296,7 @@ function Home() {
       </section>
 
       {/* --- SWAP SECTION --- */}
-      <section id="swap" className="max-w-[1100px] mx-auto px-1 sm:px-8 mt-16 sm:mt-32 relative z-20 scroll-mt-24 text-center">
+      <section id="swap" className="max-w-[1100px] mx-auto px-1 sm:px-8 mt-8 sm:mt-32 relative z-20 scroll-mt-24 text-center">
         <div className="bg-white/40 backdrop-blur-2xl border border-white/60 p-6 sm:p-12 lg:p-20 rounded-[24px] sm:rounded-[40px] shadow-[0_20px_60px_-15px_rgba(169,156,255,0.2)] flex flex-col items-center gap-6 sm:gap-8 relative overflow-hidden">
           {/* Subtle background glow */}
           <div className="absolute -top-24 -right-24 w-80 h-80 bg-gradient-to-br from-[#A99CFF] to-[#D9A85C] rounded-full blur-[80px] opacity-30 pointer-events-none"></div>
@@ -372,7 +372,7 @@ function Home() {
                 </div>
               </li>
               <li className="flex items-start gap-4">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#D9A85C] to-[#FCD34D] flex-shrink-0 flex items-center justify-center text-white shadow-md">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#A99CFF] to-[#6366F1] flex-shrink-0 flex items-center justify-center text-white shadow-md">
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <div className="flex-1 text-left">
@@ -381,7 +381,7 @@ function Home() {
                 </div>
               </li>
               <li className="flex items-start gap-4">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#4338CA] to-[#312E81] flex-shrink-0 flex items-center justify-center text-white shadow-md">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#A99CFF] to-[#6366F1] flex-shrink-0 flex items-center justify-center text-white shadow-md">
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <div className="flex-1 text-left">
@@ -390,7 +390,7 @@ function Home() {
                 </div>
               </li>
               <li className="flex items-start gap-4">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#10B981] to-[#059669] flex-shrink-0 flex items-center justify-center text-white shadow-md">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#A99CFF] to-[#6366F1] flex-shrink-0 flex items-center justify-center text-white shadow-md">
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <div className="flex-1 text-left">
@@ -399,7 +399,7 @@ function Home() {
                 </div>
               </li>
               <li className="flex items-start gap-4">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#F43F5E] to-[#BE123C] flex-shrink-0 flex items-center justify-center text-white shadow-md">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#A99CFF] to-[#6366F1] flex-shrink-0 flex items-center justify-center text-white shadow-md">
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <div className="flex-1 text-left">
@@ -408,7 +408,7 @@ function Home() {
                 </div>
               </li>
               <li className="flex items-start gap-4">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#0EA5E9] to-[#0369A1] flex-shrink-0 flex items-center justify-center text-white shadow-md">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#A99CFF] to-[#6366F1] flex-shrink-0 flex items-center justify-center text-white shadow-md">
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <div className="flex-1 text-left">
@@ -432,7 +432,7 @@ function Home() {
       </section>
 
       {/* --- LOAN DETAILS SECTION --- */}
-      <section id="loan-details" className="max-w-[1400px] mx-auto px-1 sm:px-8 mt-16 sm:mt-32 relative z-20 scroll-mt-24">
+      <section id="loan-details" className="max-w-[1400px] mx-auto px-1 sm:px-8 mt-8 sm:mt-32 relative z-20 scroll-mt-24">
         <div className="bg-[#0E1B4D] rounded-[24px] sm:rounded-[40px] p-6 sm:p-8 lg:p-16 shadow-[0_32px_64px_-12px_rgba(14,27,77,0.4)] text-white relative overflow-hidden flex flex-col lg:flex-row items-center gap-10 sm:gap-16">
           {/* Background glows */}
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#A99CFF]/20 blur-[120px] rounded-full pointer-events-none"></div>
@@ -511,22 +511,26 @@ function Home() {
       </section>
 
       {/* --- REVIEWS SECTION --- */}
-      <section id="reviews" className="max-w-[1400px] mx-auto px-1 sm:px-8 mt-32 relative z-20 scroll-mt-24">
+      <section id="reviews" className="max-w-[1400px] mx-auto px-1 sm:px-8 mt-10 sm:mt-32 relative z-20 scroll-mt-24">
         <div className="text-center max-w-3xl mx-auto mb-16 flex flex-col items-center">
-          <h2 className="text-4xl lg:text-5xl font-[800] text-[#0E1B4D] mb-4">Rated <span className="text-[#00B67A]">Excellent</span></h2>
+          <h2 className="text-4xl lg:text-5xl font-[800] text-[#0E1B4D] mb-4">Customer <span className="text-[#00B67A]">Reviews</span></h2>
           <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 mb-6">
-            <span className="text-xl font-bold text-[#1A1A1A]">4.5 / 5</span>
-            <div className="flex gap-[2px]">
-              {[...Array(4)].map((_, i) => (
+            <span className="text-xl font-bold text-[#1A1A1A]">4.5/5 Excellent</span>
+            <div className="flex items-center gap-[2px]">
+              {[...Array(5)].map((_, i) => (
                 <div key={i} className="w-8 h-8 bg-[#00B67A] flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
                 </div>
               ))}
-              <div className="w-8 h-8 bg-[linear-gradient(to_right,#00B67A_50%,#D1D5DB_50%)] flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-              </div>
             </div>
-            <span className="text-lg font-medium text-gray-500">Based on 10,000+ reviews</span>
+            <div className="flex items-center gap-1.5 text-[#64748B] font-medium text-[15px]">
+              <span>10,000+ Reviews on</span>
+              <span className="text-[#1A1A1A] font-bold flex items-center gap-1">
+                <span className="text-[#00B67A] text-lg leading-none">★</span> Trustpilot
+              </span>
+            </div>
           </div>
           <p className="text-[#475569] text-lg lg:text-xl">Don't just take our word for it. See what our global community of users has to say about their seamless, zero-freeze experience with InstaaCash.</p>
         </div>
@@ -603,8 +607,8 @@ function Home() {
       </section>
 
       {/* --- ABOUT SECTION --- */}
-      <section id="about" className="max-w-[1400px] mx-auto px-1 sm:px-8 mt-32 mb-20 relative z-20 scroll-mt-24">
-        <div className="bg-white/50 backdrop-blur-2xl border border-white/80 rounded-[40px] p-8 lg:p-16 shadow-[0_20px_60px_-15px_rgba(169,156,255,0.2)] flex flex-col lg:flex-row items-center gap-16 relative overflow-hidden">
+      <section id="about" className="max-w-[1400px] mx-auto px-1 sm:px-8 mt-10 sm:mt-32 mb-10 sm:mb-20 relative z-20 scroll-mt-24">
+        <div className="bg-white/50 backdrop-blur-2xl border border-white/80 rounded-[40px] p-8 lg:p-16 shadow-[0_20px_60px_-15px_rgba(169,156,255,0.2)] flex flex-col lg:flex-row items-center gap-4 lg:gap-16 relative overflow-hidden">
 
           {/* Decorative Glows */}
           <div className="absolute -top-24 -left-24 w-80 h-80 bg-gradient-to-br from-[#A99CFF] to-[#D9A85C] rounded-full blur-[80px] opacity-20 pointer-events-none"></div>
@@ -622,7 +626,7 @@ function Home() {
               We believe that crypto finance should be accessible, beautiful, and inherently secure. InstaaCash was built by a team of Web3 veterans to merge complex DeFi protocols with a consumer-friendly experience.
             </p>
 
-            <p className="text-[#475569] text-lg lg:text-xl font-medium leading-relaxed max-w-xl mb-10">
+            <p className="text-[#475569] text-lg lg:text-xl font-medium leading-relaxed max-w-xl mb-0 lg:mb-10">
               Our mission is to empower everyone to unlock the absolute full potential of their digital assets without the traditional barriers.
             </p>
 
@@ -643,7 +647,7 @@ function Home() {
       </section>
 
       {/* --- FOOTER SECTION --- */}
-      <footer className="w-full bg-[#0E1B4D] mt-24 relative overflow-hidden z-20">
+      <footer className="w-full bg-[#0E1B4D] mt-24 relative overflow-hidden z-20 rounded-t-[40px] sm:rounded-t-[64px]">
         {/* Top Glow Accent */}
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#A99CFF]/50 to-transparent"></div>
         <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#6366F1] blur-[150px] opacity-20 rounded-full pointer-events-none"></div>
