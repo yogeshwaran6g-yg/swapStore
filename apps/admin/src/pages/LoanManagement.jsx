@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { RefreshCw, CheckCircle, Wallet } from 'lucide-react';
+import { RefreshCw, CheckCircle, Wallet, X, Check } from 'lucide-react';
 import { useLoans } from '../hooks/useLoans';
 import { DataTable } from '../components/common/DataTable';
 import { useWriteContract } from 'wagmi';
@@ -79,34 +79,47 @@ const loanColumns = [
       if (status !== 'pending') return null;
 
       return (
-        <button
-          onClick={() => table.options.meta.handlePreApprove(row.original)}
-          className="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/25 rounded-lg transition-all font-bold text-xs cursor-pointer"
-        >
-          <CheckCircle size={13} />
-          <span>Approve & Disburse</span>
-        </button>
+        <div className="flex space-x-2">
+          <button
+            onClick={() => table.options.meta.handlePreApprove(row.original)}
+            className="p-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/25 rounded-lg transition-all cursor-pointer"
+            title="Approve & Disburse"
+          >
+            <Check size={16} strokeWidth={2.5} />
+          </button>
+          <button
+            onClick={() => table.options.meta.handlePreReject(row.original)}
+            className="p-1.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/25 rounded-lg transition-all cursor-pointer"
+            title="Reject Loan"
+          >
+            <X size={16} strokeWidth={2.5} />
+          </button>
+        </div>
       );
     },
   },
 ];
 
 const LoanManagement = () => {
-  const { loans, loading, fetchLoans } = useLoans();
+  const { loans, loading, fetchLoans, rejectLoan } = useLoans();
   const { writeContractAsync, isPending: isConfirming } = useWriteContract();
   const { isConnected } = useAppKitAccount();
 
-  const [confirmModal, setConfirmModal] = useState({ isOpen: false, loan: null });
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, loan: null, type: null });
 
   const handlePreApprove = (loan) => {
-    setConfirmModal({ isOpen: true, loan });
+    setConfirmModal({ isOpen: true, loan, type: 'approve' });
+  };
+
+  const handlePreReject = (loan) => {
+    setConfirmModal({ isOpen: true, loan, type: 'reject' });
   };
 
   const handleApprove = async () => {
     const loan = confirmModal.loan;
     if (!loan) return;
     
-    setConfirmModal({ isOpen: false, loan: null });
+    setConfirmModal({ isOpen: false, loan: null, type: null });
 
     if (!isConnected) {
       toast.error('Please connect your admin wallet first using the top right button.');
@@ -150,8 +163,22 @@ const LoanManagement = () => {
     }
   };
 
+  const handleReject = async () => {
+    const loan = confirmModal.loan;
+    if (!loan) return;
+    
+    setConfirmModal({ isOpen: false, loan: null, type: null });
+
+    try {
+      await rejectLoan(loan.uid);
+    } catch (err) {
+      // Handled in hook
+    }
+  };
+
   const meta = {
     handlePreApprove,
+    handlePreReject,
   };
 
   return (
@@ -243,11 +270,15 @@ const LoanManagement = () => {
       
       <ConfirmModal 
         isOpen={confirmModal.isOpen}
-        onClose={() => setConfirmModal({ isOpen: false, loan: null })}
-        onConfirm={handleApprove}
-        title="Confirm Loan Approval"
-        message={`Are you sure you want to approve this loan and disburse ${confirmModal.loan?.principal_amount} to ${confirmModal.loan?.wallet_address}?`}
-        confirmText="Approve & Disburse"
+        onClose={() => setConfirmModal({ isOpen: false, loan: null, type: null })}
+        onConfirm={confirmModal.type === 'approve' ? handleApprove : handleReject}
+        title={confirmModal.type === 'approve' ? "Confirm Loan Approval" : "Confirm Loan Rejection"}
+        message={confirmModal.type === 'approve' 
+          ? `Are you sure you want to approve this loan and disburse ${confirmModal.loan?.principal_amount} to ${confirmModal.loan?.wallet_address}?`
+          : `Are you sure you want to reject this loan request for ${confirmModal.loan?.principal_amount}?`
+        }
+        confirmText={confirmModal.type === 'approve' ? "Approve & Disburse" : "Reject Loan"}
+        isDestructive={confirmModal.type === 'reject'}
       />
     </div>
   );

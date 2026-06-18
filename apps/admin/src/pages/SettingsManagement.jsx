@@ -98,18 +98,18 @@ const SettingsManagement = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-12">
-      <div className="flex justify-between items-center bg-zinc-900/80 p-6 rounded-2xl border border-zinc-800/50 backdrop-blur-xl">
+    <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8 pb-12">
+      <div className="flex justify-between items-center bg-zinc-900/80 p-4 sm:p-6 rounded-2xl border border-zinc-800/50 backdrop-blur-xl">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-100 flex items-center space-x-2">
-            <Settings2 className="text-amber-500" />
+          <h1 className="text-xl sm:text-2xl font-bold text-zinc-100 flex items-center space-x-2">
+            <Settings2 className="text-amber-500 w-5 h-5 sm:w-6 sm:h-6" />
             <span>System Settings</span>
           </h1>
-          <p className="text-zinc-400 text-sm mt-1">Select a setting to modify its configuration</p>
+          <p className="text-zinc-400 text-xs sm:text-sm mt-1">Select a setting to modify its configuration</p>
         </div>
       </div>
 
-      <div className="bg-zinc-900/80 rounded-2xl border border-zinc-800/50 p-6 lg:p-8 shadow-xl backdrop-blur-xl space-y-8">
+      <div className="bg-zinc-900/80 rounded-2xl border border-zinc-800/50 p-4 sm:p-6 lg:p-8 shadow-xl backdrop-blur-xl space-y-6 sm:space-y-8">
         
         {/* Dropdown Selector */}
         <div className="space-y-2">
@@ -117,7 +117,7 @@ const SettingsManagement = () => {
           <select
             value={selectedKey}
             onChange={(e) => setSelectedKey(e.target.value)}
-            className="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-4 text-zinc-100 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 text-lg shadow-sm"
+            className="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-3 sm:p-4 text-zinc-100 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 text-base sm:text-lg shadow-sm"
           >
             {SETTING_KEYS.map((setting) => (
               <option key={setting.key} value={setting.key}>
@@ -138,7 +138,7 @@ const SettingsManagement = () => {
               type="number"
               value={currentValue}
               onChange={(e) => setCurrentValue(e.target.value)}
-              className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-zinc-100 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+              className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 sm:p-4 text-sm sm:text-base text-zinc-100 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
               placeholder="Enter value..."
             />
           )}
@@ -147,7 +147,7 @@ const SettingsManagement = () => {
             <select
               value={currentValue}
               onChange={(e) => setCurrentValue(e.target.value)}
-              className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-zinc-100 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+              className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 sm:p-4 text-sm sm:text-base text-zinc-100 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
             >
               {selectedSettingConfig.options.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -235,7 +235,7 @@ const SettingsManagement = () => {
             <button
               onClick={handlePreSave}
               disabled={saving}
-              className="flex items-center space-x-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold rounded-xl shadow-lg disabled:opacity-50 transition-all w-full sm:w-auto"
+              className="flex items-center justify-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold rounded-xl shadow-lg disabled:opacity-50 transition-all w-full sm:w-auto"
             >
               <Save size={18} />
               <span>{saving ? 'Updating...' : `Update ${selectedSettingConfig?.label}`}</span>

@@ -46,11 +46,11 @@ const SwapOrders = () => {
   };
 
   return (
-    <div className="w-full space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="w-full space-y-6 text-sm">
+      <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-zinc-100 tracking-tight">Swap Orders</h1>
-          <p className="mt-1 text-zinc-400">Manage user crypto swaps and INR payouts</p>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-zinc-100 tracking-tight">Swap Orders</h1>
+          <p className="mt-1 text-xs sm:text-sm text-zinc-400">Manage user crypto swaps and INR payouts</p>
         </div>
       </div>
 
@@ -65,7 +65,7 @@ const SwapOrders = () => {
             placeholder="Filter by Order ID..."
             value={filterOrderId}
             onChange={(e) => setFilterOrderId(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-zinc-700 rounded-lg leading-5 bg-zinc-950 text-zinc-300 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition-colors"
+            className="block w-full pl-10 pr-3 py-1.5 text-xs sm:text-sm border border-zinc-700 rounded-lg leading-5 bg-zinc-950 text-zinc-300 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 transition-colors"
           />
         </div>
         <div className="flex-1 relative">
@@ -77,7 +77,7 @@ const SwapOrders = () => {
             placeholder="Filter by User (Username/Wallet/UID)..."
             value={filterUser}
             onChange={(e) => setFilterUser(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-zinc-700 rounded-lg leading-5 bg-zinc-950 text-zinc-300 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition-colors"
+            className="block w-full pl-10 pr-3 py-1.5 text-xs sm:text-sm border border-zinc-700 rounded-lg leading-5 bg-zinc-950 text-zinc-300 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 transition-colors"
           />
         </div>
       </div>
