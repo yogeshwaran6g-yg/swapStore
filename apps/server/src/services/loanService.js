@@ -274,11 +274,11 @@ export const collectInterestForLoan = async (loan, cronRunId = null) => {
   }
 
   try {
-    // Convert interestAmount (human-readable) to on-chain units (18 decimals)
+    // Convert interestAmount (human-readable) to on-chain units (token decimals via 18)
     const amountWei = parseUnits(interestAmount.toFixed(18), 18);
     const loanIdBytes32 = loan.loan_id.startsWith('0x') ? loan.loan_id : `0x${loan.loan_id}`;
 
-    // Mark ledger as collecting
+    // Mark ledger as collecting — listener will update to 'collected' + tx_hash when the tx confirms
     await queryRunner(
       `UPDATE loan_interest_ledger SET collection_status = 'collecting' WHERE id = ?`,
       [ledgerId]
@@ -297,18 +297,15 @@ export const collectInterestForLoan = async (loan, cronRunId = null) => {
       ],
     });
 
-    // Update ledger — listener will also fire but we update immediately as backup
+    // Advance next_debit_date immediately so the cron doesn't re-queue this loan.
+    // total_interest_paid is updated by the PaymentCollected listener once the tx confirms.
     const nextDebit = new Date(now.getTime() + frequencyDays * 24 * 60 * 60 * 1000);
     await queryRunner(
-      `UPDATE loan_interest_ledger SET collection_status = 'collected', tx_hash = ?, collected_at = NOW() WHERE id = ?`,
-      [txHash, ledgerId]
-    );
-    await queryRunner(
-      `UPDATE loans SET total_interest_paid = total_interest_paid + ?, next_debit_date = ?, updated_at = NOW() WHERE uid = UNHEX(?)`,
-      [interestAmount, nextDebit, loan.uid]
+      `UPDATE loans SET next_debit_date = ?, updated_at = NOW() WHERE uid = UNHEX(?)`,
+      [nextDebit, loan.uid]
     );
 
-    console.log(`✅ On-chain collectPayment tx: ${txHash}`);
+    console.log(`✅ On-chain collectPayment tx submitted: ${txHash}`);
     return { success: true, interestAmount, txHash, failureReason: null };
   } catch (err) {
     await queryRunner(
