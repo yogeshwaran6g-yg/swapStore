@@ -158,28 +158,28 @@ const startLoanListeners = (networks) => {
             console.log(`💸 [Loan/${name}] PaymentCollected | loanId=${hexLoanId} amount=${amount}`);
 
             try {
-              // Update the most recent pending ledger entry for this loan
-              const result = await queryRunner(
+              // amount is in wei (18 decimals) — convert to human-readable
+              const humanAmount = Number(amount) / 1e18;
+
+              // Mark the most recent collecting ledger entry with the confirmed tx_hash
+              await queryRunner(
                 `UPDATE loan_interest_ledger 
                  SET collection_status = 'collected', tx_hash = ?, collected_at = NOW(), updated_at = NOW()
-                 WHERE loan_uid = UNHEX(?) AND collection_status IN ('pending', 'collecting')
-                 ORDER BY created_at DESC LIMIT 1`,
+                 WHERE loan_uid = (SELECT uid FROM loans WHERE loan_id = UNHEX(?) LIMIT 1)
+                   AND collection_status = 'collecting'
+                 ORDER BY id DESC LIMIT 1`,
                 [txHash, hexLoanId]
               );
 
-              // Also update loan totals
+              // Update loan total_interest_paid with the confirmed on-chain amount
               await queryRunner(
                 `UPDATE loans 
                  SET total_interest_paid = total_interest_paid + ?, updated_at = NOW()
                  WHERE loan_id = UNHEX(?)`,
-                [String(amount), hexLoanId]
+                [humanAmount, hexLoanId]
               );
 
-              if (result?.affectedRows > 0) {
-                console.log(`🎉 [Loan/${name}] Ledger entry for loan ${hexLoanId} marked collected.`);
-              } else {
-                console.log(`⚠️  [Loan/${name}] No pending ledger entry found for loan ${hexLoanId}.`);
-              }
+              console.log(`🎉 [Loan/${name}] Loan ${hexLoanId} interest +${humanAmount} confirmed on-chain.`);
             } catch (err) {
               console.error(`❌ [Loan/${name}] DB error for PaymentCollected ${loanId}:`, err.message);
             }

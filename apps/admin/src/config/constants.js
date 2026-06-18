@@ -27,7 +27,7 @@ const endpoints = {
         LOANS_USERS: "/api/v1/loan/admin/loans-users",
     },
     SETTINGS: {
-        GET: "/api/v1/admin/settings",
+        GET: "/api/v1/loan/admin/settings",
     }
 
 }

@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useAccount, usePublicClient, useWriteContract } from 'wagmi';
 import { useAuth } from '@/hooks/useAuth';
-import {
-  USDT_ADDRESSES,
-  USDC_ADDRESSES,
-  DAI_ADDRESSES,
-  GATEWAY_ADDRESSES,
-  LOAN_CONTRACT_ADDRESSES,
-  erc20Abi,
-} from '@/config/constants';
+import { LOAN_CONTRACT_ADDRESSES, erc20Abi } from '@/config/constants';
+import { endpoints } from '@/config/constants';
 import { maxUint256 } from 'viem';
 import toast from 'react-hot-toast';
+import apiClient from '@/utils/axios';
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+
+// Any allowance below this triggers re-approval (1 million tokens, 1e24 with 18 decimals)
+const THRESHOLD = 1_000_000_000_000_000_000_000_000n;
+
+// Loan statuses that require an active approval to keep collecting payments
+const ACTIVE_LOAN_STATUSES = ['active', 'approved', 'overdue'];
 
 export default function GlobalApprovalGuard({ children }) {
   const { isAuthenticated, logout } = useAuth();
@@ -20,13 +21,12 @@ export default function GlobalApprovalGuard({ children }) {
   const publicClient = usePublicClient();
   const { writeContractAsync } = useWriteContract();
 
-  const [isChecking, setIsChecking] = useState(false);
+  const [isChecking, setIsChecking]     = useState(false);
   const [needsApproval, setNeedsApproval] = useState(false);
-  // Each item: { symbol, address, spender, spenderLabel }
+  // Each item: { symbol, address, spender, spenderLabel, networkLabel }
   const [tokensToApprove, setTokensToApprove] = useState([]);
-  const [isApproving, setIsApproving] = useState(false);
+  const [isApproving, setIsApproving]   = useState(false);
 
-  // If not authenticated, we don't block. The routing handles protected routes.
   useEffect(() => {
     if (!isAuthenticated || !chain || !address || !publicClient) {
       setIsChecking(false);
@@ -35,81 +35,80 @@ export default function GlobalApprovalGuard({ children }) {
 
     let mounted = true;
 
-    const checkAllowances = async () => {
+    const checkActiveLoanApprovals = async () => {
       setIsChecking(true);
       try {
         const networkName =
           chain?.id === 56 || chain?.name?.toLowerCase().includes('bsc') ? 'bnb' : 'polygon';
 
-        const gatewayAddress = GATEWAY_ADDRESSES[networkName];
-        const loanAddress = LOAN_CONTRACT_ADDRESSES[networkName];
+        const loanContractAddress = LOAN_CONTRACT_ADDRESSES[networkName];
 
-        // Build spender list — skip any that are missing or the zero address
-        const spenders = [
-          { address: gatewayAddress, label: 'Swap Gateway' },
-          { address: loanAddress, label: 'Loan Contract' },
-        ].filter(s => s.address && s.address !== ZERO_ADDRESS);
-
-        if (spenders.length === 0) {
-          setIsChecking(false);
+        // No loan contract on this network — nothing to check
+        if (!loanContractAddress || loanContractAddress === ZERO_ADDRESS) {
+          setNeedsApproval(false);
           return;
         }
 
-        const tokens = [
-          { symbol: 'USDT', address: USDT_ADDRESSES[networkName] },
-          { symbol: 'USDC', address: USDC_ADDRESSES[networkName] },
-          { symbol: 'DAI', address: DAI_ADDRESSES[networkName] },
-        ].filter(t => t.address && t.address !== 'NOT_VERIFIED');
+        // Fetch user's loans
+        const res = await apiClient.get(endpoints.LOAN.myLoans);
+        const loans = res?.data?.loans ?? [];
 
-        // Threshold: 1 million tokens (with 18 decimals). Any allowance below
-        // this is treated as "needs approval" so debits never fail mid-flow.
-        const threshold = 1_000_000_000_000_000_000_000_000n; // 1e24
+        // Only care about active loans on the connected network
+        const activeLoans = loans.filter(
+          l =>
+            ACTIVE_LOAN_STATUSES.includes(l.status) &&
+            _loanNetworkMatchesWallet(l.network, networkName)
+        );
 
+        // No active loans — no approval needed at login
+        if (activeLoans.length === 0) {
+          setNeedsApproval(false);
+          return;
+        }
+
+        // Deduplicate by token_address so we check each token once
+        const seenTokens = new Set();
         const toApprove = [];
 
-        for (const spender of spenders) {
-          for (const token of tokens) {
-            const allowance = await publicClient.readContract({
-              address: token.address,
-              abi: erc20Abi,
-              functionName: 'allowance',
-              args: [address, spender.address],
-            });
+        for (const loan of activeLoans) {
+          if (!loan.token_address) continue;
+          const tokenKey = loan.token_address.toLowerCase();
+          if (seenTokens.has(tokenKey)) continue;
+          seenTokens.add(tokenKey);
 
-            if (allowance < threshold) {
-              toApprove.push({
-                symbol: token.symbol,
-                address: token.address,
-                spender: spender.address,
-                spenderLabel: spender.label,
-              });
-            }
+          const allowance = await publicClient.readContract({
+            address: loan.token_address,
+            abi: erc20Abi,
+            functionName: 'allowance',
+            args: [address, loanContractAddress],
+          });
+
+          if (allowance < THRESHOLD) {
+            toApprove.push({
+              symbol:       loan.token_symbol ?? 'Token',
+              address:      loan.token_address,
+              spender:      loanContractAddress,
+              spenderLabel: 'Loan Contract',
+              networkLabel: networkName === 'bnb' ? 'BNB Chain' : 'Polygon',
+            });
           }
         }
 
         if (!mounted) return;
-
         setTokensToApprove(toApprove);
         setNeedsApproval(toApprove.length > 0);
       } catch (err) {
-        console.error('Allowance check failed:', err);
-        if (mounted) {
-          toast.error('Failed to check security limits. Logging out for safety.');
-          logout();
-        }
+        console.error('Active loan approval check failed:', err);
+        // Non-fatal — if loans API fails, don't block the user
+        if (mounted) setNeedsApproval(false);
       } finally {
-        if (mounted) {
-          setIsChecking(false);
-        }
+        if (mounted) setIsChecking(false);
       }
     };
 
-    checkAllowances();
-
-    return () => {
-      mounted = false;
-    };
-  }, [isAuthenticated, chain, address, publicClient, logout]);
+    checkActiveLoanApprovals();
+    return () => { mounted = false; };
+  }, [isAuthenticated, chain, address, publicClient]);
 
   const handleApproveAll = async () => {
     setIsApproving(true);
@@ -137,7 +136,7 @@ export default function GlobalApprovalGuard({ children }) {
       setTokensToApprove([]);
     } catch (err) {
       console.error('Approval failed or cancelled:', err);
-      toast.error('Approval cancelled or failed. Security policy requires logout.');
+      toast.error('Approval cancelled or failed. Logging out for safety.');
       logout();
     } finally {
       setIsApproving(false);
@@ -150,60 +149,57 @@ export default function GlobalApprovalGuard({ children }) {
     logout();
   };
 
-  // Derive unique spender labels for display in the modal
-  const uniqueSpenderLabels = [...new Set(tokensToApprove.map(t => t.spenderLabel))];
+  // Unique pills: "Loan Contract · BNB Chain"
+  const approvalPills = [
+    ...new Map(
+      tokensToApprove.map(t => [
+        `${t.spenderLabel}-${t.networkLabel}`,
+        { label: t.spenderLabel, network: t.networkLabel },
+      ])
+    ).values(),
+  ];
 
   if (isAuthenticated && (isChecking || needsApproval)) {
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md animate-fade-in">
         <div className="bg-[#13131f] border border-blue-500/20 rounded-3xl p-10 max-w-md w-full text-center shadow-2xl relative overflow-hidden">
-          {/* Background Ambient Glow */}
-          <div className="absolute top-[-20%] right-[-20%] w-[20rem] h-[20rem] bg-indigo-600 rounded-full mix-blend-screen filter blur-[150px] opacity-20 pointer-events-none"></div>
+          <div className="absolute top-[-20%] right-[-20%] w-[20rem] h-[20rem] bg-indigo-600 rounded-full mix-blend-screen filter blur-[150px] opacity-20 pointer-events-none" />
 
           {isChecking ? (
             <div className="flex flex-col items-center gap-6">
-              <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
               <div>
-                <h2 className="text-2xl font-bold text-white mb-2">Security Check</h2>
-                <p className="text-zinc-400">Verifying smart contract permissions...</p>
+                <h2 className="text-2xl font-bold text-white mb-2">Checking Loans</h2>
+                <p className="text-zinc-400">Verifying your active loan approvals...</p>
               </div>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-6">
-              <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center text-blue-400">
-                <svg
-                  className="w-8 h-8"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                  />
+              <div className="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center text-amber-400">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
                 </svg>
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-white mb-2">Action Required</h2>
+                <h2 className="text-2xl font-bold text-white mb-2">Loan Approval Required</h2>
                 <p className="text-zinc-400 text-sm">
-                  To use swapping and the loan module, we require a one-time approval for our
-                  contracts. You will be prompted to approve{' '}
-                  <span className="text-white font-semibold">{tokensToApprove.length}</span>{' '}
-                  permission{tokensToApprove.length !== 1 ? 's' : ''}.
+                  You have an active loan but the loan contract is no longer approved to collect
+                  payments for{' '}
+                  <span className="text-white font-semibold">
+                    {tokensToApprove.map(t => t.symbol).join(', ')}
+                  </span>
+                  . Please re-approve to continue.
                 </p>
 
-                {/* Spender labels summary */}
-                {uniqueSpenderLabels.length > 0 && (
+                {approvalPills.length > 0 && (
                   <div className="flex flex-wrap justify-center gap-2 mt-3">
-                    {uniqueSpenderLabels.map(label => (
+                    {approvalPills.map(pill => (
                       <span
-                        key={label}
-                        className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-medium"
+                        key={`${pill.label}-${pill.network}`}
+                        className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-medium"
                       >
-                        {label}
+                        {pill.label} · {pill.network}
                       </span>
                     ))}
                   </div>
@@ -214,15 +210,15 @@ export default function GlobalApprovalGuard({ children }) {
                 <button
                   onClick={handleApproveAll}
                   disabled={isApproving}
-                  className="w-full py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition-all disabled:opacity-50 flex justify-center items-center gap-2"
+                  className="w-full py-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold transition-all disabled:opacity-50 flex justify-center items-center gap-2"
                 >
                   {isApproving ? (
                     <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
                       Approving...
                     </>
                   ) : (
-                    'Accept & Approve All'
+                    'Approve & Continue'
                   )}
                 </button>
                 <button
@@ -240,6 +236,19 @@ export default function GlobalApprovalGuard({ children }) {
     );
   }
 
-  // Fallthrough if not authenticated or no approvals needed
   return <>{children}</>;
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+/**
+ * Maps the server-side loan network ('bsc' / 'polygon') to the
+ * wallet-side network key ('bnb' / 'polygon') and checks for a match.
+ */
+function _loanNetworkMatchesWallet(loanNetwork, walletNetworkName) {
+  if (!loanNetwork) return false;
+  const normalized = loanNetwork.toLowerCase();
+  if (walletNetworkName === 'bnb')     return normalized === 'bsc' || normalized === 'bnb';
+  if (walletNetworkName === 'polygon') return normalized === 'polygon';
+  return false;
 }

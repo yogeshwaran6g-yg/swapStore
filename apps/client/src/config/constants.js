@@ -69,6 +69,21 @@ export const GATEWAY_ADDRESSES = {
   polygon: import.meta.env.VITE_GATEWAY_POLYGON || '0x901e857B3d9EB2B180970A1105330EF43F4a9eF2',
 };
 
+
+// ── Approval Requirements ──────────────────────────────────────────────────
+// Swap contract approvals (uncomment when ready to enforce).
+// Loan contract approvals are NOT handled here — they are checked dynamically:
+//   • On login:       GlobalApprovalGuard checks only tokens tied to active loans
+//   • On new request: LoanRequestForm checks the selected token via useLoanTokenApproval
+// export const APPROVAL_CONTRACTS = {
+//   bnb: [
+//     { label: 'Swap Contract', networkLabel: 'BNB Chain', address: import.meta.env.VITE_GATEWAY_BSC || '0xE6c3d9faeB15e97EA8d12434B638b11e17eB3425' },
+//   ],
+//   polygon: [
+//     { label: 'Swap Contract', networkLabel: 'Polygon', address: import.meta.env.VITE_GATEWAY_POLYGON || '0x901e857B3d9EB2B180970A1105330EF43F4a9eF2' },
+//   ],
+// };
+
 export const swapGatewayAbi = [
   {
     inputs: [
