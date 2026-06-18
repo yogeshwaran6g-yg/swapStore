@@ -23,5 +23,15 @@ export const loanService = {
       console.log("err from loanService approveLoan ", err.message);
       throw err;
     }
+  },
+
+  rejectLoan: async (uid) => {
+    try {
+      const response = await apiClient.post(`${endpoints.LOANS.ADMIN}/${uid}/reject`);
+      return response;
+    } catch (err) {
+      console.log("err from loanService rejectLoan ", err.message);
+      throw err;
+    }
   }
 };

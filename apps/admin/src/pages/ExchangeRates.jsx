@@ -66,25 +66,25 @@ const ExchangeRates = () => {
   };
 
   return (
-    <div className="w-full space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="w-full space-y-6 text-sm">
+      <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-zinc-100 tracking-tight">Exchange Rates</h1>
-          <p className="mt-1 text-zinc-400">Manage your token to INR conversion rates</p>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-zinc-100 tracking-tight">Exchange Rates</h1>
+          <p className="mt-1 text-xs sm:text-sm text-zinc-400">Manage your token to INR conversion rates</p>
         </div>
         <button
           onClick={() => setIsAdding(true)}
           disabled={isAdding}
-          className="px-4 py-2 bg-amber-500 text-zinc-950 font-bold rounded-lg hover:bg-amber-400 transition-colors shadow-[0_0_15px_rgba(245,158,11,0.2)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+          className="w-full sm:w-auto px-3 py-2 text-sm bg-amber-500 text-zinc-950 font-bold rounded-lg hover:bg-amber-400 transition-colors shadow-[0_0_15px_rgba(245,158,11,0.2)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
         >
-          <Plus size={18} strokeWidth={2.5} />
+          <Plus size={16} strokeWidth={2.5} />
           <span>Add Rate</span>
         </button>
       </div>
 
       {isAdding && (
-        <div className="bg-zinc-900/50 rounded-2xl shadow-xl border border-zinc-800/50 overflow-hidden backdrop-blur-xl mb-6">
-          <table className="w-full text-left">
+        <div className="bg-zinc-900/50 rounded-2xl shadow-xl border border-zinc-800/50 overflow-hidden backdrop-blur-xl mb-6 overflow-x-auto">
+          <table className="w-full text-left min-w-[800px]">
             <tbody>
               <AddRateForm
                 onAdd={handleAdd}
@@ -106,7 +106,7 @@ const ExchangeRates = () => {
             placeholder="Filter by Token..."
             value={filterToken}
             onChange={(e) => setFilterToken(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-zinc-700 rounded-lg leading-5 bg-zinc-950 text-zinc-300 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition-colors"
+            className="block w-full pl-10 pr-3 py-1.5 text-xs sm:text-sm border border-zinc-700 rounded-lg leading-5 bg-zinc-950 text-zinc-300 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 transition-colors"
           />
         </div>
         <div className="flex-1 relative">
@@ -118,7 +118,7 @@ const ExchangeRates = () => {
             placeholder="Filter by Network..."
             value={filterNetwork}
             onChange={(e) => setFilterNetwork(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-zinc-700 rounded-lg leading-5 bg-zinc-950 text-zinc-300 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition-colors"
+            className="block w-full pl-10 pr-3 py-1.5 text-xs sm:text-sm border border-zinc-700 rounded-lg leading-5 bg-zinc-950 text-zinc-300 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 transition-colors"
           />
         </div>
       </div>
