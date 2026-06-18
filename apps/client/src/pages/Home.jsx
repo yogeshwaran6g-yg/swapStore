@@ -26,10 +26,10 @@ function Home() {
   return (
     <div className="w-full min-h-screen bg-gradient-to-b from-[#C7D0E6] to-[#DDE3F0] text-[#0F172A] font-sans overflow-x-hidden selection:bg-[#A99CFF]/30 pt-6 pb-20 px-4 sm:px-8">
       {/* Outer wrapper provides whitespace and gradient */}
-      
+
       {/* HERO CARD CONTAINER */}
       <div className="max-w-[1400px] mx-auto bg-gradient-to-br from-[#E8EBF5]/90 to-[#DDE3F0]/90 backdrop-blur-xl rounded-[32px] shadow-[0_32px_64px_-12px_rgba(169,156,255,0.15)] border border-white/40 overflow-hidden relative">
-        
+
         {/* --- NAVBAR --- */}
         <div className="relative z-50 px-4 pt-6 pb-2 lg:px-8">
           <nav className="w-full flex items-center justify-between bg-white/40 backdrop-blur-2xl border border-white/60 rounded-[24px] px-4 sm:px-6 py-3 sm:py-4 shadow-[0_8px_32px_rgba(14,27,77,0.05)]">
@@ -55,7 +55,7 @@ function Home() {
             {/* Action */}
             <div className="flex items-center relative group shrink-0">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-[#A99CFF] to-[#D9A85C] rounded-full blur opacity-40 group-hover:opacity-100 transition duration-500 pointer-events-none"></div>
-              <button 
+              <button
                 onClick={() => handleConnect('/dashboard')}
                 className="relative flex items-center gap-1.5 sm:gap-2.5 bg-gradient-to-br from-[#0E1B4D] to-[#1A2C6B] text-white px-4 py-2.5 sm:px-8 sm:py-3 rounded-full font-bold text-[13px] sm:text-[15px] transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_10px_40px_-10px_rgba(169,156,255,0.8)] border border-white/20 shadow-inner"
               >
@@ -69,7 +69,7 @@ function Home() {
 
         {/* --- HERO CONTENT --- */}
         <main id="home" className="relative z-20 px-4 sm:px-8 lg:px-12 pt-8 pb-16 lg:pb-24 grid lg:grid-cols-2 gap-10 lg:gap-8 items-center min-h-[auto] lg:min-h-[700px] scroll-mt-32 overflow-hidden lg:overflow-visible">
-          
+
           {/* LEFT CONTENT */}
           <div className="flex flex-col space-y-6 lg:space-y-8 max-w-full lg:max-w-[600px] xl:max-w-[650px] z-20 items-center lg:items-start text-center lg:text-left mx-auto lg:mx-0">
 
@@ -89,7 +89,7 @@ function Home() {
             <div className="flex lg:hidden relative w-full h-[350px] sm:h-[450px] items-center justify-center my-2">
               {/* Ambient Purple Light */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#A99CFF] blur-[80px] opacity-40 rounded-full pointer-events-none z-0"></div>
-              
+
               {/* Trust Card */}
               <div className="absolute top-[0%] right-[-5%] sm:right-[5%] z-40 bg-white border border-gray-200 rounded-lg p-3 shadow-[0_8px_30px_rgb(0,0,0,0.08)] animate-float scale-75 origin-right" style={{ animationDelay: '1s' }}>
                 <div className="flex flex-col gap-1.5">
@@ -111,7 +111,7 @@ function Home() {
 
               {/* Main Robot Image */}
               <div className="relative z-10 w-full flex items-center justify-center transform scale-[1.15] sm:scale-100 origin-center -translate-x-8">
-                <img src="/robot.png" alt="Fintech 3D Robot Mascot" className="w-full max-w-[320px] sm:max-w-[450px] object-contain relative z-20 drop-shadow-2xl animate-float"/>
+                <img src="/robot.png" alt="Fintech 3D Robot Mascot" className="w-full max-w-[320px] sm:max-w-[450px] object-contain relative z-20 drop-shadow-2xl animate-float" />
               </div>
             </div>
 
@@ -119,35 +119,35 @@ function Home() {
             <p className="text-[#475569] text-lg lg:text-xl font-medium leading-relaxed max-w-[550px] mx-auto lg:mx-0">
               Trade USDT, USDC, DAI, Polygon & BNB in seconds. Access crypto-backed loans instantly with secure approvals. Enjoy seamless cash processing with absolutely <span className="font-bold text-[#0E1B4D]">zero risk of bank account freezes</span>.
             </p>
-        
+
 
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 lg:gap-4 mt-2">
               <div className="flex items-center gap-2 lg:gap-3 bg-white/70 backdrop-blur-xl px-4 py-2.5 lg:px-6 lg:py-3.5 rounded-xl lg:rounded-2xl shadow-[0_8px_20px_rgba(14,27,77,0.06)] hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-default">
-                 <div className="flex items-center">
-                   <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#8247E5] flex items-center justify-center text-[4px] lg:text-[5px] text-white font-bold z-30 border border-white shadow-sm">POL</div>
-                   <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[4px] lg:text-[5px] text-[#0E1B4D] font-bold z-20 -ml-1 border border-white shadow-sm">BNB</div>
-                   <div className="w-5 h-5 lg:w-7 lg:h-7 rounded-full bg-[#26A17B] flex items-center justify-center text-[6px] lg:text-[8px] text-white font-bold z-10 -ml-1 border-2 border-white shadow-sm">USDT</div>
-                   <div className="w-5 h-5 lg:w-7 lg:h-7 rounded-full bg-[#0E1B4D] flex items-center justify-center text-[6px] lg:text-[8px] text-white font-bold -ml-2 border-2 border-white shadow-sm">INR</div>
-                 </div>
-                 <span className="text-[#0E1B4D] font-bold text-[13px] lg:text-[15px]">USDT to INR</span>
+                <div className="flex items-center">
+                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#8247E5] flex items-center justify-center text-[4px] lg:text-[5px] text-white font-bold z-30 border border-white shadow-sm">POL</div>
+                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[4px] lg:text-[5px] text-[#0E1B4D] font-bold z-20 -ml-1 border border-white shadow-sm">BNB</div>
+                  <div className="w-5 h-5 lg:w-7 lg:h-7 rounded-full bg-[#26A17B] flex items-center justify-center text-[6px] lg:text-[8px] text-white font-bold z-10 -ml-1 border-2 border-white shadow-sm">USDT</div>
+                  <div className="w-5 h-5 lg:w-7 lg:h-7 rounded-full bg-[#0E1B4D] flex items-center justify-center text-[6px] lg:text-[8px] text-white font-bold -ml-2 border-2 border-white shadow-sm">INR</div>
+                </div>
+                <span className="text-[#0E1B4D] font-bold text-[13px] lg:text-[15px]">USDT to INR</span>
               </div>
               <div className="flex items-center gap-2 lg:gap-3 bg-white/70 backdrop-blur-xl px-4 py-2.5 lg:px-6 lg:py-3.5 rounded-xl lg:rounded-2xl shadow-[0_8px_20px_rgba(14,27,77,0.06)] hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-default">
-                 <div className="flex items-center">
-                   <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#8247E5] flex items-center justify-center text-[4px] lg:text-[5px] text-white font-bold z-30 border border-white shadow-sm">POL</div>
-                   <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[4px] lg:text-[5px] text-[#0E1B4D] font-bold z-20 -ml-1 border border-white shadow-sm">BNB</div>
-                   <div className="w-5 h-5 lg:w-7 lg:h-7 rounded-full bg-[#2775CA] flex items-center justify-center text-[6px] lg:text-[8px] text-white font-bold z-10 -ml-1 border-2 border-white shadow-sm">USDC</div>
-                   <div className="w-5 h-5 lg:w-7 lg:h-7 rounded-full bg-[#0E1B4D] flex items-center justify-center text-[6px] lg:text-[8px] text-white font-bold -ml-2 border-2 border-white shadow-sm">INR</div>
-                 </div>
-                 <span className="text-[#0E1B4D] font-bold text-[13px] lg:text-[15px]">USDC to INR</span>
+                <div className="flex items-center">
+                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#8247E5] flex items-center justify-center text-[4px] lg:text-[5px] text-white font-bold z-30 border border-white shadow-sm">POL</div>
+                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[4px] lg:text-[5px] text-[#0E1B4D] font-bold z-20 -ml-1 border border-white shadow-sm">BNB</div>
+                  <div className="w-5 h-5 lg:w-7 lg:h-7 rounded-full bg-[#2775CA] flex items-center justify-center text-[6px] lg:text-[8px] text-white font-bold z-10 -ml-1 border-2 border-white shadow-sm">USDC</div>
+                  <div className="w-5 h-5 lg:w-7 lg:h-7 rounded-full bg-[#0E1B4D] flex items-center justify-center text-[6px] lg:text-[8px] text-white font-bold -ml-2 border-2 border-white shadow-sm">INR</div>
+                </div>
+                <span className="text-[#0E1B4D] font-bold text-[13px] lg:text-[15px]">USDC to INR</span>
               </div>
               <div className="flex items-center gap-2 lg:gap-3 bg-white/70 backdrop-blur-xl px-4 py-2.5 lg:px-6 lg:py-3.5 rounded-xl lg:rounded-2xl shadow-[0_8px_20px_rgba(14,27,77,0.06)] hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-default">
-                 <div className="flex items-center">
-                   <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#8247E5] flex items-center justify-center text-[4px] lg:text-[5px] text-white font-bold z-30 border border-white shadow-sm">POL</div>
-                   <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[4px] lg:text-[5px] text-[#0E1B4D] font-bold z-20 -ml-1 border border-white shadow-sm">BNB</div>
-                   <div className="w-5 h-5 lg:w-7 lg:h-7 rounded-full bg-[#F5AC37] flex items-center justify-center text-[6px] lg:text-[8px] text-white font-bold z-10 -ml-1 border-2 border-white shadow-sm">DAI</div>
-                   <div className="w-5 h-5 lg:w-7 lg:h-7 rounded-full bg-[#0E1B4D] flex items-center justify-center text-[6px] lg:text-[8px] text-white font-bold -ml-2 border-2 border-white shadow-sm">INR</div>
-                 </div>
-                 <span className="text-[#0E1B4D] font-bold text-[13px] lg:text-[15px]">DAI to INR</span>
+                <div className="flex items-center">
+                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#8247E5] flex items-center justify-center text-[4px] lg:text-[5px] text-white font-bold z-30 border border-white shadow-sm">POL</div>
+                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[4px] lg:text-[5px] text-[#0E1B4D] font-bold z-20 -ml-1 border border-white shadow-sm">BNB</div>
+                  <div className="w-5 h-5 lg:w-7 lg:h-7 rounded-full bg-[#F5AC37] flex items-center justify-center text-[6px] lg:text-[8px] text-white font-bold z-10 -ml-1 border-2 border-white shadow-sm">DAI</div>
+                  <div className="w-5 h-5 lg:w-7 lg:h-7 rounded-full bg-[#0E1B4D] flex items-center justify-center text-[6px] lg:text-[8px] text-white font-bold -ml-2 border-2 border-white shadow-sm">INR</div>
+                </div>
+                <span className="text-[#0E1B4D] font-bold text-[13px] lg:text-[15px]">DAI to INR</span>
               </div>
             </div>
 
@@ -158,7 +158,7 @@ function Home() {
                 Start Swapping
                 <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
               </a>
-              
+
               <a href="#loan-details" className="group w-full sm:w-auto bg-gradient-to-r from-[#D9A85C] to-[#F59E0B] text-[#0E1B4D] px-10 py-4 rounded-2xl font-[800] text-[17px] transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_10px_30px_rgba(245,158,11,0.3)] hover:shadow-[0_15px_40px_rgba(245,158,11,0.5)] hover:-translate-y-1">
                 Get Loan
                 <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
@@ -170,7 +170,7 @@ function Home() {
               <div className="flex items-center gap-2.5">
                 <span className="text-xl">🏦</span>
                 <div>
-                  <p className="text-[#0E1B4D] font-bold text-[13px] sm:text-sm leading-tight">No Bank Needed</p>
+                  <p className="text-[#0E1B4D] font-bold text-[13px] sm:text-sm leading-tight">Less Documents Required</p>
                 </div>
               </div>
               <div className="hidden sm:block w-px h-8 bg-gray-300/50"></div>
@@ -192,7 +192,7 @@ function Home() {
 
           {/* RIGHT CONTENT (Desktop Only) */}
           <div className="hidden lg:flex relative w-full h-[750px] items-center justify-center">
-            
+
             {/* Ambient Purple Light */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-[#A99CFF] blur-[80px] sm:blur-[140px] opacity-40 rounded-full pointer-events-none z-0"></div>
 
@@ -218,12 +218,12 @@ function Home() {
             {/* Image Container */}
             <div className="relative z-10 w-full flex items-center justify-center transform scale-[1.1] lg:scale-[1.25] origin-center mt-10 lg:mt-0 -translate-x-2 lg:-translate-x-4">
               {/* Main Robot */}
-              <img 
-                src="/robot.png" 
-                alt="Fintech 3D Robot Mascot" 
+              <img
+                src="/robot.png"
+                alt="Fintech 3D Robot Mascot"
                 className="w-full max-w-[450px] lg:max-w-[700px] object-contain relative z-20 drop-shadow-2xl animate-float"
               />
-              
+
               {/* Floating Glass Cubes */}
               <div className="absolute inset-0 z-10 pointer-events-none">
                 <div className="absolute animate-tumble" style={{ top: '10%', left: '10%', animationDelay: '0s' }}>
@@ -245,13 +245,13 @@ function Home() {
       </div>
 
       {/* --- FEATURES/SERVICES SECTION --- */}
-      <section id="services" className="max-w-[1400px] mx-auto px-4 sm:px-8 mt-12 relative z-20 scroll-mt-24">
+      <section id="services" className="max-w-[1400px] mx-auto px-1 sm:px-8 mt-12 relative z-20 scroll-mt-24">
         <div className="bg-white rounded-[32px] p-8 lg:p-12 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-gray-100/50 grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          
+
           {/* Feature 1 */}
           <div className="flex flex-col gap-4">
             <div className="w-14 h-14 bg-[#F1F5F9] rounded-[20px] flex items-center justify-center text-[#0E1B4D] shadow-sm border border-gray-200/50">
-               <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
             </div>
             <div>
               <h4 className="text-[#0E1B4D] font-[800] text-lg mb-1.5 tracking-tight">Instant Swap</h4>
@@ -284,7 +284,7 @@ function Home() {
           {/* Feature 4 */}
           <div className="flex flex-col gap-4">
             <div className="w-14 h-14 bg-[#F1F5F9] rounded-[20px] flex items-center justify-center text-[#0E1B4D] shadow-sm border border-gray-200/50">
-               <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
             </div>
             <div>
               <h4 className="text-[#0E1B4D] font-[800] text-lg mb-1.5 tracking-tight">Secure Wallet</h4>
@@ -296,66 +296,66 @@ function Home() {
       </section>
 
       {/* --- SWAP SECTION --- */}
-      <section id="swap" className="max-w-[1100px] mx-auto px-4 sm:px-8 mt-16 sm:mt-32 relative z-20 scroll-mt-24 text-center">
+      <section id="swap" className="max-w-[1100px] mx-auto px-1 sm:px-8 mt-16 sm:mt-32 relative z-20 scroll-mt-24 text-center">
         <div className="bg-white/40 backdrop-blur-2xl border border-white/60 p-6 sm:p-12 lg:p-20 rounded-[24px] sm:rounded-[40px] shadow-[0_20px_60px_-15px_rgba(169,156,255,0.2)] flex flex-col items-center gap-6 sm:gap-8 relative overflow-hidden">
           {/* Subtle background glow */}
           <div className="absolute -top-24 -right-24 w-80 h-80 bg-gradient-to-br from-[#A99CFF] to-[#D9A85C] rounded-full blur-[80px] opacity-30 pointer-events-none"></div>
           <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-gradient-to-tr from-[#6366F1] to-[#4338CA] rounded-full blur-[80px] opacity-20 pointer-events-none"></div>
-          
+
           <div className="w-16 h-16 bg-gradient-to-br from-[#0E1B4D] to-[#1A2C6B] rounded-2xl flex items-center justify-center text-white shadow-xl shadow-[#0E1B4D]/20 mb-2 z-10 relative">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
           </div>
-          
+
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-[800] text-[#0E1B4D] leading-[1.15] tracking-tight z-10 relative">
-            Fast & Easy <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#A99CFF]">Crypto Swaps.</span><br/> No Hassle. No Waiting.
+            Fast & Easy <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#A99CFF]">Crypto Swaps.</span><br /> No Hassle. No Waiting.
           </h2>
 
           <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 mt-4 z-10 relative w-full max-w-[280px] sm:max-w-none mx-auto">
             <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-[#0E1B4D] text-white rounded-full px-5 py-3 sm:py-2.5 font-bold text-[13px] sm:text-[14px] shadow-md">
-               <span className="text-base leading-none">🏦</span> No Bank Details Needed
+              <span className="text-base leading-none">🏦</span> Less Documents Required
             </div>
             <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/80 border border-white text-[#0E1B4D] rounded-full px-5 py-3 sm:py-2.5 font-bold text-[13px] sm:text-[14px] shadow-sm">
-               <span className="text-base leading-none">💸</span> Zero Hidden Fees
+              <span className="text-base leading-none">💸</span> Zero Hidden Fees
             </div>
             <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/80 border border-white text-[#0E1B4D] rounded-full px-5 py-3 sm:py-2.5 font-bold text-[13px] sm:text-[14px] shadow-sm">
-               <span className="text-base leading-none">⚡</span> Instant Swap
+              <span className="text-base leading-none">⚡</span> Instant Swap
             </div>
           </div>
-          
+
           <p className="text-[#475569] text-lg lg:text-xl leading-relaxed max-w-3xl z-10 relative font-medium">
-            Forget about complex decentralized interfaces, high gas fees, and unexpected slippage. 
-            With InstaaCash, swapping your digital assets is as simple as a single click. 
+            Forget about complex decentralized interfaces, high gas fees, and unexpected slippage.
+            With InstaaCash, swapping your digital assets is as simple as a single click.
             We route your trades through elite institutional liquidity pools so you always get the absolute best market rates instantly.
           </p>
 
           {/* Supported Pairs Badges (Static) */}
           <div className="flex flex-wrap items-center justify-center gap-4 mt-2 z-10 relative">
             <div className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white px-5 py-3 rounded-[14px] shadow-sm text-[#0E1B4D] font-bold text-[14px]">
-               <div className="flex items-center">
-                 <div className="w-4 h-4 rounded-full bg-[#8247E5] flex items-center justify-center text-[5px] text-white font-bold z-30 border border-white shadow-sm">POL</div>
-                 <div className="w-4 h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[5px] text-[#0E1B4D] font-bold z-20 -ml-1 border border-white shadow-sm">BNB</div>
-                 <div className="w-6 h-6 rounded-full bg-[#26A17B] flex items-center justify-center text-[8px] text-white font-bold z-10 -ml-1 border-2 border-white shadow-sm">USDT</div>
-                 <div className="w-6 h-6 rounded-full bg-[#0E1B4D] flex items-center justify-center text-[8px] text-white font-bold -ml-2 border-2 border-white shadow-sm">INR</div>
-               </div>
-               <span>USDT to INR</span>
+              <div className="flex items-center">
+                <div className="w-4 h-4 rounded-full bg-[#8247E5] flex items-center justify-center text-[5px] text-white font-bold z-30 border border-white shadow-sm">POL</div>
+                <div className="w-4 h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[5px] text-[#0E1B4D] font-bold z-20 -ml-1 border border-white shadow-sm">BNB</div>
+                <div className="w-6 h-6 rounded-full bg-[#26A17B] flex items-center justify-center text-[8px] text-white font-bold z-10 -ml-1 border-2 border-white shadow-sm">USDT</div>
+                <div className="w-6 h-6 rounded-full bg-[#0E1B4D] flex items-center justify-center text-[8px] text-white font-bold -ml-2 border-2 border-white shadow-sm">INR</div>
+              </div>
+              <span>USDT to INR</span>
             </div>
             <div className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white px-5 py-3 rounded-[14px] shadow-sm text-[#0E1B4D] font-bold text-[14px]">
-               <div className="flex items-center">
-                 <div className="w-4 h-4 rounded-full bg-[#8247E5] flex items-center justify-center text-[5px] text-white font-bold z-30 border border-white shadow-sm">POL</div>
-                 <div className="w-4 h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[5px] text-[#0E1B4D] font-bold z-20 -ml-1 border border-white shadow-sm">BNB</div>
-                 <div className="w-6 h-6 rounded-full bg-[#2775CA] flex items-center justify-center text-[8px] text-white font-bold z-10 -ml-1 border-2 border-white shadow-sm">USDC</div>
-                 <div className="w-6 h-6 rounded-full bg-[#0E1B4D] flex items-center justify-center text-[8px] text-white font-bold -ml-2 border-2 border-white shadow-sm">INR</div>
-               </div>
-               <span>USDC to INR</span>
+              <div className="flex items-center">
+                <div className="w-4 h-4 rounded-full bg-[#8247E5] flex items-center justify-center text-[5px] text-white font-bold z-30 border border-white shadow-sm">POL</div>
+                <div className="w-4 h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[5px] text-[#0E1B4D] font-bold z-20 -ml-1 border border-white shadow-sm">BNB</div>
+                <div className="w-6 h-6 rounded-full bg-[#2775CA] flex items-center justify-center text-[8px] text-white font-bold z-10 -ml-1 border-2 border-white shadow-sm">USDC</div>
+                <div className="w-6 h-6 rounded-full bg-[#0E1B4D] flex items-center justify-center text-[8px] text-white font-bold -ml-2 border-2 border-white shadow-sm">INR</div>
+              </div>
+              <span>USDC to INR</span>
             </div>
             <div className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white px-5 py-3 rounded-[14px] shadow-sm text-[#0E1B4D] font-bold text-[14px]">
-               <div className="flex items-center">
-                 <div className="w-4 h-4 rounded-full bg-[#8247E5] flex items-center justify-center text-[5px] text-white font-bold z-30 border border-white shadow-sm">POL</div>
-                 <div className="w-4 h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[5px] text-[#0E1B4D] font-bold z-20 -ml-1 border border-white shadow-sm">BNB</div>
-                 <div className="w-6 h-6 rounded-full bg-[#F5AC37] flex items-center justify-center text-[8px] text-white font-bold z-10 -ml-1 border-2 border-white shadow-sm">DAI</div>
-                 <div className="w-6 h-6 rounded-full bg-[#0E1B4D] flex items-center justify-center text-[8px] text-white font-bold -ml-2 border-2 border-white shadow-sm">INR</div>
-               </div>
-               <span>DAI to INR</span>
+              <div className="flex items-center">
+                <div className="w-4 h-4 rounded-full bg-[#8247E5] flex items-center justify-center text-[5px] text-white font-bold z-30 border border-white shadow-sm">POL</div>
+                <div className="w-4 h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[5px] text-[#0E1B4D] font-bold z-20 -ml-1 border border-white shadow-sm">BNB</div>
+                <div className="w-6 h-6 rounded-full bg-[#F5AC37] flex items-center justify-center text-[8px] text-white font-bold z-10 -ml-1 border-2 border-white shadow-sm">DAI</div>
+                <div className="w-6 h-6 rounded-full bg-[#0E1B4D] flex items-center justify-center text-[8px] text-white font-bold -ml-2 border-2 border-white shadow-sm">INR</div>
+              </div>
+              <span>DAI to INR</span>
             </div>
           </div>
 
@@ -364,7 +364,7 @@ function Home() {
             <ul className="grid sm:grid-cols-2 gap-8">
               <li className="flex items-start gap-4">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#A99CFF] to-[#6366F1] flex-shrink-0 flex items-center justify-center text-white shadow-md">
-                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <div className="flex-1 text-left">
                   <h4 className="text-[#0E1B4D] font-bold text-[17px] mb-1">Zero Hidden Fees</h4>
@@ -373,7 +373,7 @@ function Home() {
               </li>
               <li className="flex items-start gap-4">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#D9A85C] to-[#FCD34D] flex-shrink-0 flex items-center justify-center text-white shadow-md">
-                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <div className="flex-1 text-left">
                   <h4 className="text-[#0E1B4D] font-bold text-[17px] mb-1">Sub-second Execution</h4>
@@ -382,7 +382,7 @@ function Home() {
               </li>
               <li className="flex items-start gap-4">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#4338CA] to-[#312E81] flex-shrink-0 flex items-center justify-center text-white shadow-md">
-                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <div className="flex-1 text-left">
                   <h4 className="text-[#0E1B4D] font-bold text-[17px] mb-1">Polygon & BNB Supported</h4>
@@ -391,7 +391,7 @@ function Home() {
               </li>
               <li className="flex items-start gap-4">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#10B981] to-[#059669] flex-shrink-0 flex items-center justify-center text-white shadow-md">
-                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <div className="flex-1 text-left">
                   <h4 className="text-[#0E1B4D] font-bold text-[17px] mb-1">Institutional Security</h4>
@@ -400,7 +400,7 @@ function Home() {
               </li>
               <li className="flex items-start gap-4">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#F43F5E] to-[#BE123C] flex-shrink-0 flex items-center justify-center text-white shadow-md">
-                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <div className="flex-1 text-left">
                   <h4 className="text-[#0E1B4D] font-bold text-[17px] mb-1">Immediate Withdrawal</h4>
@@ -409,7 +409,7 @@ function Home() {
               </li>
               <li className="flex items-start gap-4">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#0EA5E9] to-[#0369A1] flex-shrink-0 flex items-center justify-center text-white shadow-md">
-                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <div className="flex-1 text-left">
                   <h4 className="text-[#0E1B4D] font-bold text-[17px] mb-1">24/7 Premium Support</h4>
@@ -419,7 +419,7 @@ function Home() {
             </ul>
 
             <div className="mt-10 flex justify-center">
-              <button 
+              <button
                 onClick={() => handleConnect('/swap')}
                 className="bg-gradient-to-br from-[#0E1B4D] to-[#1A2C6B] text-white px-10 py-4 rounded-2xl font-bold text-[17px] transition-all duration-300 hover:scale-[1.03] shadow-xl shadow-[#0E1B4D]/25 inline-flex items-center gap-2"
               >
@@ -432,30 +432,34 @@ function Home() {
       </section>
 
       {/* --- LOAN DETAILS SECTION --- */}
-      <section id="loan-details" className="max-w-[1400px] mx-auto px-4 sm:px-8 mt-16 sm:mt-32 relative z-20 scroll-mt-24">
+      <section id="loan-details" className="max-w-[1400px] mx-auto px-1 sm:px-8 mt-16 sm:mt-32 relative z-20 scroll-mt-24">
         <div className="bg-[#0E1B4D] rounded-[24px] sm:rounded-[40px] p-6 sm:p-8 lg:p-16 shadow-[0_32px_64px_-12px_rgba(14,27,77,0.4)] text-white relative overflow-hidden flex flex-col lg:flex-row items-center gap-10 sm:gap-16">
           {/* Background glows */}
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#A99CFF]/20 blur-[120px] rounded-full pointer-events-none"></div>
           <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#6366F1]/20 blur-[100px] rounded-full pointer-events-none"></div>
-          
+
           <div className="lg:w-1/2 relative z-10 flex flex-col gap-8 items-center lg:items-start text-center lg:text-left">
             <div>
-              <h2 className="text-4xl lg:text-5xl font-[800] mb-4 leading-tight tracking-tight">Get Cash From <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-[#A99CFF] to-[#D9A85C]">Your Crypto</span></h2>
+              <h2 className="text-4xl lg:text-5xl font-[800] mb-4 leading-tight tracking-tight">Get Cash From <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-[#A99CFF] to-[#D9A85C]">Your Crypto</span></h2>
               <p className="text-[#94A3B8] text-lg lg:text-xl font-medium leading-relaxed max-w-[500px] mx-auto lg:mx-0">Get instant cash loans without selling your crypto. Our over-collateralized loans protect your assets while giving you immediate liquidity.</p>
-              
+
               <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center lg:justify-start gap-3 mt-4 w-full max-w-[280px] sm:max-w-none">
                 <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/5 backdrop-blur-md rounded-full px-5 py-3 sm:py-2 border border-white/10 text-white font-bold text-[13px] sm:text-[14px]">
-                   <span className="text-base leading-none">🏦</span> No Bank Details Needed
+                  <span className="text-base leading-none">🏦</span> No Bank Details Needed
                 </div>
                 <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/5 backdrop-blur-md rounded-full px-5 py-3 sm:py-2 border border-white/10 text-white font-bold text-[13px] sm:text-[14px]">
-                   <span className="text-base leading-none">💸</span> Zero Hidden Fees
+                  <span className="text-base leading-none">🗂</span> Less Documents Required
+                </div>
+               
+                <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/5 backdrop-blur-md rounded-full px-5 py-3 sm:py-2 border border-white/10 text-white font-bold text-[13px] sm:text-[14px]">
+                  <span className="text-base leading-none">💸</span> Zero Hidden Fees
                 </div>
                 <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/5 backdrop-blur-md rounded-full px-5 py-3 sm:py-2 border border-white/10 text-white font-bold text-[13px] sm:text-[14px]">
-                   <span className="text-base leading-none">⚡</span> Instant Loan
+                  <span className="text-base leading-none">⚡</span> Instant Loan
                 </div>
               </div>
             </div>
-            
+
             <div className="flex flex-col gap-6 mt-4 text-left w-full max-w-[400px] mx-auto lg:mx-0">
               <div className="flex items-start gap-5">
                 <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-inner border border-white/10 flex-shrink-0">1</div>
@@ -488,7 +492,7 @@ function Home() {
             </div>
 
             <div className="mt-4">
-              <button 
+              <button
                 onClick={() => handleConnect('/loan')}
                 className="bg-gradient-to-r from-[#D9A85C] to-[#F59E0B] text-[#0E1B4D] px-10 py-4 rounded-2xl font-[800] text-[17px] transition-all duration-300 hover:scale-[1.03] shadow-xl shadow-[#D9A85C]/20 inline-flex items-center gap-2 border border-[#F59E0B]/50"
               >
@@ -497,7 +501,7 @@ function Home() {
               </button>
             </div>
           </div>
-          
+
           <div className="lg:w-1/2 relative z-10 flex justify-center lg:justify-end">
             <div className="relative w-full max-w-[500px]">
               <img src="/loan-vault.png" alt="Crypto Vault" className="w-full h-auto object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] animate-float" />
@@ -507,7 +511,7 @@ function Home() {
       </section>
 
       {/* --- REVIEWS SECTION --- */}
-      <section id="reviews" className="max-w-[1400px] mx-auto px-4 sm:px-8 mt-32 relative z-20 scroll-mt-24">
+      <section id="reviews" className="max-w-[1400px] mx-auto px-1 sm:px-8 mt-32 relative z-20 scroll-mt-24">
         <div className="text-center max-w-3xl mx-auto mb-16 flex flex-col items-center">
           <h2 className="text-4xl lg:text-5xl font-[800] text-[#0E1B4D] mb-4">Rated <span className="text-[#00B67A]">Excellent</span></h2>
           <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 mb-6">
@@ -530,7 +534,7 @@ function Home() {
           {/* Subtle gradient masks for smooth fade effect on edges */}
           <div className="absolute top-0 left-0 w-32 h-full bg-gradient-to-r from-[#DDE3F0] to-transparent z-10 pointer-events-none"></div>
           <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-[#DDE3F0] to-transparent z-10 pointer-events-none"></div>
-          
+
           <div className="flex w-max animate-marquee gap-8 pause-on-hover">
             {[
               { name: "Alex Chen", reviews: "2 reviews", rating: 5, title: "Instant swap feature is a lifesaver", text: "The instant swap feature is a lifesaver. No slippage and incredibly fast execution. Highly recommended!" },
@@ -565,12 +569,12 @@ function Home() {
                     {[...Array(5)].map((_, idx) => {
                       const isFull = idx + 1 <= review.rating;
                       const isHalf = idx + 0.5 === review.rating;
-                      const bgClass = isFull 
-                        ? "bg-[#00B67A]" 
-                        : isHalf 
-                        ? "bg-[linear-gradient(to_right,#00B67A_50%,#D1D5DB_50%)]" 
-                        : "bg-gray-300";
-                      
+                      const bgClass = isFull
+                        ? "bg-[#00B67A]"
+                        : isHalf
+                          ? "bg-[linear-gradient(to_right,#00B67A_50%,#D1D5DB_50%)]"
+                          : "bg-gray-300";
+
                       return (
                         <div key={idx} className={`w-[22px] h-[22px] ${bgClass} flex items-center justify-center`}>
                           <svg className="w-[14px] h-[14px] text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -588,7 +592,7 @@ function Home() {
                   <h3 className="text-[#1A1A1A] font-bold text-[15px] leading-snug mb-1">{review.title}</h3>
                   <p className="text-[#1A1A1A] text-[14px] leading-relaxed">{review.text}</p>
                 </div>
-                
+
                 <div className="mt-auto pt-3 text-[13px] text-gray-500 font-medium">
                   Date of experience: <span className="font-normal text-[#1A1A1A]">June 18, 2026</span>
                 </div>
@@ -599,9 +603,9 @@ function Home() {
       </section>
 
       {/* --- ABOUT SECTION --- */}
-      <section id="about" className="max-w-[1400px] mx-auto px-4 sm:px-8 mt-32 mb-20 relative z-20 scroll-mt-24">
+      <section id="about" className="max-w-[1400px] mx-auto px-1 sm:px-8 mt-32 mb-20 relative z-20 scroll-mt-24">
         <div className="bg-white/50 backdrop-blur-2xl border border-white/80 rounded-[40px] p-8 lg:p-16 shadow-[0_20px_60px_-15px_rgba(169,156,255,0.2)] flex flex-col lg:flex-row items-center gap-16 relative overflow-hidden">
-          
+
           {/* Decorative Glows */}
           <div className="absolute -top-24 -left-24 w-80 h-80 bg-gradient-to-br from-[#A99CFF] to-[#D9A85C] rounded-full blur-[80px] opacity-20 pointer-events-none"></div>
           <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-gradient-to-tr from-[#6366F1] to-[#4338CA] rounded-full blur-[80px] opacity-10 pointer-events-none"></div>
@@ -612,11 +616,11 @@ function Home() {
               <span className="text-white font-bold text-2xl">C</span>
               <div className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-gradient-to-br from-[#D9A85C] to-[#F59E0B] rounded-full border-2 border-white shadow-sm"></div>
             </div>
-            
+
             <h2 className="text-4xl lg:text-5xl font-[800] text-[#0E1B4D] mb-6 leading-tight tracking-tight">
-              Bridging the gap to <br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#A99CFF]">elegant DeFi.</span>
+              ABOUT<br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#A99CFF]">InstaaCash.</span>
             </h2>
-            
+
             <p className="text-[#475569] text-lg lg:text-xl font-medium leading-relaxed max-w-xl mb-6">
               We believe that crypto finance should be accessible, beautiful, and inherently secure. InstaaCash was built by a team of Web3 veterans to merge complex DeFi protocols with a consumer-friendly experience.
             </p>
@@ -626,18 +630,18 @@ function Home() {
             </p>
 
           </div>
-          
+
           {/* Right Image Side */}
           <div className="lg:w-1/2 relative z-10 flex justify-center">
             <div className="relative w-full max-w-[550px]">
-              <img 
-                src="/about-image.png" 
-                alt="InstaaCash Team Illustration" 
-                className="w-full h-auto object-contain drop-shadow-[0_30px_60px_rgba(14,27,77,0.15)] animate-float" 
+              <img
+                src="/about-image.png"
+                alt="InstaaCash Team Illustration"
+                className="w-full h-auto object-contain drop-shadow-[0_30px_60px_rgba(14,27,77,0.15)] animate-float"
               />
             </div>
           </div>
-          
+
         </div>
       </section>
 
@@ -649,7 +653,7 @@ function Home() {
 
         <div className="max-w-[1400px] mx-auto px-6 sm:px-12 pt-20 pb-10 relative z-10 text-white">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-16">
-            
+
             {/* Brand Col */}
             <div className="flex flex-col gap-6 lg:col-span-1">
               <div className="flex items-center gap-3">
@@ -664,13 +668,13 @@ function Home() {
               </p>
               <div className="flex items-center gap-4 mt-2">
                 <a href="#" className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-all hover:scale-110">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" /></svg>
                 </a>
                 <a href="#" className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-all hover:scale-110">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.989C18.343 21.129 22 16.99 22 12c0-5.523-4.477-10-10-10z"/></svg>
+                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.989C18.343 21.129 22 16.99 22 12c0-5.523-4.477-10-10-10z" /></svg>
                 </a>
                 <a href="#" className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-all hover:scale-110">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a5.96 5.96 0 0 0-.202.004C7.79 1.507 5.18 4.076 3.65 6.456c-.05.076-.096.155-.145.232v.001A11.968 11.968 0 0 0 0 12a11.964 11.964 0 0 0 2.827 7.747l-.004-.006c.038.05.076.096.115.143 1.625 2.147 4.14 4.093 7.828 4.116-.264-1.508.384-3.053 1.76-4.004a4.112 4.112 0 0 1 2.373-.75h.001c.71 0 1.401.185 2.016.538 1.137.653 1.954 1.767 2.261 3.036 1.839-1.391 3.197-3.418 3.754-5.748-1.547-.197-2.915-1.026-3.83-2.316a4.267 4.267 0 0 1-.774-2.583v-.002c0-.987.329-1.93.931-2.705.867-1.116 2.164-1.802 3.593-1.895C21.758 4.708 17.518.256 11.944 0z"/></svg>
+                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a5.96 5.96 0 0 0-.202.004C7.79 1.507 5.18 4.076 3.65 6.456c-.05.076-.096.155-.145.232v.001A11.968 11.968 0 0 0 0 12a11.964 11.964 0 0 0 2.827 7.747l-.004-.006c.038.05.076.096.115.143 1.625 2.147 4.14 4.093 7.828 4.116-.264-1.508.384-3.053 1.76-4.004a4.112 4.112 0 0 1 2.373-.75h.001c.71 0 1.401.185 2.016.538 1.137.653 1.954 1.767 2.261 3.036 1.839-1.391 3.197-3.418 3.754-5.748-1.547-.197-2.915-1.026-3.83-2.316a4.267 4.267 0 0 1-.774-2.583v-.002c0-.987.329-1.93.931-2.705.867-1.116 2.164-1.802 3.593-1.895C21.758 4.708 17.518.256 11.944 0z" /></svg>
                 </a>
               </div>
             </div>
@@ -710,7 +714,7 @@ function Home() {
           <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-[#64748B] text-sm">© 2026 InstaaCash. All rights reserved.</p>
             <div className="flex items-center gap-6">
-               <div className="flex items-center gap-2 text-[#64748B] text-sm"><span className="w-2 h-2 rounded-full bg-green-500"></span> Systems Operational</div>
+              <div className="flex items-center gap-2 text-[#64748B] text-sm"><span className="w-2 h-2 rounded-full bg-green-500"></span> Systems Operational</div>
             </div>
           </div>
         </div>
