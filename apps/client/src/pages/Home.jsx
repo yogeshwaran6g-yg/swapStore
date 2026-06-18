@@ -612,10 +612,7 @@ function Home() {
 
           {/* Left Text Side */}
           <div className="lg:w-1/2 relative z-10 flex flex-col items-start text-left">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0E1B4D] to-[#1A2C6B] flex items-center justify-center relative shadow-xl shadow-[#0E1B4D]/20 mb-8">
-              <span className="text-white font-bold text-2xl">C</span>
-              <div className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-gradient-to-br from-[#D9A85C] to-[#F59E0B] rounded-full border-2 border-white shadow-sm"></div>
-            </div>
+           
 
             <h2 className="text-4xl lg:text-5xl font-[800] text-[#0E1B4D] mb-6 leading-tight tracking-tight">
               ABOUT<br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#A99CFF]">InstaaCash.</span>
