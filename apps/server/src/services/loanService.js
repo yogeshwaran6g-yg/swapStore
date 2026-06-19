@@ -66,7 +66,9 @@ export const getTokenBalance = async (walletAddress, tokenAddress, network) => {
       functionName: 'decimals',
     });
 
-    return Number(balance) / (10 ** decimals);
+    // Use BigInt division to avoid precision loss on 18-decimal tokens with large balances
+    const divisor = BigInt(10) ** BigInt(decimals);
+    return Number((balance * BigInt(1_000_000_000)) / divisor) / 1_000_000_000;
   } catch (error) {
     console.error('Error fetching on-chain balance:', error);
     return 0;

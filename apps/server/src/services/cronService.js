@@ -32,6 +32,7 @@ export const runInterestCollection = async (runType = 'auto_scheduled', triggere
       SELECT HEX(l.uid) as uid, HEX(l.user_uid) as user_uid, HEX(l.loan_id) as loan_id,
              l.principal_amount, l.outstanding_principal, l.interest_rate,
              l.token_symbol, l.token_address, l.network, l.maturity_date,
+             l.next_debit_date,
              u.wallet_address
       FROM loans l
       JOIN users u ON l.user_uid = u.uid
@@ -49,7 +50,6 @@ export const runInterestCollection = async (runType = 'auto_scheduled', triggere
     }
 
     const loansToProcess = await queryRunner(query, params);
-
     if (!loansToProcess || loansToProcess.length === 0) {
       console.log('⏰ No loans require interest collection this run.');
       await queryRunner(
@@ -58,7 +58,7 @@ export const runInterestCollection = async (runType = 'auto_scheduled', triggere
       );
       return { cronRunId, totalProcessed: 0 };
     }
-
+ 
     // 3. Process each loan
     const gracePeriodDays = Number(await getSystemSettings('loan_grace_period_days')) || 3;
 
@@ -133,3 +133,9 @@ export const startCronJobs = () => {
     }
   });
 };
+
+
+// SET GLOBAL time_zone = '+05:30';
+// SET SESSION time_zone = '+05:30';
+
+// SELECT NOW(), @@global.time_zone, @@session.time_zone;

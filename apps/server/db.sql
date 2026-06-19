@@ -112,6 +112,9 @@ INSERT IGNORE INTO system_settings (setting_key, setting_value) VALUES
 ('loan_interest_rate', '5.0'),
 ('loan_interest_calc_basis', 'original'),
 ('loan_interest_frequency_days', '30'),
+('loan_default_term_days', '90'),
+('loan_grace_period_days', '3'),
+('loan_default_threshold_days', '90'),
 ('loan_auto_close_on_maturity', '1');
 
 CREATE TABLE IF NOT EXISTS user_kyc_documents (

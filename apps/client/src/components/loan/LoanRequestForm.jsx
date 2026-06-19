@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAccount, useReadContract } from 'wagmi';
+import { bsc, polygon } from 'wagmi/chains';
 import { useRequestLoan, useLoanEligibility } from '../../hooks/useLoanQueries';
 import { useLoanTokenApproval } from '../../hooks/useLoanTokenApproval';
 import { erc20Abi, USDT_ADDRESSES, USDC_ADDRESSES, DAI_ADDRESSES } from '../../config/constants';
@@ -10,9 +11,9 @@ export const LoanRequestForm = () => {
   const { data: eligibilityData } = useLoanEligibility();
   const { mutate: submitLoanRequest, isPending } = useRequestLoan();
 
-  const [principal, setPrincipal]                 = useState('');
-  const [tokenSymbol, setTokenSymbol]             = useState('USDT');
-  const [network, setNetwork]                     = useState('bsc');
+  const [principal, setPrincipal]                   = useState('');
+  const [tokenSymbol, setTokenSymbol]               = useState('USDT');
+  const [network, setNetwork]                       = useState('bsc');
   const [eligibilityChecked, setEligibilityChecked] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
@@ -20,6 +21,9 @@ export const LoanRequestForm = () => {
   useEffect(() => {
     setEligibilityChecked(false);
   }, [network, tokenSymbol, principal]);
+
+  // Derive chainId from the selected network string
+  const chainId = network === 'bsc' ? bsc.id : polygon.id;
 
   // Resolve the ERC20 address for the currently selected token + network
   const tokenAddr = useMemo(() => {
@@ -30,10 +34,14 @@ export const LoanRequestForm = () => {
     return '';
   }, [tokenSymbol, network]);
 
+  // ── Debug: log resolved tokenAddr and chainId on change ───────────────
+  useEffect(() => {
+    console.log('[tokenAddr/chainId]', { tokenAddr, chainId, network, tokenSymbol });
+  }, [tokenAddr, chainId, network, tokenSymbol]);
+
   // ── Loan token approval check ──────────────────────────────────────────
-  // Runs reactively whenever tokenAddr or network changes.
   const {
-    isChecking:   isCheckingApproval,
+    isChecking: isCheckingApproval,
     needsApproval,
     isApproving,
     approve,
@@ -43,50 +51,115 @@ export const LoanRequestForm = () => {
   const tiers = eligibilityData?.data?.tiers || [];
 
   const applicableTiers = useMemo(() => {
-    return tiers.filter(
+    const filtered = tiers.filter(
       t =>
         t.network.toLowerCase() === network.toLowerCase() &&
         t.token.toLowerCase() === tokenSymbol.toLowerCase()
     );
+    console.log('[Eligibility] applicableTiers recalculated', {
+      allTiers: tiers,
+      selectedNetwork: network,
+      selectedToken: tokenSymbol,
+      applicableTiers: filtered,
+    });
+    return filtered;
   }, [tiers, network, tokenSymbol]);
 
-  const { data: balanceData } = useReadContract({
+  // ── Debug: log all args passed to useReadContract ─────────────────────
+  console.log('[useReadContract] balanceOf args:', {
+    address: tokenAddr || undefined,
+    functionName: 'balanceOf',
+    args: address ? [address] : undefined,
+    chainId,
+    enabled: !!tokenAddr && !!address,
+  });
+  console.log('[useReadContract] decimals args:', {
+    address: tokenAddr || undefined,
+    functionName: 'decimals',
+    chainId,
+    enabled: !!tokenAddr,
+  });
+
+  const { data: balanceData, isLoading: isBalanceFetching } = useReadContract({
     address: tokenAddr || undefined,
     abi: erc20Abi,
     functionName: 'balanceOf',
     args: address ? [address] : undefined,
+    chainId,                                   // ← forces query on correct chain
     query: { enabled: !!tokenAddr && !!address },
   });
 
-  const { data: decimalsData } = useReadContract({
+  const { data: decimalsData, isLoading: isDecimalsFetching } = useReadContract({
     address: tokenAddr || undefined,
     abi: erc20Abi,
     functionName: 'decimals',
+    chainId,                                   // ← forces query on correct chain
     query: { enabled: !!tokenAddr },
   });
 
+  // Only truly loading when the queries are enabled AND actively fetching
+  const isBalanceLoading = isBalanceFetching || isDecimalsFetching;
+
   const balanceNum = useMemo(() => {
-    if (balanceData && decimalsData) {
-      return Number(balanceData) / 10 ** Number(decimalsData);
+    console.log('[Balance] raw balanceData:', balanceData, '| raw decimalsData:', decimalsData);
+
+    if (balanceData != null && decimalsData != null) {
+      const divisor = BigInt(10) ** BigInt(decimalsData);
+      const result = Number((BigInt(balanceData) * BigInt(1e9)) / divisor) / 1e9;
+      console.log('[Balance] computed balanceNum:', result, '| decimals:', Number(decimalsData));
+      return result;
     }
+
+    console.warn('[Balance] balanceData or decimalsData is null — balanceNum defaulting to 0');
     return 0;
   }, [balanceData, decimalsData]);
 
   const maxAllowedLoan = useMemo(() => {
     let max = 0;
+    console.log('[Eligibility] checking tiers against balanceNum:', balanceNum);
     for (const tier of applicableTiers) {
+      console.log(
+        `[Eligibility] tier check — token: ${tier.token}, network: ${tier.network}, ` +
+        `min_balance: ${tier.min_balance}, max_loan: ${tier.max_loan}, ` +
+        `balanceNum: ${balanceNum}, passes: ${balanceNum >= tier.min_balance}`
+      );
       if (balanceNum >= tier.min_balance && tier.max_loan > max) {
         max = tier.max_loan;
       }
     }
+    console.log('[Eligibility] maxAllowedLoan result:', max);
     return max;
   }, [applicableTiers, balanceNum]);
 
-  const isEligible       = maxAllowedLoan > 0;
-  const requestedAmount  = Number(principal);
-  const isExceedingMax   = requestedAmount > maxAllowedLoan;
-  const isInvalidAmount  = requestedAmount <= 0;
-  const canSubmit        = isEligible && !isExceedingMax && !isInvalidAmount;
+  const isEligible      = maxAllowedLoan > 0;
+  const requestedAmount = Number(principal);
+  const isExceedingMax  = requestedAmount > maxAllowedLoan;
+  const isInvalidAmount = requestedAmount <= 0;
+  const canSubmit       = isEligible && !isExceedingMax && !isInvalidAmount;
+
+  // ── Log full state on every eligibility check ──────────────────────────
+  useEffect(() => {
+    if (!eligibilityChecked) return;
+    console.log('[Eligibility] Check triggered — full state snapshot:', {
+      address,
+      network,
+      tokenSymbol,
+      tokenAddr,
+      chainId,
+      principal,
+      balanceData: balanceData?.toString(),
+      decimalsData: decimalsData?.toString(),
+      isBalanceLoading,
+      balanceNum,
+      applicableTiers,
+      maxAllowedLoan,
+      isEligible,
+      requestedAmount,
+      isExceedingMax,
+      isInvalidAmount,
+      canSubmit,
+    });
+  }, [eligibilityChecked]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Handlers ───────────────────────────────────────────────────────────
   const handleLoanSubmit = (e) => {
@@ -98,7 +171,6 @@ export const LoanRequestForm = () => {
   const handleApprove = async () => {
     try {
       await approve();
-      // approval succeeded — needsApproval will flip to false reactively
     } catch {
       // toast already shown inside the hook; just don't proceed
     }
@@ -113,30 +185,44 @@ export const LoanRequestForm = () => {
   };
 
   // ── Derived button state ───────────────────────────────────────────────
-  // After eligibility is confirmed we show one of three bottom actions:
-  //   1. Approval pending check  → spinner / disabled
-  //   2. Needs approval          → "Approve TOKEN" button
-  //   3. Approved + eligible     → "Confirm Request" submit button
   const renderActionButton = () => {
     if (!eligibilityChecked) {
       return (
         <button
           type="button"
           onClick={() => setEligibilityChecked(true)}
-          disabled={!principal || !tokenAddr}
-          className="w-full flex justify-center py-3 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          disabled={!principal || !tokenAddr || isBalanceLoading}
+          className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
-          Check Eligibility
+          {isBalanceLoading ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Loading balance...
+            </>
+          ) : (
+            'Check Eligibility'
+          )}
         </button>
       );
     }
 
-    // Not eligible — don't proceed to approval or submit
+    if (isBalanceLoading) {
+      return (
+        <button
+          type="button"
+          disabled
+          className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl text-sm font-bold text-white bg-blue-600/50 cursor-not-allowed"
+        >
+          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          Fetching balance...
+        </button>
+      );
+    }
+
     if (!canSubmit) {
       return null;
     }
 
-    // Allowance check still in flight
     if (isCheckingApproval) {
       return (
         <button
@@ -150,11 +236,9 @@ export const LoanRequestForm = () => {
       );
     }
 
-    // Token not yet approved
     if (needsApproval) {
       return (
         <div className="space-y-3">
-          {/* Info banner */}
           <div className="flex items-start gap-3 bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
             <svg className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
@@ -192,7 +276,6 @@ export const LoanRequestForm = () => {
       );
     }
 
-    // Approved + ready to submit
     return (
       <button
         type="submit"
@@ -260,20 +343,23 @@ export const LoanRequestForm = () => {
           </div>
 
           {/* Eligibility feedback */}
-          {eligibilityChecked && !isEligible && (
+          {eligibilityChecked && isBalanceLoading && (
+            <p className="text-gray-400 text-sm">Fetching your balance, please wait...</p>
+          )}
+          {eligibilityChecked && !isBalanceLoading && !isEligible && (
             <p className="text-red-400 text-sm">
               You do not hold the minimum required balance for a loan on this network.
             </p>
           )}
-          {eligibilityChecked && isEligible && isInvalidAmount && (
+          {eligibilityChecked && !isBalanceLoading && isEligible && isInvalidAmount && (
             <p className="text-red-400 text-sm">Amount must be greater than zero.</p>
           )}
-          {eligibilityChecked && isEligible && isExceedingMax && !isInvalidAmount && (
+          {eligibilityChecked && !isBalanceLoading && isEligible && isExceedingMax && !isInvalidAmount && (
             <p className="text-red-400 text-sm">
               Amount exceeds your maximum allowed loan of {maxAllowedLoan} {tokenSymbol}.
             </p>
           )}
-          {eligibilityChecked && canSubmit && !needsApproval && (
+          {eligibilityChecked && !isBalanceLoading && canSubmit && !needsApproval && (
             <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-xl text-green-400 text-sm">
               <p className="font-bold mb-1">Eligibility Confirmed!</p>
               <p>You meet the requirements. Maximum allowed loan: {maxAllowedLoan} {tokenSymbol}.</p>
