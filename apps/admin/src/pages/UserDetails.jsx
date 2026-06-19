@@ -128,15 +128,18 @@ const UserDetails = () => {
             {/* Status Indicator Bar */}
             <div className={`absolute top-0 left-0 w-full h-1 ${userData.is_blocked ? 'bg-rose-500/80' : 'bg-emerald-500/80'}`}></div>
             
-            <div className="flex items-start justify-between mb-6 pt-2">
-              <div>
-                <h1 className="text-2xl font-extrabold text-zinc-100 tracking-tight mb-1 flex items-center">
-                  {userData.username || 'Unnamed User'}
-                  {userData.kyc_status === 'approved' && <ShieldCheck className="ml-2 text-emerald-400" size={20} />}
+            <div className="flex items-start justify-between mb-8 pt-2">
+              <div className="min-w-0 pr-4">
+                <h1 className="text-2xl font-extrabold text-zinc-100 tracking-tight mb-2 flex items-center">
+                  <span className="truncate">{userData.username || 'Unnamed User'}</span>
+                  {userData.kyc_status === 'approved' && <ShieldCheck className="ml-2 text-emerald-400 shrink-0" size={20} />}
                 </h1>
-                <p className="text-zinc-500 font-mono text-xs">UID: {userData.uid}</p>
+                <p className="text-zinc-500 font-mono text-[11px] truncate" title={userData.uid}>
+                  <span className="text-zinc-600 font-bold mr-1 tracking-wider uppercase">UID:</span> 
+                  {userData.uid}
+                </p>
               </div>
-              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+              <span className={`shrink-0 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border ${
                 userData.is_blocked ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
               }`}>
                 {userData.is_blocked ? 'Blocked' : 'Active'}
@@ -144,34 +147,39 @@ const UserDetails = () => {
             </div>
 
             <div className="space-y-6">
-              <div>
-                <p className="text-xs text-zinc-500 mb-1">Email Address</p>
-                <div className="flex items-center text-zinc-200">
-                  <Mail size={16} className="mr-2 text-zinc-600 shrink-0" />
-                  <span className="truncate">{userData.email}</span>
-                  {userData.email_verified ? <CheckCircle2 size={14} className="ml-2 text-emerald-400 shrink-0" /> : null}
+              <div className="flex flex-col">
+                <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Email Address</span>
+                <div className="flex items-center text-zinc-300 text-[14px]">
+                  <Mail size={16} className="mr-3 text-zinc-500 shrink-0" />
+                  <span className="truncate font-medium">{userData.email || 'Not provided'}</span>
+                  {userData.email_verified && <CheckCircle2 size={14} className="ml-2 text-emerald-400 shrink-0" />}
                 </div>
               </div>
-              <div>
-                <p className="text-xs text-zinc-500 mb-1">Phone Number</p>
-                <div className="flex items-center text-zinc-200">
-                  <Phone size={16} className="mr-2 text-zinc-600 shrink-0" />
-                  <span>{userData.phone || 'Not provided'}</span>
-                  {userData.phone_verified ? <CheckCircle2 size={14} className="ml-2 text-emerald-400 shrink-0" /> : null}
+              
+              <div className="flex flex-col">
+                <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Phone Number</span>
+                <div className="flex items-center text-zinc-300 text-[14px]">
+                  <Phone size={16} className="mr-3 text-zinc-500 shrink-0" />
+                  <span className="font-medium">{userData.phone || 'Not provided'}</span>
+                  {userData.phone_verified && <CheckCircle2 size={14} className="ml-2 text-emerald-400 shrink-0" />}
                 </div>
               </div>
-              <div>
-                <p className="text-xs text-zinc-500 mb-1">Web3 Wallet</p>
-                <div className="flex items-center text-amber-400 font-mono text-xs bg-zinc-950/60 px-2 py-1.5 rounded-lg border border-zinc-800/80 shadow-sm break-all">
-                  <Wallet size={15} className="mr-2 shrink-0 text-amber-400/80" />
-                  {userData.wallet_address || 'Not connected'}
+              
+              <div className="flex flex-col">
+                <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Web3 Wallet</span>
+                <div className="flex items-center text-amber-400 text-[13px] font-mono bg-zinc-950/80 px-3 py-2.5 rounded-xl border border-zinc-800/80 shadow-inner">
+                  <Wallet size={16} className="mr-3 shrink-0 text-amber-500/80" />
+                  <span className="truncate">{userData.wallet_address || 'Not connected'}</span>
                 </div>
               </div>
-              <div className="pt-2">
-                <p className="text-xs text-zinc-500 mb-1">Joined On</p>
-                <div className="flex items-center text-zinc-300 text-sm">
-                  <Clock size={16} className="mr-2 text-zinc-600 shrink-0" />
-                  {new Date(userData.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+              
+              <div className="flex flex-col pt-2">
+                <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Joined On</span>
+                <div className="flex items-center text-zinc-300 text-[14px]">
+                  <Clock size={16} className="mr-3 text-zinc-500 shrink-0" />
+                  <span className="font-medium">
+                    {new Date(userData.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                  </span>
                 </div>
               </div>
             </div>

@@ -32,14 +32,10 @@ function Home() {
 
         {/* --- NAVBAR --- */}
         <div className="relative z-50 px-2 sm:px-4 pt-4 sm:pt-6 pb-2 lg:px-6 xl:px-8">
-          <nav className="w-full flex items-center justify-between bg-white/40 backdrop-blur-2xl border border-white/60 rounded-[18px] sm:rounded-[24px] px-3 sm:px-5 lg:px-4 xl:px-6 py-2.5 sm:py-3 lg:py-2.5 xl:py-4 shadow-[0_8px_32px_rgba(14,27,77,0.05)]">
+          <nav className="w-full flex items-center justify-between bg-white/80 backdrop-blur-2xl border border-white/60 rounded-[18px] sm:rounded-[24px] px-3 sm:px-5 lg:px-4 xl:px-6 py-2.5 sm:py-3 lg:py-2.5 xl:py-4 shadow-[0_8px_32px_rgba(14,27,77,0.05)]">
             {/* Logo */}
-            <div className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer group shrink-0">
-              <div className="w-7 h-7 sm:w-9 sm:h-9 lg:w-8 lg:h-8 xl:w-10 xl:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#0E1B4D] to-[#1A2C6B] flex items-center justify-center relative shadow-md group-hover:scale-105 transition-transform duration-300">
-                <span className="text-white font-bold text-[12px] sm:text-[14px] lg:text-[13px] xl:text-[16px]">C</span>
-                <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-2 h-2 sm:w-3 sm:h-3 lg:w-2.5 lg:h-2.5 xl:w-3.5 xl:h-3.5 bg-gradient-to-tr from-[#D9A85C] to-[#FCD34D] rounded-full border-[1.5px] sm:border-2 border-white shadow-sm"></div>
-              </div>
-              <span className="text-[15px] sm:text-xl lg:text-[16px] xl:text-2xl font-extrabold tracking-tight text-[#0E1B4D]">InstaaCash</span>
+            <div className="flex items-center cursor-pointer group shrink-0">
+              <img src="/instaa-cash-logo.png" alt="Instaa Cash" className="h-8 sm:h-10 lg:h-9 xl:h-12 w-auto object-contain group-hover:scale-105 transition-transform duration-300" />
             </div>
 
             {/* Links - only visible on large screens */}
@@ -57,9 +53,9 @@ function Home() {
               <div className="absolute -inset-0.5 bg-gradient-to-r from-[#A99CFF] to-[#D9A85C] rounded-full blur opacity-40 group-hover:opacity-100 transition duration-500 pointer-events-none"></div>
               <button
                 onClick={() => handleConnect('/dashboard')}
-                className="relative flex items-center gap-1 sm:gap-2 lg:gap-1.5 xl:gap-2.5 bg-gradient-to-br from-[#0E1B4D] to-[#1A2C6B] text-white px-3 py-2 sm:px-6 sm:py-2.5 lg:px-4 lg:py-2 xl:px-8 xl:py-3 rounded-full font-bold text-[11px] sm:text-[14px] lg:text-[12px] xl:text-[15px] transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_10px_40px_-10px_rgba(169,156,255,0.8)] border border-white/20 shadow-inner"
+                className="relative flex items-center gap-1 sm:gap-2 lg:gap-1.5 xl:gap-2.5 bg-gradient-to-br from-[#A99CFF] to-[#6366F1] text-white px-3 py-2 sm:px-6 sm:py-2.5 lg:px-4 lg:py-2 xl:px-8 xl:py-3 rounded-full font-bold text-[11px] sm:text-[14px] lg:text-[12px] xl:text-[15px] transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_10px_40px_-10px_rgba(169,156,255,0.8)] border border-white/20 shadow-inner"
               >
-                <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-3.5 lg:h-3.5 xl:w-5 xl:h-5 text-[#A99CFF]" />
+                <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-3.5 lg:h-3.5 xl:w-5 xl:h-5 text-white" />
                 <span className="hidden sm:inline">Connect Wallet</span>
                 <span className="sm:hidden">Connect</span>
               </button>
@@ -638,12 +634,8 @@ function Home() {
 
             {/* Brand Col */}
             <div className="flex flex-col gap-6 lg:col-span-1">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#A99CFF] to-[#6366F1] flex items-center justify-center relative shadow-lg">
-                  <span className="text-white font-bold text-[16px]">C</span>
-                  <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-gradient-to-tr from-[#D9A85C] to-[#FCD34D] rounded-full border-2 border-[#0E1B4D]"></div>
-                </div>
-                <span className="text-2xl font-extrabold tracking-tight text-white">InstaaCash</span>
+              <div className="flex items-center">
+                <img src="/instaa-cash-logo.png" alt="Instaa Cash" className="h-12 w-auto object-contain" />
               </div>
               <p className="text-[#94A3B8] text-[15px] leading-relaxed">
                 The most elegant, zero-friction decentralized platform for instant swaps and over-collateralized crypto loans.

@@ -98,24 +98,27 @@ const kycColumns = [
     header: 'Actions',
     cell: ({ row, table }) => {
       const { status, id } = row.original;
-      if (status !== 'pending') return null;
 
       return (
         <div className="flex items-center space-x-2.5">
-          <button
-            onClick={() => table.options.meta.handlePreUpdateStatus(id, 'approved')}
-            className="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/25 rounded-lg transition-all font-bold text-xs cursor-pointer"
-          >
-            <CheckCircle size={13} />
-            <span>Approve</span>
-          </button>
-          <button
-            onClick={() => table.options.meta.handlePreUpdateStatus(id, 'rejected')}
-            className="flex items-center space-x-1.5 px-3 py-1.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/25 rounded-lg transition-all font-bold text-xs cursor-pointer"
-          >
-            <XCircle size={13} />
-            <span>Reject</span>
-          </button>
+          {status !== 'approved' && (
+            <button
+              onClick={() => table.options.meta.handlePreUpdateStatus(id, 'approved')}
+              className="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/25 rounded-lg transition-all font-bold text-xs cursor-pointer"
+            >
+              <CheckCircle size={13} />
+              <span>Approve</span>
+            </button>
+          )}
+          {status !== 'rejected' && (
+            <button
+              onClick={() => table.options.meta.handlePreUpdateStatus(id, 'rejected')}
+              className="flex items-center space-x-1.5 px-3 py-1.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/25 rounded-lg transition-all font-bold text-xs cursor-pointer"
+            >
+              <XCircle size={13} />
+              <span>Reject</span>
+            </button>
+          )}
         </div>
       );
     },
@@ -216,9 +219,9 @@ const KycManagement = () => {
       </div>
 
       <div className="flex items-center justify-between mb-4 mt-8">
-         <h2 className="text-lg font-bold text-zinc-100 flex items-center">
-            <div className="w-2 h-2 rounded-full bg-amber-500 mr-3 animate-pulse"></div>
-            Pending KYC
+         <h2 className="text-lg font-bold text-zinc-100 flex items-center capitalize">
+            <div className={`w-2 h-2 rounded-full mr-3 ${filterStatus === 'pending' ? 'bg-amber-500 animate-pulse' : filterStatus === 'approved' ? 'bg-emerald-500' : filterStatus === 'rejected' ? 'bg-rose-500' : 'bg-blue-500'}`}></div>
+            {filterStatus === 'all' ? 'All' : filterStatus} KYC Documents
          </h2>
          <button
             onClick={fetchKyc}

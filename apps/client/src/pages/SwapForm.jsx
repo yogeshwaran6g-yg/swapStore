@@ -8,6 +8,7 @@ import { useSmartContractSwap } from '@/hooks/useSmartContractSwap';
 import { useAccount, useSwitchChain } from 'wagmi';
 import { USDT_ADDRESSES, USDC_ADDRESSES, DAI_ADDRESSES } from '@/config/constants';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { useUserSwaps } from '@/hooks/useUserSwaps';
 
 function SwapForm() {
   const { isAuthenticated, address } = useAuth();
@@ -415,8 +416,130 @@ function SwapForm() {
               isLoading={submitting || isProcessing}
             />
           </div>
+
+          {/* Swap History Section */}
+          <SwapHistory />
+
         </div>
       </div>
+    </div>
+  );
+}
+
+// Sub-component for Swap History
+function SwapHistory() {
+  const queryResult = useUserSwaps();
+  const { data: swaps, isLoading, error } = queryResult;
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+
+  if (isLoading) {
+    return (
+      <div className="mt-8 backdrop-blur-xl bg-[#0a0a14]/60 border border-white/10 rounded-[2rem] p-8 shadow-2xl flex justify-center">
+        <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!swaps || swaps.length === 0) {
+    return (
+      <div className="mt-8 backdrop-blur-xl bg-[#0a0a14]/60 border border-white/10 rounded-[2rem] p-8 shadow-2xl relative text-center text-white">
+        <p className="text-white/60">No swap history found.</p>
+      </div>
+    );
+  }
+
+  const totalPages = Math.ceil(swaps.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedSwaps = swaps.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  return (
+    <div className="mt-8 backdrop-blur-xl bg-[#0a0a14]/60 border border-white/10 rounded-[2rem] p-8 shadow-2xl relative">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-bold text-white tracking-wide">Recent Swaps</h3>
+        <span className="text-xs text-zinc-500">{swaps.length} total</span>
+      </div>
+      <div className="overflow-x-auto rounded-xl border border-white/10 bg-black/20">
+        <table className="w-full text-left text-sm text-zinc-400">
+          <thead className="text-xs uppercase bg-white/5 border-b border-white/10 text-zinc-500">
+            <tr>
+              <th className="px-4 py-3 font-medium">Order Details</th>
+              <th className="px-4 py-3 font-medium">Amount</th>
+              <th className="px-4 py-3 font-medium">Crypto Status</th>
+              <th className="px-4 py-3 font-medium">Fiat (INR) Status</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/5">
+            {paginatedSwaps.map((swap) => (
+              <tr key={swap.order_id} className="hover:bg-white/5 transition-colors">
+                <td className="px-4 py-4">
+                  <div className="font-mono text-white text-xs mb-1 tracking-wider">{swap.order_id?.substring(0, 8)}...</div>
+                  <div className="text-[11px] text-zinc-500">{new Date(swap.created_at).toLocaleDateString()} {new Date(swap.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                </td>
+                <td className="px-4 py-4">
+                  <div className="flex flex-col items-start gap-1">
+                    <span className="text-white font-bold text-sm tracking-wide">{swap.amount} {swap.token_symbol}</span>
+                    <span className="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-black/60 text-zinc-400">{swap.network}</span>
+                  </div>
+                </td>
+                <td className="px-4 py-4">
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${
+                    swap.user_crypto_payment_status === 'completed' || swap.user_crypto_payment_status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                    swap.user_crypto_payment_status === 'failed' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' :
+                    'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                  }`}>
+                    {swap.user_crypto_payment_status || 'pending'}
+                  </span>
+                </td>
+                <td className="px-4 py-4">
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${
+                    swap.admin_inr_payment_status === 'completed' || swap.admin_inr_payment_status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                    swap.admin_inr_payment_status === 'failed' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' :
+                    'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                  }`}>
+                    {swap.admin_inr_payment_status || 'pending'}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-5 px-1">
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+              currentPage === 1
+                ? 'bg-white/5 text-zinc-600 cursor-not-allowed'
+                : 'bg-white/10 text-white hover:bg-white/20 active:scale-95'
+            }`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            Previous
+          </button>
+
+          <span className="text-xs text-zinc-400">
+            Page <span className="text-white font-bold">{currentPage}</span> of <span className="text-white font-bold">{totalPages}</span>
+          </span>
+
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+              currentPage === totalPages
+                ? 'bg-white/5 text-zinc-600 cursor-not-allowed'
+                : 'bg-white/10 text-white hover:bg-white/20 active:scale-95'
+            }`}
+          >
+            Next
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

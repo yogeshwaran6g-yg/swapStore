@@ -7,7 +7,9 @@ import { useAuth } from '../hooks/useAuth';
 
 const Layout = () => {
   const { logout, admin } = useAuth();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 768);
+
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   const handleLogout = () => {
     logout();
@@ -23,33 +25,30 @@ const Layout = () => {
 
   return (
     <div className="flex h-screen bg-zinc-950 text-zinc-100 font-sans overflow-hidden">
-      
+
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm"
           onClick={closeSidebar}
         />
       )}
 
       {/* Sidebar */}
-      <aside 
-        className={`fixed inset-y-0 left-0 z-50 w-[260px] bg-zinc-900/95 border-r border-zinc-800/50 flex flex-col flex-shrink-0 backdrop-blur-xl transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-[260px] bg-zinc-900/95 border-r border-zinc-800/50 flex flex-col flex-shrink-0 backdrop-blur-xl transform transition-all duration-300 ease-in-out md:relative ${isSidebarOpen ? 'translate-x-0 md:ml-0' : '-translate-x-full md:-ml-[260px]'
+          }`}
       >
         <div className="h-16 flex items-center justify-between px-6 border-b border-zinc-800/50 shrink-0">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.3)]">
-              <span className="text-zinc-950 font-black text-lg">S</span>
-            </div>
-            <span className="text-xl font-extrabold tracking-tight text-zinc-100">SWAPSTORE</span>
+          <div className="flex items-center">
+            <img src="/instaa-cash-logo.png" alt="Instaa Cash" className="h-9 object-contain" />
           </div>
-          <button 
-            className="md:hidden text-zinc-500 hover:text-amber-500 transition-colors"
+          <button
+            className="md:hidden text-zinc-500 hover:text-amber-500 transition-colors bg-zinc-800/50 p-1.5 rounded-lg"
             onClick={closeSidebar}
+            title="Close Sidebar"
           >
-            <X size={20} strokeWidth={2} />
+            <X size={18} strokeWidth={2} />
           </button>
         </div>
 
@@ -109,14 +108,15 @@ const Layout = () => {
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
         {/* Top Navbar */}
         <header className="h-16 bg-zinc-900/50 border-b border-zinc-800/50 flex items-center justify-between px-6 z-10 flex-shrink-0 backdrop-blur-md">
-          <button 
-            onClick={() => setIsSidebarOpen(true)}
-            className="md:hidden text-zinc-500 hover:text-amber-500 transition-colors bg-zinc-800/50 p-2 rounded-lg"
-          >
-            <Menu size={20} strokeWidth={2} />
-          </button>
-          
-          <div className="hidden md:block"></div> {/* Spacer for desktop when menu button is hidden */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={toggleSidebar}
+              className="text-zinc-500 hover:text-amber-500 transition-colors bg-zinc-800/50 p-2 rounded-lg"
+              title="Toggle Sidebar"
+            >
+              <Menu size={20} strokeWidth={2} />
+            </button>
+          </div>
 
           <div className="flex items-center space-x-4 ml-auto">
             <appkit-button balance="hide" />

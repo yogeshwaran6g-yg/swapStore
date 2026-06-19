@@ -92,14 +92,14 @@ export const getPendingKyc = async (req, res) => {
     const offset = (page - 1) * limit;
 
     const [{ total }] = await queryRunner(
-      `SELECT COUNT(*) as total FROM user_kyc_documents WHERE status = 'pending'`
+      `SELECT COUNT(*) as total FROM user_kyc_documents`
     );
 
     const documents = await queryRunner(
       `SELECT k.id, HEX(k.user_uid) as user_uid, k.document_type, k.document_url, k.status, k.uploaded_at, u.email, u.username
        FROM user_kyc_documents k
        JOIN users u ON k.user_uid = u.uid
-       WHERE k.status = 'pending'
+       ORDER BY k.uploaded_at DESC
        LIMIT ? OFFSET ?`,
       [limit, offset]
     );
