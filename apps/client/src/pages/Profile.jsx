@@ -291,7 +291,34 @@ export default function Profile() {
 
               {/* KYC Tab */}
               {activeTab === 'kyc' && (
-                <form onSubmit={handlePreKycUpload} className="space-y-8 animate-fade-in">
+                <div className="animate-fade-in space-y-8">
+                  {profile?.kyc_status === 'approved' ? (
+                    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-10 text-center flex flex-col items-center">
+                      <div className="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+                        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                      </div>
+                      <h3 className="text-2xl font-extrabold text-white mb-2">Identity Verified</h3>
+                      <p className="text-zinc-400">Your KYC documents have been approved. Your account is fully verified.</p>
+                    </div>
+                  ) : profile?.kyc_status === 'pending' ? (
+                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-10 text-center flex flex-col items-center">
+                      <div className="w-20 h-20 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(245,158,11,0.2)]">
+                        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                      </div>
+                      <h3 className="text-2xl font-extrabold text-white mb-2">Verification Pending</h3>
+                      <p className="text-zinc-400">Your documents have been submitted and are currently under review by our team.</p>
+                    </div>
+                  ) : (
+                    <form onSubmit={handlePreKycUpload} className="space-y-8">
+                      {profile?.kyc_status === 'rejected' && (
+                        <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-4 flex items-center shadow-inner">
+                          <svg className="w-6 h-6 mr-3 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                          <div>
+                            <p className="text-rose-400 font-bold text-sm">Verification Rejected</p>
+                            <p className="text-rose-500/80 text-xs mt-0.5">Your previous submission was rejected. Please upload clear, valid documents.</p>
+                          </div>
+                        </div>
+                      )}
                   <div>
                     <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Document Type <span className="text-red-500">*</span></label>
                     <select 
@@ -340,6 +367,8 @@ export default function Profile() {
                     {uploadingKyc ? 'Uploading...' : 'Submit Document'}
                   </button>
                 </form>
+                  )}
+                </div>
               )}
             </div>
 

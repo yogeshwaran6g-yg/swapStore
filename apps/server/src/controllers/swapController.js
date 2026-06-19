@@ -44,6 +44,29 @@ export const submitSwapForm = async (req, res) => {
   }
 };
 
+export const getUserSwaps = async (req, res) => {
+  try {
+    const userUid = req.user?.uid;
+    if (!userUid) return rtnRes(res, 401, 'Unauthorized');
+
+    const { queryRunner } = await import('../config/db.js');
+    const swaps = await queryRunner(`
+      SELECT 
+        HEX(order_id) as order_id, token_symbol, amount, network,
+        user_crypto_payment_status, admin_inr_payment_status, tx_hash, created_at
+      FROM swap_orders 
+      WHERE user_uid = UNHEX(?)
+      ORDER BY created_at DESC
+      LIMIT 50
+    `, [userUid]);
+
+    return rtnRes(res, 200, 'Swaps fetched successfully', { swaps: swaps || [] });
+  } catch (error) {
+    console.error('Error fetching user swaps:', error);
+    return rtnRes(res, 500, 'Internal Server Error', { error: error.message });
+  }
+};
+
 export const getAllSwaps = async (req, res) => {
   try {
       // Role check

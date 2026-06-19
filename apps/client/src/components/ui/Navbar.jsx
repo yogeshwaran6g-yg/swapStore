@@ -28,10 +28,9 @@ const Navbar = () => {
             onClick={() => navigate('/')}
             className="flex items-center gap-2 cursor-pointer group"
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center transform group-hover:rotate-12 transition-transform">
-              <span className="text-white font-black text-lg">S</span>
+            <div className="flex items-center group">
+              <img src="/instaa-cash-logo.png" alt="Instaa Cash" className="h-8 sm:h-9 object-contain transform group-hover:scale-105 transition-transform" />
             </div>
-            <span className="text-xl font-bold text-white tracking-tight hidden sm:block">SwapStore</span>
           </div>
 
           <div className="hidden lg:flex items-center gap-8 text-sm font-medium text-zinc-400">
@@ -89,10 +88,7 @@ const Navbar = () => {
           <div className="relative w-64 max-w-sm h-full bg-[#0a0a0f] border-r border-white/10 shadow-2xl flex flex-col p-6 animate-fade-in">
             <div className="flex items-center justify-between mb-10">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-black text-lg">S</span>
-                </div>
-                <span className="text-xl font-bold text-white tracking-tight">SwapStore</span>
+                <img src="/instaa-cash-logo.png" alt="Instaa Cash" className="h-8 object-contain" />
               </div>
               <button onClick={() => setIsMenuOpen(false)} className="text-zinc-400 hover:text-white p-2">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
