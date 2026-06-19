@@ -102,34 +102,18 @@ export const updateBankDetails = async (req, res) => {
       return rtnRes(res, 401, 'Unauthorized');
     }
 
-    const { name, account_no, ifsc } = req.body;
-    
-    const updates = [];
-    const values = [];
+    const { name, account_no, ifsc, email, phone } = req.body;
 
-    if (name !== undefined) {
-      updates.push('account_holder_name = ?');
-      values.push(name);
-    }
-    if (account_no !== undefined) {
-      updates.push('account_number = ?');
-      values.push(account_no);
-    }
-    if (ifsc !== undefined) {
-      updates.push('ifsc_code = ?');
-      values.push(ifsc);
-    }
-
-    if (updates.length === 0) {
+    if (!name && !account_no && !ifsc) {
       return rtnRes(res, 400, 'No valid fields provided for update');
     }
 
-    updates.push('updated_at = CURRENT_TIMESTAMP');
-    values.push(userUid);
+    const { saveBankDetails } = await import('../services/userService.js');
+    const saveResult = await saveBankDetails(userUid, { name, account_no, ifsc, email, phone });
 
-    const { queryRunner } = await import('../config/db.js');
-    const updateQuery = `UPDATE users SET ${updates.join(', ')} WHERE uid = UNHEX(?)`;
-    await queryRunner(updateQuery, values);
+    if (!saveResult.success) {
+      return rtnRes(res, 500, saveResult.error || 'Failed to update bank details');
+    }
 
     const { getUserByUid } = await import('../services/userService.js');
     const result = await getUserByUid(userUid);

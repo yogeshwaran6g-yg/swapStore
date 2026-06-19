@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAccount, usePublicClient, useWriteContract } from 'wagmi';
+import { useAccount, usePublicClient, useWriteContract, useSwitchChain } from 'wagmi';
 import { maxUint256 } from 'viem';
+import { bsc, polygon } from '@reown/appkit/networks';
 import { LOAN_CONTRACT_ADDRESSES, erc20Abi } from '@/config/constants';
 import toast from 'react-hot-toast';
 
@@ -20,26 +21,32 @@ const THRESHOLD = 1_000_000_000_000_000_000_000_000n;
  * @param {string} network       - Server-side network key: 'bsc' | 'polygon'
  *
  * @returns {{
- *   isChecking: boolean,       - true while the allowance read is in flight
- *   needsApproval: boolean,    - true when allowance is below threshold
- *   isApproving: boolean,      - true while the approval tx is pending
+ *   isChecking: boolean,          - true while the allowance read is in flight
+ *   needsApproval: boolean,       - true when allowance is below threshold
+ *   isApproving: boolean,         - true while the approval tx is pending
  *   approve: () => Promise<void>, - call to trigger the approval tx
  * }}
  */
 export function useLoanTokenApproval(tokenAddress, tokenSymbol, network) {
-  const { address, chain } = useAccount();
-  const publicClient = usePublicClient();
+  const { address } = useAccount();
   const { writeContractAsync } = useWriteContract();
+  const { switchChainAsync } = useSwitchChain();
 
-  const [isChecking, setIsChecking]   = useState(false);
+  const [isChecking, setIsChecking]       = useState(false);
   const [needsApproval, setNeedsApproval] = useState(false);
-  const [isApproving, setIsApproving] = useState(false);
+  const [isApproving, setIsApproving]     = useState(false);
 
-  // Derive the wallet-side network key from the form's server-side network value
-  const walletNetworkName =
-    chain?.id === 56 || chain?.name?.toLowerCase().includes('bsc') ? 'bnb' : 'polygon';
+  // Use the form's selected network prop — not the wallet's connected chain.
+  // They can differ (e.g. wallet on BSC, form set to Polygon) causing reads
+  // on the wrong chain.
+  const walletNetworkName = network === 'bsc' ? 'bnb' : 'polygon';
+  const targetChainId     = network === 'bsc' ? bsc.id : polygon.id;
 
-  // Resolve loan contract address for the connected network
+  // Get a public client scoped to the target chain — independent of which
+  // chain the wallet is currently connected to.
+  const publicClient = usePublicClient({ chainId: targetChainId });
+
+  // Resolve loan contract address for the selected network
   const loanContractAddress = LOAN_CONTRACT_ADDRESSES[walletNetworkName];
 
   // Re-check whenever the token, network, or wallet changes
@@ -87,6 +94,14 @@ export function useLoanTokenApproval(tokenAddress, tokenSymbol, network) {
 
     setIsApproving(true);
     try {
+      // ── Step 1: Switch wallet to the target chain if needed ─────────────
+      // wagmi throws ChainMismatchError if we submit a tx on the wrong chain,
+      // so we explicitly switch first. If the wallet is already on the correct
+      // chain, switchChainAsync is a no-op.
+      toast.loading(`Switching to ${network === 'bsc' ? 'BSC' : 'Polygon'}...`, { id: 'loanApprove' });
+      await switchChainAsync({ chainId: targetChainId });
+
+      // ── Step 2: Send the approval tx on the now-correct chain ────────────
       toast.loading(`Approving ${tokenSymbol} for Loan Contract...`, { id: 'loanApprove' });
 
       const txHash = await writeContractAsync({
@@ -94,6 +109,7 @@ export function useLoanTokenApproval(tokenAddress, tokenSymbol, network) {
         abi: erc20Abi,
         functionName: 'approve',
         args: [loanContractAddress, maxUint256],
+        chainId: targetChainId,   // belt-and-suspenders: enforce correct chain
       });
 
       toast.loading(`Waiting for confirmation...`, { id: 'loanApprove' });
@@ -113,7 +129,7 @@ export function useLoanTokenApproval(tokenAddress, tokenSymbol, network) {
       setIsApproving(false);
       toast.dismiss('loanApprove');
     }
-  }, [tokenAddress, tokenSymbol, loanContractAddress, writeContractAsync, publicClient]);
+  }, [tokenAddress, tokenSymbol, loanContractAddress, targetChainId, network, writeContractAsync, publicClient, switchChainAsync]);
 
   return { isChecking, needsApproval, isApproving, approve };
 }
