@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSettings, useUpdateSettings } from '../hooks/useSettings';
 import toast from 'react-hot-toast';
-import { Plus, Trash2, Save, Settings2 } from 'lucide-react';
+import { Plus, Trash2, Save, Settings2, RefreshCw } from 'lucide-react';
 import { ConfirmModal } from '../components/common/ConfirmModal';
 
 const SETTING_KEYS = [
@@ -11,7 +11,7 @@ const SETTING_KEYS = [
 ];
 
 const SettingsManagement = () => {
-  const { data: settingsData, isLoading: loading } = useSettings();
+  const { data: settingsData, isLoading: loading, fetchSettings } = useSettings();
   const { mutateAsync: updateSettings, isPending: saving } = useUpdateSettings();
 
   const [selectedKey, setSelectedKey] = useState(SETTING_KEYS[0].key);
@@ -107,6 +107,13 @@ const SettingsManagement = () => {
           </h1>
           <p className="text-zinc-400 text-xs sm:text-sm mt-1">Select a setting to modify its configuration</p>
         </div>
+        <button
+          onClick={fetchSettings}
+          className="p-2 text-zinc-400 hover:text-amber-500 transition-colors rounded-lg hover:bg-amber-500/10"
+          title="Refresh Settings"
+        >
+          <RefreshCw size={20} className={loading ? 'animate-spin text-amber-500' : ''} />
+        </button>
       </div>
 
       <div className="bg-zinc-900/80 rounded-2xl border border-zinc-800/50 p-4 sm:p-6 lg:p-8 shadow-xl backdrop-blur-xl space-y-6 sm:space-y-8">

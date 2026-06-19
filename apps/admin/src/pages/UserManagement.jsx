@@ -4,9 +4,11 @@ import { useUsers } from '../hooks/useUsers';
 import { DataTable } from '../components/common/DataTable';
 import { userColumns } from '../components/users/userColumns';
 import { ConfirmModal } from '../components/common/ConfirmModal';
+import InlineUserBalances from '../components/users/InlineUserBalances';
+import { Pagination } from '../components/common/Pagination';
 
 const UserManagement = () => {
-  const { users, loading, fetchUsers, toggleBlock } = useUsers();
+  const { users, pagination, loading, fetchUsers, toggleBlock, page, setPage } = useUsers();
   
   const [filterQuery, setFilterQuery] = useState('');
 
@@ -83,7 +85,15 @@ const UserManagement = () => {
           </div>
         </div>
       ) : (
-        <DataTable data={filteredUsers} columns={userColumns} meta={meta} />
+        <>
+          <DataTable 
+            data={filteredUsers} 
+            columns={userColumns} 
+            meta={meta} 
+            renderSubComponent={(user) => <InlineUserBalances walletAddress={user.wallet_address} />}
+          />
+          <Pagination pagination={pagination} onPageChange={setPage} />
+        </>
       )}
 
       <ConfirmModal 

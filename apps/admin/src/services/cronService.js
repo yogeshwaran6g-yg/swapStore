@@ -12,10 +12,10 @@ export const cronService = {
     }
   },
 
-  getCronHistory: async () => {
+  getCronHistory: async ({ page = 1, limit = 20 } = {}) => {
     try {
-      const response = await apiClient.get(endpoints.CRON.HISTORY);
-      return response?.runs || [];
+      const response = await apiClient.get(endpoints.CRON.HISTORY, { params: { page, limit } });
+      return response?.data || { runs: [], pagination: null };
     } catch (err) {
       console.error("err from cronService getCronHistory", err.message);
       throw err;

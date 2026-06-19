@@ -3,6 +3,7 @@ import { Play, Clock, RefreshCw, Users, Zap, ChevronDown, ChevronUp, AlertTriang
 import { useCron } from '../hooks/useCron';
 import toast from 'react-hot-toast';
 import { ConfirmModal } from '../components/common/ConfirmModal';
+import { Pagination } from '../components/common/Pagination';
 
 const statusStyles = {
   completed: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/25', icon: CheckCircle2 },
@@ -23,6 +24,7 @@ const CronManagement = () => {
     loansUsers, usersLoading,
     settings, settingsLoading,
     runInterestCollection, isRunning,
+    pagination, page, setPage,
   } = useCron();
 
   const [selectedUserUid, setSelectedUserUid] = useState('');
@@ -63,10 +65,13 @@ const CronManagement = () => {
 
   const formatDate = (d) => {
     if (!d) return '—';
-    return new Date(d).toLocaleString('en-IN', {
-      day: '2-digit', month: 'short', year: 'numeric',
-      hour: '2-digit', minute: '2-digit', second: '2-digit',
-    });
+    const date = new Date(d);
+    return (
+      <div className="flex flex-col">
+        <span className="text-xs font-semibold text-zinc-200">{date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+        <span className="text-[10px] text-zinc-500 font-medium">{date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+      </div>
+    );
   };
 
   return (
@@ -237,6 +242,7 @@ const CronManagement = () => {
             <table className="min-w-full divide-y divide-zinc-800/50">
               <thead className="bg-zinc-950/50">
                 <tr>
+                  <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">S.No</th>
                   <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">ID</th>
                   <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Type</th>
                   <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Triggered By</th>
@@ -248,11 +254,11 @@ const CronManagement = () => {
                   <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Interest Collected</th>
                   <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Started</th>
                   <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Completed</th>
-                  <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider"></th>
+                  <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Errors</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800/30">
-                {cronHistory.map((run) => {
+                {cronHistory.map((run, index) => {
                   const style = statusStyles[run.run_status] || statusStyles.failed;
                   const typeInfo = runTypeLabels[run.run_type] || { label: run.run_type, color: 'text-zinc-400' };
                   const StatusIcon = style.icon;
@@ -261,6 +267,9 @@ const CronManagement = () => {
                   return (
                     <React.Fragment key={run.id}>
                       <tr className="hover:bg-zinc-800/20 transition-colors">
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <span className="text-zinc-500 text-xs font-mono">{(page - 1) * 20 + index + 1}</span>
+                        </td>
                         <td className="px-4 py-3 whitespace-nowrap">
                           <span className="text-zinc-400 font-mono text-xs">#{run.id}</span>
                         </td>
@@ -287,8 +296,8 @@ const CronManagement = () => {
                             ${Number(run.total_interest_collected || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
                           </span>
                         </td>
-                        <td className="px-4 py-3 whitespace-nowrap text-zinc-400 text-[11px]">{formatDate(run.started_at)}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-zinc-400 text-[11px]">{formatDate(run.completed_at)}</td>
+                        <td className="px-4 py-3 whitespace-nowrap">{formatDate(run.started_at)}</td>
+                        <td className="px-4 py-3 whitespace-nowrap">{formatDate(run.completed_at)}</td>
                         <td className="px-4 py-3 whitespace-nowrap">
                           {run.error_log && (
                             <button
@@ -318,6 +327,7 @@ const CronManagement = () => {
             </table>
           </div>
         )}
+        <Pagination pagination={pagination} onPageChange={setPage} />
       </div>
     </div>
   );

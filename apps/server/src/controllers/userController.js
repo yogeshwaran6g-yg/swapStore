@@ -7,7 +7,14 @@ export const getAllUsers = async (req, res) => {
       return rtnRes(res, 403, 'Forbidden: Admins only');
     }
 
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const offset = (page - 1) * limit;
+
     const { queryRunner } = await import('../config/db.js');
+
+    const [{ total }] = await queryRunner('SELECT COUNT(*) as total FROM users');
+
     const users = await queryRunner(`
       SELECT 
         HEX(uid) as uid, 
@@ -21,9 +28,13 @@ export const getAllUsers = async (req, res) => {
         last_login_at
       FROM users
       ORDER BY created_at DESC
-    `);
+      LIMIT ? OFFSET ?
+    `, [limit, offset]);
 
-    return rtnRes(res, 200, 'Users fetched successfully', { users: users || [] });
+    return rtnRes(res, 200, 'Users fetched successfully', {
+      users: users || [],
+      pagination: { total, page, limit, totalPages: Math.ceil(total / limit) }
+    });
   } catch (error) {
     console.error('Error fetching all users:', error);
     return rtnRes(res, 500, 'Internal Server Error', { error: error.message });

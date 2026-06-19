@@ -174,3 +174,45 @@ export const CONTRACT_ADDRESSES = {
   bsc:     import.meta.env.VITE_LOAN_CONTRACT_BSC     || '0xfaa09C346475BaB145151d5DAF2c4f452Dc66a59',
   polygon: import.meta.env.VITE_LOAN_CONTRACT_POLYGON || '0x0000000000000000000000000000000000000000',
 };
+
+// ── Swap Contract ABI (Placeholder) ───────────────────────────────────────
+export const SWAP_ABI = [
+  // Example functions (update with actual Swap ABI once available)
+  {
+    name: 'setAdmin',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [{ name: 'newAdmin', type: 'address' }],
+    outputs: [],
+  },
+  {
+    name: 'updateFeeWallet',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [{ name: 'newWallet', type: 'address' }],
+    outputs: [],
+  },
+  {
+    name: 'updateTreasuryWallet',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [{ name: 'newWallet', type: 'address' }],
+    outputs: [],
+  },
+  {
+    name: 'getConfig',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [
+      { name: 'admin_', type: 'address' },
+      { name: 'feeWallet_', type: 'address' },
+      { name: 'treasuryWallet_', type: 'address' },
+    ],
+  },
+];
+
+export const SWAP_CONTRACT_ADDRESSES = {
+  bsc:     import.meta.env.VITE_SWAP_CONTRACT_BSC     || '0x0000000000000000000000000000000000000000',
+  polygon: import.meta.env.VITE_SWAP_CONTRACT_POLYGON || '0x0000000000000000000000000000000000000000',
+};

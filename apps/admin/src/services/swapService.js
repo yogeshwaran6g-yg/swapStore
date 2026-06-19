@@ -2,10 +2,10 @@ import { apiClient } from "../utils/axios.js";
 import endpoints from "../config/constants.js";
 
 export const swapService = {
-  getAllSwaps: async () => {
+  getAllSwaps: async ({ page = 1, limit = 20 } = {}) => {
     try {
-      const response = await apiClient.get(endpoints.SWAPS.ADMIN);
-      return response?.data?.swaps || [];
+      const response = await apiClient.get(endpoints.SWAPS.ADMIN, { params: { page, limit } });
+      return response?.data || { swaps: [], pagination: null };
     } catch (err) {
       console.log("err from swapService getAllSwaps ", err.message);
       throw err;

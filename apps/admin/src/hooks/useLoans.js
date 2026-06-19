@@ -1,13 +1,17 @@
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { loanService } from '../services/loanService';
 
 export const useLoans = () => {
   const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
+  const limit = 20;
 
-  const { data: loans = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['loans'],
-    queryFn: loanService.getAllLoans,
+  const { data, isLoading, isFetching, error, refetch } = useQuery({
+    queryKey: ['loans', page],
+    queryFn: () => loanService.getAllLoans({ page, limit }),
+    keepPreviousData: true,
   });
 
   const approveLoanMutation = useMutation({
@@ -33,10 +37,17 @@ export const useLoans = () => {
   });
 
   return {
-    loans,
-    loading: isLoading,
+    loans: data?.loans || [],
+    pagination: data?.pagination || null,
+    loading: isLoading || isFetching,
     error,
-    fetchLoans: refetch,
+    page,
+    setPage,
+    fetchLoans: async () => {
+      const result = await refetch();
+      if (result.isError) toast.error('Failed to refresh loans');
+      else toast.success('Loans refreshed successfully');
+    },
     approveLoan: (payload) => approveLoanMutation.mutateAsync(payload),
     rejectLoan: (uid) => rejectLoanMutation.mutateAsync(uid),
   };

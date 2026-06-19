@@ -28,8 +28,10 @@ const endpoints = {
     },
     SETTINGS: {
         GET: "/api/v1/loan/admin/settings",
+    },
+    DASHBOARD: {
+        STATS: "/api/v1/admin/dashboard-stats",
     }
-
 }
 
 export default endpoints;

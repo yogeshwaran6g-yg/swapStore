@@ -86,13 +86,27 @@ export const handleGetMyLoans = async (req, res) => {
 export const getPendingKyc = async (req, res) => {
   try {
     if (req.user?.role !== 'admin') return rtnRes(res, 403, 'Forbidden: Admins only');
+
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const offset = (page - 1) * limit;
+
+    const [{ total }] = await queryRunner(
+      `SELECT COUNT(*) as total FROM user_kyc_documents WHERE status = 'pending'`
+    );
+
     const documents = await queryRunner(
       `SELECT k.id, HEX(k.user_uid) as user_uid, k.document_type, k.document_url, k.status, k.uploaded_at, u.email, u.username
        FROM user_kyc_documents k
        JOIN users u ON k.user_uid = u.uid
-       WHERE k.status = 'pending'`
+       WHERE k.status = 'pending'
+       LIMIT ? OFFSET ?`,
+      [limit, offset]
     );
-    return rtnRes(res, 200, 'Fetched KYC documents', { documents });
+    return rtnRes(res, 200, 'Fetched KYC documents', {
+      documents,
+      pagination: { total, page, limit, totalPages: Math.ceil(total / limit) }
+    });
   } catch (err) {
     return rtnRes(res, 500, 'Server Error', { error: err.message });
   }
@@ -123,27 +137,45 @@ export const approveKyc = async (req, res) => {
 export const getAllLoans = async (req, res) => {
   try {
     if (req.user?.role !== 'admin') return rtnRes(res, 403, 'Forbidden: Admins only');
+
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const offset = (page - 1) * limit;
+
+    const [{ total }] = await queryRunner('SELECT COUNT(*) as total FROM loans');
+
     const loans = await queryRunner(
       `SELECT HEX(l.uid) as uid, HEX(l.user_uid) as user_uid, HEX(l.loan_id) as loan_id,
               l.principal_amount, l.interest_rate, l.token_symbol, l.token_address, l.network, l.status, l.created_at,
               u.email, u.wallet_address
        FROM loans l
        JOIN users u ON l.user_uid = u.uid
-       ORDER BY l.created_at DESC`
+       ORDER BY l.created_at DESC
+       LIMIT ? OFFSET ?`,
+      [limit, offset]
     );
 
-    const ledgers = await queryRunner(
-      `SELECT id, HEX(loan_uid) as loan_uid, interest_amount, interest_rate, principal_at_time, 
-              period_start, period_end, collection_status, tx_hash, failure_reason, collected_at, created_at
-       FROM loan_interest_ledger ORDER BY created_at DESC`
-    );
+    const loansUids = loans.map(l => l.uid);
+    let loansWithLedger = loans.map(loan => ({ ...loan, ledger: [] }));
 
-    const loansWithLedger = loans.map((loan) => {
-      loan.ledger = ledgers.filter((l) => l.loan_uid === loan.uid);
-      return loan;
+    if (loansUids.length > 0) {
+      const placeholders = loansUids.map(() => 'UNHEX(?)').join(',');
+      const ledgers = await queryRunner(
+        `SELECT id, HEX(loan_uid) as loan_uid, interest_amount, interest_rate, principal_at_time, 
+                period_start, period_end, collection_status, tx_hash, failure_reason, collected_at, created_at
+         FROM loan_interest_ledger WHERE loan_uid IN (${placeholders}) ORDER BY created_at DESC`,
+        loansUids
+      );
+      loansWithLedger = loans.map(loan => ({
+        ...loan,
+        ledger: ledgers.filter(l => l.loan_uid === loan.uid)
+      }));
+    }
+
+    return rtnRes(res, 200, 'Fetched all loans', {
+      loans: loansWithLedger,
+      pagination: { total, page, limit, totalPages: Math.ceil(total / limit) }
     });
-
-    return rtnRes(res, 200, 'Fetched all loans', { loans: loansWithLedger });
   } catch (err) {
     return rtnRes(res, 500, 'Server Error', { error: err.message });
   }
@@ -234,6 +266,12 @@ export const getCronRunHistory = async (req, res) => {
   try {
     if (req.user?.role !== 'admin') return rtnRes(res, 403, 'Forbidden: Admins only');
 
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const offset = (page - 1) * limit;
+
+    const [{ total }] = await queryRunner('SELECT COUNT(*) as total FROM loan_cron_runs');
+
     const runs = await queryRunner(
       `SELECT cr.id, cr.run_type, cr.triggered_by, a.username as triggered_by_username,
               HEX(cr.target_user_uid) as target_user_uid, HEX(cr.target_loan_uid) as target_loan_uid,
@@ -243,10 +281,14 @@ export const getCronRunHistory = async (req, res) => {
        FROM loan_cron_runs cr
        LEFT JOIN admins a ON cr.triggered_by = a.id
        ORDER BY cr.started_at DESC
-       LIMIT 100`
+       LIMIT ? OFFSET ?`,
+      [limit, offset]
     );
 
-    return rtnRes(res, 200, 'Cron run history fetched', { runs });
+    return rtnRes(res, 200, 'Cron run history fetched', {
+      runs,
+      pagination: { total, page, limit, totalPages: Math.ceil(total / limit) }
+    });
   } catch (err) {
     return rtnRes(res, 500, 'Server Error', { error: err.message });
   }

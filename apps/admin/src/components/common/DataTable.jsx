@@ -18,7 +18,10 @@ export const DataTable = ({ data, columns, meta, renderSubComponent }) => {
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    meta,
+    meta: {
+      ...meta,
+      expandedRows,
+    },
   });
 
   return (

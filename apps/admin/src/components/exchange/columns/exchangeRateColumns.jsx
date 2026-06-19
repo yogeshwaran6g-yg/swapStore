@@ -5,7 +5,7 @@ const RateEditor = ({ getValue, row: { original }, column: { id }, table }) => {
   const initialValue = getValue();
   const [value, setValue] = useState(initialValue);
   const isEditing = table.options.meta?.editingId === original.id;
-  
+
   if (isEditing) {
     return (
       <div className="flex items-center space-x-2">
@@ -41,7 +41,7 @@ const ActionCell = ({ row: { original }, table }) => {
   // Wait, let's fix this by not having an internal state in RateEditor, or passing the save function down.
   // Actually, the simplest way is to handle the edit state outside React Table if we want a single row editing,
   // OR we can make the row a custom component. But React Table is just a table. 
-  
+
   return (
     <div className="flex justify-end space-x-2">
       {isEditing ? (
@@ -79,6 +79,11 @@ const ActionCell = ({ row: { original }, table }) => {
 
 export const columns = [
   {
+    id: 'sno',
+    header: 'S.No',
+    cell: ({ row }) => <span className="text-zinc-500 text-xs font-mono">{row.index + 1}</span>,
+  },
+  {
     accessorKey: 'token_symbol',
     header: 'Token',
     cell: (info) => {
@@ -90,19 +95,19 @@ export const columns = [
         if (s === 'DAI') return 'https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.png';
         return `https://cryptologos.cc/logos/${s.toLowerCase()}-${s.toLowerCase()}-logo.png`; // Fallback attempt
       };
-      
+
       return (
         <div className="flex items-center">
-          <img 
-            src={getLogoUrl(symbol)} 
-            alt={symbol} 
-            className="h-8 w-8 rounded-full mr-3 border border-zinc-800 bg-white" 
-            onError={(e) => { 
-              e.target.onerror = null; 
+          <img
+            src={getLogoUrl(symbol)}
+            alt={symbol}
+            className="h-8 w-8 rounded-full mr-3 border border-zinc-800 bg-white"
+            onError={(e) => {
+              e.target.onerror = null;
               // Hide image and show fallback generic circle if image fails to load
               e.target.style.display = 'none';
               e.target.nextSibling.style.display = 'flex';
-            }} 
+            }}
           />
           <div style={{ display: 'none' }} className="h-8 w-8 rounded-full bg-amber-500/10 items-center justify-center text-amber-500 font-bold mr-3 border border-amber-500/20">
             {symbol.charAt(0)}
@@ -158,11 +163,10 @@ export const columns = [
       return (
         <button
           onClick={() => toggleRateActive && toggleRateActive(original, !isActive)}
-          className={`px-2.5 py-0.5 text-xs font-bold rounded-full border transition-all ${
-            isActive 
-              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20' 
+          className={`px-2.5 py-0.5 text-xs font-bold rounded-full border transition-all ${isActive
+              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20'
               : 'bg-zinc-850 text-zinc-400 border-zinc-700/60 hover:bg-zinc-800 hover:text-zinc-200'
-          }`}
+            }`}
         >
           {isActive ? 'Active' : 'Inactive'}
         </button>

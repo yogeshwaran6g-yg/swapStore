@@ -1,13 +1,17 @@
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { cronService } from '../services/cronService';
 
 export const useCron = () => {
   const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
+  const limit = 20;
 
-  const { data: cronHistory = [], isLoading: historyLoading, refetch: refetchHistory } = useQuery({
-    queryKey: ['cronHistory'],
-    queryFn: cronService.getCronHistory,
+  const { data: cronData, isLoading: historyLoading, isFetching: isHistoryFetching, refetch: refetchHistory } = useQuery({
+    queryKey: ['cronHistory', page],
+    queryFn: () => cronService.getCronHistory({ page, limit }),
+    keepPreviousData: true,
   });
 
   const { data: loansUsers = [], isLoading: usersLoading } = useQuery({
@@ -36,9 +40,16 @@ export const useCron = () => {
   });
 
   return {
-    cronHistory,
-    historyLoading,
-    refetchHistory,
+    cronHistory: cronData?.runs || [],
+    pagination: cronData?.pagination || null,
+    historyLoading: historyLoading || isHistoryFetching,
+    refetchHistory: async () => {
+      const result = await refetchHistory();
+      if (result.isError) toast.error('Failed to refresh history');
+      else toast.success('History refreshed successfully');
+    },
+    page,
+    setPage,
     loansUsers,
     usersLoading,
     settings,
