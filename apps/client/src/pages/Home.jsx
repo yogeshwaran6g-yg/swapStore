@@ -157,7 +157,7 @@ function Home() {
               <div className="hidden sm:block w-px h-6 sm:h-8 bg-gray-300/50"></div>
               <div className="flex items-center gap-2">
                 <span className="text-lg sm:text-xl">💸</span>
-                <p className="text-[#0E1B4D] font-bold text-[12px] sm:text-[13px] md:text-[12px] leading-tight">Zero Hidden Fees</p>
+                <p className="text-[#0E1B4D] font-bold text-[12px] sm:text-[13px] md:text-[12px] leading-tight">No Hidden Fees</p>
               </div>
               <div className="hidden sm:block w-px h-6 sm:h-8 bg-gray-300/50"></div>
               <div className="flex items-center gap-2">
@@ -296,7 +296,7 @@ function Home() {
               <span className="text-base leading-none">🏦</span> Less Documents Required
             </div>
             <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/80 border border-white text-[#0E1B4D] rounded-full px-5 py-3 sm:py-2.5 font-bold text-[13px] sm:text-[14px] shadow-sm">
-              <span className="text-base leading-none">💸</span> Zero Hidden Fees
+              <span className="text-base leading-none">💸</span> No Hidden Fees
             </div>
             <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/80 border border-white text-[#0E1B4D] rounded-full px-5 py-3 sm:py-2.5 font-bold text-[13px] sm:text-[14px] shadow-sm">
               <span className="text-base leading-none">⚡</span> Instant Swap
@@ -348,7 +348,7 @@ function Home() {
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <div className="flex-1 text-left">
-                  <h4 className="text-[#0E1B4D] font-bold text-[17px] mb-1">Zero Hidden Fees</h4>
+                  <h4 className="text-[#0E1B4D] font-bold text-[17px] mb-1">No Hidden Fees</h4>
                   <p className="text-[#64748B] text-[15px] font-medium leading-relaxed">What you see is exactly what you get. No unexpected gas spikes or markup.</p>
                 </div>
               </li>
@@ -431,9 +431,9 @@ function Home() {
                 <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/5 backdrop-blur-md rounded-full px-5 py-3 sm:py-2 border border-white/10 text-white font-bold text-[13px] sm:text-[14px]">
                   <span className="text-base leading-none">🗂</span> Less Documents Required
                 </div>
-               
+
                 <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/5 backdrop-blur-md rounded-full px-5 py-3 sm:py-2 border border-white/10 text-white font-bold text-[13px] sm:text-[14px]">
-                  <span className="text-base leading-none">💸</span> Zero Hidden Fees
+                  <span className="text-base leading-none">💸</span> No Hidden Fees
                 </div>
                 <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/5 backdrop-blur-md rounded-full px-5 py-3 sm:py-2 border border-white/10 text-white font-bold text-[13px] sm:text-[14px]">
                   <span className="text-base leading-none">⚡</span> Instant Loan
@@ -526,14 +526,14 @@ function Home() {
               { name: "Sarah Jenkins", reviews: "5 reviews", rating: 4, title: "Loan in 30 seconds!", text: "I needed liquidity but didn't want to sell my ETH. InstaaCash gave me a loan in 30 seconds. Unbelievable." },
               { name: "Michael Ross", reviews: "1 review", rating: 5, title: "Gorgeous UI & Audited", text: "The UI is gorgeous and the smart contracts are fully audited. Finally, a platform that feels truly premium." },
               { name: "Elena Rodriguez", reviews: "4 reviews", rating: 4.5, title: "Stunning design and easy to use", text: "I've tried many platforms, but this is by far the easiest way to manage my crypto loans. The design is absolutely stunning!" },
-              { name: "David Kim", reviews: "8 reviews", rating: 5, title: "Zero hidden fees", text: "Zero hidden fees is not just a marketing gimmick here. I get exactly what I expect on every swap. 10/10." },
+              { name: "David Kim", reviews: "8 reviews", rating: 5, title: "No Hidden Fees", text: "No Hidden Fees is not just a marketing gimmick here. I get exactly what I expect on every swap. 10/10." },
               { name: "Anita Patel", reviews: "3 reviews", rating: 4.5, title: "My go-to decentralized hub", text: "The cross-chain swap capabilities combined with institutional security make this my go-to decentralized hub." },
               // Duplicate the exact same array to create a seamless infinite scroll loop
               { name: "Alex Chen", reviews: "2 reviews", rating: 5, title: "Instant swap feature is a lifesaver", text: "The instant swap feature is a lifesaver. No slippage and incredibly fast execution. Highly recommended!" },
               { name: "Sarah Jenkins", reviews: "5 reviews", rating: 4, title: "Loan in 30 seconds!", text: "I needed liquidity but didn't want to sell my ETH. InstaaCash gave me a loan in 30 seconds. Unbelievable." },
               { name: "Michael Ross", reviews: "1 review", rating: 5, title: "Gorgeous UI & Audited", text: "The UI is gorgeous and the smart contracts are fully audited. Finally, a platform that feels truly premium." },
               { name: "Elena Rodriguez", reviews: "4 reviews", rating: 4.5, title: "Stunning design and easy to use", text: "I've tried many platforms, but this is by far the easiest way to manage my crypto loans. The design is absolutely stunning!" },
-              { name: "David Kim", reviews: "8 reviews", rating: 5, title: "Zero hidden fees", text: "Zero hidden fees is not just a marketing gimmick here. I get exactly what I expect on every swap. 10/10." },
+              { name: "David Kim", reviews: "8 reviews", rating: 5, title: "No Hidden Fees", text: "No Hidden Fees is not just a marketing gimmick here. I get exactly what I expect on every swap. 10/10." },
               { name: "Anita Patel", reviews: "3 reviews", rating: 4.5, title: "My go-to decentralized hub", text: "The cross-chain swap capabilities combined with institutional security make this my go-to decentralized hub." }
             ].map((review, i) => (
               <div key={i} className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200 flex flex-col gap-3 w-[280px] sm:w-[360px] shrink-0 hover:shadow-md transition-shadow cursor-default text-left">
@@ -597,7 +597,7 @@ function Home() {
 
           {/* Left Text Side */}
           <div className="lg:w-1/2 relative z-10 flex flex-col items-start text-left">
-           
+
 
             <h2 className="text-4xl lg:text-5xl font-[800] text-[#0E1B4D] mb-6 leading-tight tracking-tight">
               ABOUT<br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#A99CFF]">InstaaCash.</span>
