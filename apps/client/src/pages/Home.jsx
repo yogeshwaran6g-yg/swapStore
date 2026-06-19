@@ -31,25 +31,25 @@ function Home() {
       <div className="max-w-[1400px] mx-auto bg-gradient-to-br from-[#E8EBF5]/90 to-[#DDE3F0]/90 backdrop-blur-xl rounded-[32px] shadow-[0_32px_64px_-12px_rgba(169,156,255,0.15)] border border-white/40 overflow-hidden relative">
 
         {/* --- NAVBAR --- */}
-        <div className="relative z-50 px-4 pt-6 pb-2 lg:px-8">
-          <nav className="w-full flex items-center justify-between bg-white/40 backdrop-blur-2xl border border-white/60 rounded-[24px] px-4 sm:px-6 py-3 sm:py-4 shadow-[0_8px_32px_rgba(14,27,77,0.05)]">
+        <div className="relative z-50 px-2 sm:px-4 pt-4 sm:pt-6 pb-2 lg:px-6 xl:px-8">
+          <nav className="w-full flex items-center justify-between bg-white/40 backdrop-blur-2xl border border-white/60 rounded-[18px] sm:rounded-[24px] px-3 sm:px-5 lg:px-4 xl:px-6 py-2.5 sm:py-3 lg:py-2.5 xl:py-4 shadow-[0_8px_32px_rgba(14,27,77,0.05)]">
             {/* Logo */}
-            <div className="flex items-center gap-2 sm:gap-3 cursor-pointer group">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0E1B4D] to-[#1A2C6B] flex items-center justify-center relative shadow-md group-hover:scale-105 transition-transform duration-300">
-                <span className="text-white font-bold text-[14px] sm:text-[16px]">C</span>
-                <div className="absolute -top-1 -right-1 w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 bg-gradient-to-tr from-[#D9A85C] to-[#FCD34D] rounded-full border-2 border-white shadow-sm"></div>
+            <div className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer group shrink-0">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 lg:w-8 lg:h-8 xl:w-10 xl:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#0E1B4D] to-[#1A2C6B] flex items-center justify-center relative shadow-md group-hover:scale-105 transition-transform duration-300">
+                <span className="text-white font-bold text-[12px] sm:text-[14px] lg:text-[13px] xl:text-[16px]">C</span>
+                <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-2 h-2 sm:w-3 sm:h-3 lg:w-2.5 lg:h-2.5 xl:w-3.5 xl:h-3.5 bg-gradient-to-tr from-[#D9A85C] to-[#FCD34D] rounded-full border-[1.5px] sm:border-2 border-white shadow-sm"></div>
               </div>
-              <span className="text-[19px] sm:text-2xl font-extrabold tracking-tight text-[#0E1B4D]">InstaaCash</span>
+              <span className="text-[15px] sm:text-xl lg:text-[16px] xl:text-2xl font-extrabold tracking-tight text-[#0E1B4D]">InstaaCash</span>
             </div>
 
-            {/* Links */}
-            <div className="hidden lg:flex items-center bg-white/40 border border-white/50 rounded-full px-2 py-1.5 shadow-sm">
-              <a href="#home" className="text-[14px] font-bold text-[#0E1B4D] bg-white shadow-sm rounded-full px-4 py-2 transition-all">Home</a>
-              <a href="#swap" className="text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-4 py-2 transition-all">Swap</a>
-              <a href="#loan-details" className="text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-4 py-2 transition-all">Loan Details</a>
-              <a href="#services" className="text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-4 py-2 transition-all">Services</a>
-              <a href="#reviews" className="text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-4 py-2 transition-all">Reviews</a>
-              <a href="#about" className="text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-4 py-2 transition-all">About</a>
+            {/* Links - only visible on large screens */}
+            <div className="hidden lg:flex items-center bg-white/40 border border-white/50 rounded-full px-1 lg:px-1 xl:px-2 py-1 xl:py-1.5 shadow-sm">
+              <a href="#home" className="text-[11px] lg:text-[11px] xl:text-[14px] font-bold text-[#0E1B4D] bg-white shadow-sm rounded-full px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 transition-all">Home</a>
+              <a href="#swap" className="text-[11px] lg:text-[11px] xl:text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 transition-all">Swap</a>
+              <a href="#loan-details" className="text-[11px] lg:text-[11px] xl:text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 transition-all whitespace-nowrap">Loan Details</a>
+              <a href="#services" className="text-[11px] lg:text-[11px] xl:text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 transition-all">Services</a>
+              <a href="#reviews" className="text-[11px] lg:text-[11px] xl:text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 transition-all">Reviews</a>
+              <a href="#about" className="text-[11px] lg:text-[11px] xl:text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 transition-all">About</a>
             </div>
 
             {/* Action */}
@@ -57,9 +57,9 @@ function Home() {
               <div className="absolute -inset-0.5 bg-gradient-to-r from-[#A99CFF] to-[#D9A85C] rounded-full blur opacity-40 group-hover:opacity-100 transition duration-500 pointer-events-none"></div>
               <button
                 onClick={() => handleConnect('/dashboard')}
-                className="relative flex items-center gap-1.5 sm:gap-2.5 bg-gradient-to-br from-[#0E1B4D] to-[#1A2C6B] text-white px-4 py-2.5 sm:px-8 sm:py-3 rounded-full font-bold text-[13px] sm:text-[15px] transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_10px_40px_-10px_rgba(169,156,255,0.8)] border border-white/20 shadow-inner"
+                className="relative flex items-center gap-1 sm:gap-2 lg:gap-1.5 xl:gap-2.5 bg-gradient-to-br from-[#0E1B4D] to-[#1A2C6B] text-white px-3 py-2 sm:px-6 sm:py-2.5 lg:px-4 lg:py-2 xl:px-8 xl:py-3 rounded-full font-bold text-[11px] sm:text-[14px] lg:text-[12px] xl:text-[15px] transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_10px_40px_-10px_rgba(169,156,255,0.8)] border border-white/20 shadow-inner"
               >
-                <Wallet className="w-4 h-4 sm:w-5 sm:h-5 text-[#A99CFF]" />
+                <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-3.5 lg:h-3.5 xl:w-5 xl:h-5 text-[#A99CFF]" />
                 <span className="hidden sm:inline">Connect Wallet</span>
                 <span className="sm:hidden">Connect</span>
               </button>
@@ -71,52 +71,35 @@ function Home() {
         <main id="home" className="relative z-20 px-4 sm:px-8 lg:px-12 pt-8 pb-16 lg:pb-24 grid lg:grid-cols-2 gap-10 lg:gap-8 items-center min-h-[auto] lg:min-h-[700px] scroll-mt-32 overflow-hidden lg:overflow-visible">
 
           {/* LEFT CONTENT */}
-          <div className="flex flex-col space-y-6 lg:space-y-8 max-w-full lg:max-w-[600px] xl:max-w-[650px] z-20 items-center lg:items-start text-center lg:text-left mx-auto lg:mx-0">
+          <div className="flex flex-col space-y-4 md:space-y-5 lg:space-y-8 max-w-full md:max-w-[600px] lg:max-w-[600px] xl:max-w-[650px] z-20 items-center lg:items-start text-center lg:text-left mx-auto lg:mx-0">
 
             {/* Headline */}
-            <div className="flex flex-col gap-1 lg:gap-2">
-              <h1 className="text-[2.5rem] sm:text-6xl lg:text-[4.5rem] xl:text-[5rem] font-[800] leading-[1.05] tracking-tight text-[#0E1B4D]">
+            <div className="flex flex-col gap-0">
+              <h1 className="text-[2.25rem] sm:text-5xl md:text-[2.75rem] lg:text-[4rem] xl:text-[4.5rem] font-[800] leading-[1] tracking-tight text-[#0E1B4D]">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0EA5E9] to-[#6366F1]">Swap</span> Crypto to cash{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D9A85C] to-[#F59E0B] block sm:inline">Instantly</span> and
               </h1>
-              <h1 className="text-[2rem] sm:text-5xl lg:text-[3.5rem] xl:text-[4rem] font-[800] leading-[1.1] tracking-tight text-[#0E1B4D]">
+              <h1 className="text-[1.875rem] sm:text-4xl md:text-[2.25rem] lg:text-[3.25rem] xl:text-[3.75rem] font-[800] leading-[1] tracking-tight text-[#0E1B4D]">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0EA5E9] to-[#6366F1]">Get</span> Crypto Loans{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D9A85C] to-[#F59E0B]">Effortlessly.</span>
               </h1>
             </div>
 
             {/* Mobile Hero Image (Hidden on Desktop) */}
-            <div className="flex lg:hidden relative w-full h-[280px] sm:h-[400px] items-center justify-center mb-0 mt-4">
+            <div className="flex lg:hidden relative w-full h-[280px] sm:h-[350px] md:h-[320px] items-center justify-center mb-0 mt-4">
               {/* Ambient Purple Light */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#A99CFF] blur-[80px] opacity-40 rounded-full pointer-events-none z-0"></div>
 
-              {/* Trust Card */}
-              <div className="absolute top-[0%] right-[-5%] sm:right-[5%] z-40 bg-white border border-gray-200 rounded-lg p-3 shadow-[0_8px_30px_rgb(0,0,0,0.08)] animate-float scale-75 origin-right" style={{ animationDelay: '1s' }}>
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex items-center gap-[2px]">
-                    {[...Array(5)].map((_, idx) => (
-                      <div key={idx} className="w-5 h-5 bg-[#00B67A] flex items-center justify-center">
-                        <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      </div>
-                    ))}
-                  </div>
-                  <div>
-                    <p className="text-[#1A1A1A] font-extrabold text-[13px] leading-tight mb-0.5">4.5/5 Excellent</p>
-                    <p className="text-gray-500 text-[10px] font-medium">10,000+ Reviews</p>
-                  </div>
-                </div>
-              </div>
+              {/* Trust Card removed to be placed under Stats Bar */}
 
               {/* Main Robot Image */}
-              <div className="relative z-10 w-full flex items-center justify-center transform scale-[1.15] sm:scale-100 origin-center -translate-x-8">
-                <img src="/robot.png" alt="Fintech 3D Robot Mascot" className="w-full max-w-[320px] sm:max-w-[450px] object-contain relative z-20 drop-shadow-2xl animate-float" />
+              <div className="relative z-10 w-full flex items-center justify-center transform scale-[1.45] sm:scale-[1.3] md:scale-[1.1] origin-center -translate-x-8">
+                <img src="/robot.png" alt="Fintech 3D Robot Mascot" className="w-full max-w-[460px] sm:max-w-[600px] md:max-w-[420px] object-contain relative z-20 drop-shadow-2xl animate-float" />
               </div>
             </div>
 
             {/* Subheading */}
-            <p className="text-[#475569] text-lg lg:text-xl font-medium leading-relaxed max-w-[550px] mx-auto lg:mx-0 -mt-4 lg:mt-0 relative z-20">
+            <p className="text-[#475569] text-base md:text-[15px] lg:text-xl font-medium leading-relaxed max-w-[550px] mx-auto lg:mx-0 -mt-4 lg:mt-0 relative z-20">
               Trade USDT, USDC, DAI, Polygon & BNB in seconds. Access crypto-backed loans instantly with secure approvals. Enjoy seamless cash processing with absolutely <span className="font-bold text-[#0E1B4D]">zero risk of bank account freezes</span>.
             </p>
 
@@ -166,25 +149,40 @@ function Home() {
             </div>
 
             {/* Stats Bar */}
-            <div className="flex flex-wrap sm:flex-nowrap items-center gap-y-3 gap-x-4 sm:gap-6 pt-4 pb-4 px-5 bg-white/50 backdrop-blur-xl border border-white/60 rounded-2xl w-full sm:w-max shadow-sm mt-2 sm:mt-4 justify-center lg:justify-start mx-auto lg:mx-0">
-              <div className="flex items-center gap-2.5">
-                <span className="text-xl">🏦</span>
-                <div>
-                  <p className="text-[#0E1B4D] font-bold text-[13px] sm:text-sm leading-tight">Less Documents Required</p>
-                </div>
+            <div className="flex flex-wrap items-center gap-y-3 gap-x-4 sm:gap-x-5 md:gap-x-4 pt-3 pb-3 sm:pt-4 sm:pb-4 px-4 sm:px-5 bg-white/50 backdrop-blur-xl border border-white/60 rounded-2xl w-full sm:w-max shadow-sm mt-2 sm:mt-4 justify-center lg:justify-start mx-auto lg:mx-0">
+              <div className="flex items-center gap-2">
+                <span className="text-lg sm:text-xl">🏦</span>
+                <p className="text-[#0E1B4D] font-bold text-[12px] sm:text-[13px] md:text-[12px] leading-tight">Less Documents Required</p>
               </div>
-              <div className="hidden sm:block w-px h-8 bg-gray-300/50"></div>
-              <div className="flex items-center gap-2.5">
-                <span className="text-xl">💸</span>
-                <div>
-                  <p className="text-[#0E1B4D] font-bold text-[13px] sm:text-sm leading-tight">Zero Hidden Fees</p>
-                </div>
+              <div className="hidden sm:block w-px h-6 sm:h-8 bg-gray-300/50"></div>
+              <div className="flex items-center gap-2">
+                <span className="text-lg sm:text-xl">💸</span>
+                <p className="text-[#0E1B4D] font-bold text-[12px] sm:text-[13px] md:text-[12px] leading-tight">No Hidden Fees</p>
               </div>
-              <div className="hidden sm:block w-px h-8 bg-gray-300/50"></div>
-              <div className="flex items-center gap-2.5">
-                <span className="text-xl">⚡</span>
-                <div>
-                  <p className="text-[#0E1B4D] font-bold text-[13px] sm:text-sm leading-tight">Instant Swaps & Loans</p>
+              <div className="hidden sm:block w-px h-6 sm:h-8 bg-gray-300/50"></div>
+              <div className="flex items-center gap-2">
+                <span className="text-lg sm:text-xl">⚡</span>
+                <p className="text-[#0E1B4D] font-bold text-[12px] sm:text-[13px] md:text-[12px] leading-tight">Instant Swaps & Loans</p>
+              </div>
+            </div>
+
+            {/* Trustpilot Review Box */}
+            <div className="flex items-center justify-center lg:justify-start w-full mt-4 sm:mt-5 mx-auto lg:mx-0">
+              <div className="bg-white/80 backdrop-blur-xl border border-gray-200/60 rounded-2xl p-3 sm:p-4 shadow-sm flex items-center gap-3 sm:gap-4 transition-transform hover:-translate-y-1 hover:shadow-md cursor-pointer">
+                <div className="flex items-center gap-[2px]">
+                  {[...Array(5)].map((_, idx) => (
+                    <div key={idx} className="w-5 h-5 sm:w-6 sm:h-6 bg-[#00B67A] flex items-center justify-center rounded-[3px]">
+                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex flex-col items-start border-l border-gray-200 pl-3 sm:pl-4">
+                  <p className="text-[#1A1A1A] font-extrabold text-[13px] sm:text-[15px] leading-tight mb-0.5">4.5/5 Excellent</p>
+                  <p className="text-gray-500 text-[11px] sm:text-[12px] font-medium flex items-center gap-1">
+                    10,000+ Reviews on <span className="text-[#1A1A1A] font-bold">Trustpilot</span>
+                  </p>
                 </div>
               </div>
             </div>
@@ -196,32 +194,15 @@ function Home() {
             {/* Ambient Purple Light */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-[#A99CFF] blur-[80px] sm:blur-[140px] opacity-40 rounded-full pointer-events-none z-0"></div>
 
-            {/* Trust Card (Beside Robot) */}
-            <div className="absolute top-[5%] lg:top-[20%] right-[0%] lg:right-[-5%] xl:right-[5%] z-40 bg-white border border-gray-200 rounded-lg p-3 lg:p-4 shadow-[0_8px_30px_rgb(0,0,0,0.08)] animate-float scale-75 lg:scale-100 origin-right" style={{ animationDelay: '1s' }}>
-              <div className="flex flex-col gap-1.5 lg:gap-2">
-                <div className="flex items-center gap-[2px]">
-                  {[...Array(5)].map((_, idx) => (
-                    <div key={idx} className="w-5 h-5 lg:w-6 lg:h-6 bg-[#00B67A] flex items-center justify-center">
-                      <svg className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    </div>
-                  ))}
-                </div>
-                <div>
-                  <p className="text-[#1A1A1A] font-extrabold text-[13px] lg:text-[15px] leading-tight mb-0.5">4.5/5 Excellent</p>
-                  <p className="text-gray-500 text-[10px] lg:text-[11px] font-medium">10,000+ Reviews</p>
-                </div>
-              </div>
-            </div>
+            {/* Trust Card (Beside Robot) removed to be placed under Stats Bar */}
 
             {/* Image Container */}
-            <div className="relative z-10 w-full flex items-center justify-center transform scale-[1.1] lg:scale-[1.25] origin-center mt-10 lg:mt-0 -translate-x-2 lg:-translate-x-4">
+            <div className="relative z-10 w-full flex items-center justify-center transform scale-[1.35] lg:scale-[1.55] origin-center mt-10 lg:-mt-64 -translate-x-2 lg:-translate-x-4">
               {/* Main Robot */}
               <img
                 src="/robot.png"
                 alt="Fintech 3D Robot Mascot"
-                className="w-full max-w-[450px] lg:max-w-[700px] object-contain relative z-20 drop-shadow-2xl animate-float"
+                className="w-full max-w-[600px] lg:max-w-[950px] object-contain relative z-20 drop-shadow-2xl animate-float"
               />
 
               {/* Floating Glass Cubes */}
@@ -315,7 +296,7 @@ function Home() {
               <span className="text-base leading-none">🏦</span> Less Documents Required
             </div>
             <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/80 border border-white text-[#0E1B4D] rounded-full px-5 py-3 sm:py-2.5 font-bold text-[13px] sm:text-[14px] shadow-sm">
-              <span className="text-base leading-none">💸</span> Zero Hidden Fees
+              <span className="text-base leading-none">💸</span> No Hidden Fees
             </div>
             <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/80 border border-white text-[#0E1B4D] rounded-full px-5 py-3 sm:py-2.5 font-bold text-[13px] sm:text-[14px] shadow-sm">
               <span className="text-base leading-none">⚡</span> Instant Swap
@@ -367,7 +348,7 @@ function Home() {
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <div className="flex-1 text-left">
-                  <h4 className="text-[#0E1B4D] font-bold text-[17px] mb-1">Zero Hidden Fees</h4>
+                  <h4 className="text-[#0E1B4D] font-bold text-[17px] mb-1">No Hidden Fees</h4>
                   <p className="text-[#64748B] text-[15px] font-medium leading-relaxed">What you see is exactly what you get. No unexpected gas spikes or markup.</p>
                 </div>
               </li>
@@ -440,7 +421,7 @@ function Home() {
 
           <div className="lg:w-1/2 relative z-10 flex flex-col gap-8 items-center lg:items-start text-center lg:text-left">
             <div>
-              <h2 className="text-4xl lg:text-5xl font-[800] mb-4 leading-tight tracking-tight">Get Cash From <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-[#A99CFF] to-[#D9A85C]">Your Crypto</span></h2>
+              <h2 className="text-4xl lg:text-5xl font-[800] mb-4 leading-tight tracking-tight">Get Crypto  <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-[#A99CFF] to-[#D9A85C]">Loans</span></h2>
               <p className="text-[#94A3B8] text-lg lg:text-xl font-medium leading-relaxed max-w-[500px] mx-auto lg:mx-0">Get instant cash loans without selling your crypto. Our over-collateralized loans protect your assets while giving you immediate liquidity.</p>
 
               <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center lg:justify-start gap-3 mt-4 w-full max-w-[280px] sm:max-w-none">
@@ -450,9 +431,9 @@ function Home() {
                 <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/5 backdrop-blur-md rounded-full px-5 py-3 sm:py-2 border border-white/10 text-white font-bold text-[13px] sm:text-[14px]">
                   <span className="text-base leading-none">🗂</span> Less Documents Required
                 </div>
-               
+
                 <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/5 backdrop-blur-md rounded-full px-5 py-3 sm:py-2 border border-white/10 text-white font-bold text-[13px] sm:text-[14px]">
-                  <span className="text-base leading-none">💸</span> Zero Hidden Fees
+                  <span className="text-base leading-none">💸</span> No Hidden Fees
                 </div>
                 <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/5 backdrop-blur-md rounded-full px-5 py-3 sm:py-2 border border-white/10 text-white font-bold text-[13px] sm:text-[14px]">
                   <span className="text-base leading-none">⚡</span> Instant Loan
@@ -545,14 +526,14 @@ function Home() {
               { name: "Sarah Jenkins", reviews: "5 reviews", rating: 4, title: "Loan in 30 seconds!", text: "I needed liquidity but didn't want to sell my ETH. InstaaCash gave me a loan in 30 seconds. Unbelievable." },
               { name: "Michael Ross", reviews: "1 review", rating: 5, title: "Gorgeous UI & Audited", text: "The UI is gorgeous and the smart contracts are fully audited. Finally, a platform that feels truly premium." },
               { name: "Elena Rodriguez", reviews: "4 reviews", rating: 4.5, title: "Stunning design and easy to use", text: "I've tried many platforms, but this is by far the easiest way to manage my crypto loans. The design is absolutely stunning!" },
-              { name: "David Kim", reviews: "8 reviews", rating: 5, title: "Zero hidden fees", text: "Zero hidden fees is not just a marketing gimmick here. I get exactly what I expect on every swap. 10/10." },
+              { name: "David Kim", reviews: "8 reviews", rating: 5, title: "No Hidden Fees", text: "No Hidden Fees is not just a marketing gimmick here. I get exactly what I expect on every swap. 10/10." },
               { name: "Anita Patel", reviews: "3 reviews", rating: 4.5, title: "My go-to decentralized hub", text: "The cross-chain swap capabilities combined with institutional security make this my go-to decentralized hub." },
               // Duplicate the exact same array to create a seamless infinite scroll loop
               { name: "Alex Chen", reviews: "2 reviews", rating: 5, title: "Instant swap feature is a lifesaver", text: "The instant swap feature is a lifesaver. No slippage and incredibly fast execution. Highly recommended!" },
               { name: "Sarah Jenkins", reviews: "5 reviews", rating: 4, title: "Loan in 30 seconds!", text: "I needed liquidity but didn't want to sell my ETH. InstaaCash gave me a loan in 30 seconds. Unbelievable." },
               { name: "Michael Ross", reviews: "1 review", rating: 5, title: "Gorgeous UI & Audited", text: "The UI is gorgeous and the smart contracts are fully audited. Finally, a platform that feels truly premium." },
               { name: "Elena Rodriguez", reviews: "4 reviews", rating: 4.5, title: "Stunning design and easy to use", text: "I've tried many platforms, but this is by far the easiest way to manage my crypto loans. The design is absolutely stunning!" },
-              { name: "David Kim", reviews: "8 reviews", rating: 5, title: "Zero hidden fees", text: "Zero hidden fees is not just a marketing gimmick here. I get exactly what I expect on every swap. 10/10." },
+              { name: "David Kim", reviews: "8 reviews", rating: 5, title: "No Hidden Fees", text: "No Hidden Fees is not just a marketing gimmick here. I get exactly what I expect on every swap. 10/10." },
               { name: "Anita Patel", reviews: "3 reviews", rating: 4.5, title: "My go-to decentralized hub", text: "The cross-chain swap capabilities combined with institutional security make this my go-to decentralized hub." }
             ].map((review, i) => (
               <div key={i} className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200 flex flex-col gap-3 w-[280px] sm:w-[360px] shrink-0 hover:shadow-md transition-shadow cursor-default text-left">
@@ -616,7 +597,7 @@ function Home() {
 
           {/* Left Text Side */}
           <div className="lg:w-1/2 relative z-10 flex flex-col items-start text-left">
-           
+
 
             <h2 className="text-4xl lg:text-5xl font-[800] text-[#0E1B4D] mb-6 leading-tight tracking-tight">
               ABOUT<br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#A99CFF]">InstaaCash.</span>
@@ -693,30 +674,28 @@ function Home() {
             <div className="flex flex-col gap-4">
               <h4 className="text-white font-bold text-lg mb-2">Company</h4>
               <a href="#about" className="text-[#94A3B8] hover:text-[#A99CFF] hover:translate-x-1 transition-all w-fit">About Us</a>
-              <a href="#" className="text-[#94A3B8] hover:text-[#A99CFF] hover:translate-x-1 transition-all w-fit">Careers</a>
-              <a href="#" className="text-[#94A3B8] hover:text-[#A99CFF] hover:translate-x-1 transition-all w-fit">Privacy Policy</a>
-              <a href="#" className="text-[#94A3B8] hover:text-[#A99CFF] hover:translate-x-1 transition-all w-fit">Terms of Service</a>
+              <a href="/privacy-policy" className="text-[#94A3B8] hover:text-[#A99CFF] hover:translate-x-1 transition-all w-fit">Privacy Policy</a>
+              <a href="/terms-of-service" className="text-[#94A3B8] hover:text-[#A99CFF] hover:translate-x-1 transition-all w-fit">Terms of Service</a>
             </div>
 
-            {/* CTA Col */}
-            <div className="flex flex-col gap-4 lg:col-span-1">
-              <h4 className="text-white font-bold text-lg mb-2">Stay Updated</h4>
-              <p className="text-[#94A3B8] text-[14px]">Join our newsletter for the latest DeFi news and platform updates.</p>
-              <div className="flex mt-2">
-                <input type="email" placeholder="Enter your email" className="bg-white/5 border border-white/10 rounded-l-xl px-4 py-3 text-white focus:outline-none focus:border-[#A99CFF]/50 w-full text-[14px]" />
-                <button className="bg-gradient-to-r from-[#D9A85C] to-[#F59E0B] text-[#0E1B4D] font-bold px-4 py-3 rounded-r-xl text-[14px] hover:opacity-90 transition-opacity">
-                  Subscribe
+            {/* Contact Col */}
+            <div className="flex flex-col gap-3 lg:col-span-1">
+              <h4 className="text-white font-bold text-lg mb-1">Contact Us</h4>
+              <p className="text-[#94A3B8] text-[14px] mb-2">Have questions? We'd love to hear from you.</p>
+              <form className="flex flex-col gap-2.5">
+                <input type="text" placeholder="Name" className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-[#A99CFF]/50 w-full text-[14px] transition-colors" required />
+                <input type="email" placeholder="Email" className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-[#A99CFF]/50 w-full text-[14px] transition-colors" required />
+                <textarea placeholder="Message" rows="2" className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-[#A99CFF]/50 w-full text-[14px] resize-none transition-colors" required></textarea>
+                <button type="submit" className="bg-gradient-to-r from-[#D9A85C] to-[#F59E0B] text-[#0E1B4D] font-bold px-4 py-2.5 rounded-xl text-[14px] hover:opacity-90 transition-opacity shadow-lg shadow-[#D9A85C]/20">
+                  Send Message
                 </button>
-              </div>
+              </form>
             </div>
 
           </div>
 
           <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-[#64748B] text-sm">© 2026 InstaaCash. All rights reserved.</p>
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2 text-[#64748B] text-sm"><span className="w-2 h-2 rounded-full bg-green-500"></span> Systems Operational</div>
-            </div>
+            <p className="text-[#64748B] text-sm">© 2025 InstaaCash. All rights reserved.</p>
           </div>
         </div>
       </footer>
