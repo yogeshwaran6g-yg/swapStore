@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, IndianRupee, LogOut, Menu, ArrowRightLeft, FileCheck, Landmark, Users, Settings, Clock, X
+  LayoutDashboard, IndianRupee, LogOut, Menu, ArrowRightLeft, FileCheck, Landmark, Users, Settings, Clock, X, Cpu
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
@@ -85,6 +85,10 @@ const Layout = () => {
           <NavLink to="/cron" onClick={closeSidebar} className={navItemClass}>
             <Clock size={18} strokeWidth={2} />
             <span>Cron Jobs</span>
+          </NavLink>
+          <NavLink to="/contracts" onClick={closeSidebar} className={navItemClass}>
+            <Cpu size={18} strokeWidth={2} />
+            <span>Contract Wallets</span>
           </NavLink>
         </nav>
 

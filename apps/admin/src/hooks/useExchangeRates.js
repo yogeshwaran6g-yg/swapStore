@@ -55,7 +55,11 @@ export const useExchangeRates = () => {
     rates,
     loading: isLoading,
     error,
-    fetchRates: refetch,
+    fetchRates: async () => {
+      const result = await refetch();
+      if (result.isError) toast.error('Failed to refresh rates');
+      else toast.success('Rates refreshed successfully');
+    },
     addRate: (token, network, rate, isActive) => addRateMutation.mutateAsync({ token, network, rate, isActive }),
     updateRate: (rateObj, newInrRate, newIsActive) => updateRateMutation.mutateAsync({ rateObj, newInrRate, newIsActive }),
   };

@@ -1,13 +1,17 @@
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { kycService } from '../services/kycService';
 
 export const useKyc = () => {
   const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
+  const limit = 20;
 
-  const { data: documents = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['kyc'],
-    queryFn: kycService.getPendingKyc,
+  const { data, isLoading, isFetching, error, refetch } = useQuery({
+    queryKey: ['kyc', page],
+    queryFn: () => kycService.getPendingKyc({ page, limit }),
+    keepPreviousData: true,
   });
 
   const updateKycStatusMutation = useMutation({
@@ -22,10 +26,17 @@ export const useKyc = () => {
   });
 
   return {
-    documents,
-    loading: isLoading,
+    documents: data?.documents || [],
+    pagination: data?.pagination || null,
+    loading: isLoading || isFetching,
     error,
-    fetchKyc: refetch,
+    page,
+    setPage,
+    fetchKyc: async () => {
+      const result = await refetch();
+      if (result.isError) toast.error('Failed to refresh KYC');
+      else toast.success('KYC refreshed successfully');
+    },
     updateStatus: (id, status) => updateKycStatusMutation.mutateAsync({ id, status }),
   };
 };

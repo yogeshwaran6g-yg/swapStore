@@ -7,6 +7,7 @@ import { resolveDocumentUrl } from '../utils/documentUrl';
 import endpoints from '../config/constants';
 import toast from 'react-hot-toast';
 import { ConfirmModal } from '../components/common/ConfirmModal';
+import DocumentPreviewModal from '../components/common/DocumentPreviewModal';
 
 const UserDetails = () => {
   const { uid } = useParams();
@@ -18,6 +19,7 @@ const UserDetails = () => {
   const [activeTab, setActiveTab] = useState('kyc'); // 'kyc' or 'bank'
   const [isTogglingBlock, setIsTogglingBlock] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [previewModal, setPreviewModal] = useState({ isOpen: false, url: null, title: null, status: null });
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -291,14 +293,17 @@ const UserDetails = () => {
                             }`}>
                               {doc.status}
                             </span>
-                            <a 
-                              href={resolveDocumentUrl(doc.document_url)} 
-                              target="_blank" 
-                              rel="noreferrer"
+                            <button 
+                              onClick={() => setPreviewModal({
+                                isOpen: true,
+                                url: doc.document_url,
+                                title: `${doc.document_type.replace('_', ' ')} Document`,
+                                status: doc.status
+                              })}
                               className="text-xs font-bold bg-zinc-800 text-zinc-300 border border-zinc-700/60 hover:bg-zinc-700 hover:text-white px-4 py-2 rounded-lg transition-all"
                             >
                               View File
-                            </a>
+                            </button>
                           </div>
                         </motion.div>
                       ))}
@@ -383,6 +388,13 @@ const UserDetails = () => {
         message={userData?.is_blocked ? "Are you sure you want to unblock this user? Their access will be restored." : "Are you sure you want to block this user? They will not be able to log in or perform any actions."}
         confirmText={userData?.is_blocked ? "Unblock User" : "Block User"}
         isDestructive={!userData?.is_blocked}
+      />
+      <DocumentPreviewModal 
+        isOpen={previewModal.isOpen}
+        onClose={() => setPreviewModal(prev => ({ ...prev, isOpen: false }))}
+        documentUrl={previewModal.url}
+        title={previewModal.title}
+        status={previewModal.status}
       />
     </div>
   );

@@ -3,10 +3,21 @@ import { getSettings, updateSettings } from '../services/settingsService';
 import toast from 'react-hot-toast';
 
 export const useSettings = () => {
-  return useQuery({
+  const { data, isLoading, isFetching, error, refetch } = useQuery({
     queryKey: ['systemSettings'],
     queryFn: getSettings,
   });
+
+  return {
+    data,
+    isLoading: isLoading || isFetching,
+    error,
+    fetchSettings: async () => {
+      const result = await refetch();
+      if (result.isError) toast.error('Failed to refresh settings');
+      else toast.success('Settings refreshed successfully');
+    }
+  };
 };
 
 export const useUpdateSettings = () => {

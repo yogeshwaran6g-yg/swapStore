@@ -89,3 +89,39 @@ export const updateSettings = async (req, res) => {
     return rtnRes(res, 500, 'Internal Server Error');
   }
 };
+
+export const getDashboardStats = async (req, res) => {
+  try {
+    if (req.user?.role !== 'admin') {
+      return rtnRes(res, 403, 'Forbidden: Admins only');
+    }
+
+    const { queryRunner } = await import('../config/db.js');
+
+    // Users
+    const [{ totalUsers }] = await queryRunner('SELECT COUNT(*) as totalUsers FROM users');
+    const [{ todayUsers }] = await queryRunner('SELECT COUNT(*) as todayUsers FROM users WHERE DATE(created_at) = CURDATE()');
+
+    // Swaps
+    const [{ totalSwaps }] = await queryRunner('SELECT COUNT(*) as totalSwaps FROM swap_orders');
+    const [{ todaySwaps }] = await queryRunner('SELECT COUNT(*) as todaySwaps FROM swap_orders WHERE DATE(created_at) = CURDATE()');
+
+    // Loans
+    const [{ totalLoans }] = await queryRunner('SELECT COUNT(*) as totalLoans FROM loans');
+    const [{ todayLoans }] = await queryRunner('SELECT COUNT(*) as todayLoans FROM loans WHERE DATE(created_at) = CURDATE()');
+
+    const stats = {
+      totalUsers,
+      todayUsers,
+      totalSwaps,
+      todaySwaps,
+      totalLoans,
+      todayLoans
+    };
+
+    return rtnRes(res, 200, 'Stats fetched successfully', { stats });
+  } catch (error) {
+    console.error('Error fetching dashboard stats:', error);
+    return rtnRes(res, 500, 'Internal Server Error');
+  }
+};

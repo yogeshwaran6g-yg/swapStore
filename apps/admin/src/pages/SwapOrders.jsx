@@ -5,9 +5,10 @@ import { DataTable } from '../components/common/DataTable';
 import { swapColumns } from '../components/swaps/swapColumns';
 import { BankDetailsModal } from '../components/swaps/BankDetailsModal';
 import { ConfirmModal } from '../components/common/ConfirmModal';
+import { Pagination } from '../components/common/Pagination';
 
 const SwapOrders = () => {
-  const { swaps, loading, fetchSwaps, updateStatus } = useSwaps();
+  const { swaps, pagination, loading, fetchSwaps, updateStatus, page, setPage } = useSwaps();
   
   const [filterOrderId, setFilterOrderId] = useState('');
   const [filterUser, setFilterUser] = useState('');
@@ -104,7 +105,10 @@ const SwapOrders = () => {
           </div>
         </div>
       ) : (
-        <DataTable data={filteredSwaps} columns={swapColumns} meta={meta} />
+        <>
+          <DataTable data={filteredSwaps} columns={swapColumns} meta={meta} />
+          <Pagination pagination={pagination} onPageChange={setPage} />
+        </>
       )}
 
       <BankDetailsModal 

@@ -2,10 +2,10 @@ import { apiClient } from "../utils/axios.js";
 import endpoints from "../config/constants.js";
 
 export const loanService = {
-  getAllLoans: async () => {
+  getAllLoans: async ({ page = 1, limit = 20 } = {}) => {
     try {
-      const response = await apiClient.get(endpoints.LOANS.ADMIN);
-      return response?.data?.loans || [];
+      const response = await apiClient.get(endpoints.LOANS.ADMIN, { params: { page, limit } });
+      return response?.data || { loans: [], pagination: null };
     } catch (err) {
       console.log("err from loanService getAllLoans ", err.message);
       throw err;

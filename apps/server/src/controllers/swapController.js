@@ -51,7 +51,14 @@ export const getAllSwaps = async (req, res) => {
           return rtnRes(res, 403, 'Forbidden: Admins only');
       }
 
+      const page = Math.max(1, parseInt(req.query.page) || 1);
+      const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+      const offset = (page - 1) * limit;
+
       const { queryRunner } = await import('../config/db.js');
+
+      const [{ total }] = await queryRunner('SELECT COUNT(*) as total FROM swap_orders');
+
       const swaps = await queryRunner(`
           SELECT 
               so.uid, HEX(so.order_id) as order_id, HEX(so.user_uid) as user_uid, 
@@ -63,9 +70,13 @@ export const getAllSwaps = async (req, res) => {
           JOIN users u ON so.user_uid = u.uid
           LEFT JOIN user_bank_accounts b ON so.user_uid = b.user_uid
           ORDER BY so.created_at DESC
-      `);
+          LIMIT ? OFFSET ?
+      `, [limit, offset]);
 
-      return rtnRes(res, 200, 'Swaps fetched successfully', { swaps: swaps || [] });
+      return rtnRes(res, 200, 'Swaps fetched successfully', {
+        swaps: swaps || [],
+        pagination: { total, page, limit, totalPages: Math.ceil(total / limit) }
+      });
   } catch (error) {
       console.error('Error fetching all swaps:', error);
       return rtnRes(res, 500, 'Internal Server Error', { error: error.message });

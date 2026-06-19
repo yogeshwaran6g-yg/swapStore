@@ -1,6 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Copy, Check, ExternalLink } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { TokenNetworkCell } from '../common/TokenNetworkCell';
 
 const CopyBtn = ({ text }) => {
   const [copied, setCopied] = React.useState(false);
@@ -41,14 +43,9 @@ const getBscScanUrl = (hash, network) => {
 
 export const swapColumns = [
   {
-    accessorKey: 'user_uid',
-    header: 'User ID',
-    cell: (info) => <Truncate value={info.getValue()} maxLen={10} color="text-zinc-300" />,
-  },
-  {
-    accessorKey: 'wallet_address',
-    header: 'Wallet',
-    cell: (info) => <Truncate value={info.getValue()} maxLen={10} color="text-zinc-300" />,
+    id: 'sno',
+    header: 'S.No',
+    cell: ({ row }) => <span className="text-zinc-500 text-xs font-mono">{row.index + 1}</span>,
   },
   {
     accessorKey: 'order_id',
@@ -56,32 +53,38 @@ export const swapColumns = [
     cell: (info) => <Truncate value={info.getValue()} maxLen={12} color="text-zinc-300" />,
   },
   {
-    accessorKey: 'created_at',
-    header: 'Date',
+    accessorKey: 'user_uid',
+    header: 'UID',
     cell: (info) => {
-      const d = new Date(info.getValue());
+      const uid = info.getValue();
+      if (!uid) return <span className="text-zinc-600 italic text-xs">—</span>;
       return (
-        <div className="flex flex-col">
-          <span className="text-xs font-semibold text-zinc-200">{d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-          <span className="text-[10px] text-zinc-500 font-medium">{d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
-        </div>
+        <Link
+          to={`/users/${uid}`}
+          className="flex items-center gap-1.5 group"
+          title={`View profile: ${uid}`}
+        >
+          <span className="text-zinc-300 font-mono text-xs bg-zinc-950/60 px-2 py-1 rounded-lg border border-zinc-800/80 shadow-sm group-hover:text-amber-400 group-hover:border-amber-500/30 transition-colors">
+            {uid.slice(0, 8)}…
+          </span>
+          <ExternalLink size={11} className="shrink-0 text-zinc-600 group-hover:text-amber-400 transition-colors" />
+        </Link>
       );
     },
   },
   {
+    accessorKey: 'wallet_address',
+    header: 'Wallet',
+    cell: (info) => <Truncate value={info.getValue()} maxLen={10} color="text-zinc-300" />,
+  },
+
+
+  {
     accessorKey: 'token_symbol',
     header: 'Token',
-    cell: ({ row: { original } }) => {
-      const symbol = original.token_symbol || '—';
-      const network = original.network || '';
-      const networkColor = network.toLowerCase() === 'polygon' ? 'text-purple-400 bg-purple-500/10 border-purple-500/20' : 'text-amber-400 bg-amber-500/10 border-amber-500/20';
-      return (
-        <div className="flex flex-col gap-1">
-          <span className="font-extrabold text-sm text-zinc-100 tracking-wide">{symbol}</span>
-          <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded border w-fit ${networkColor}`}>{network}</span>
-        </div>
-      );
-    },
+    cell: ({ row: { original } }) => (
+      <TokenNetworkCell token={original.token_symbol} network={original.network} />
+    ),
   },
   {
     accessorKey: 'amount',
@@ -114,7 +117,7 @@ export const swapColumns = [
     accessorKey: 'user_crypto_payment_status',
     header: 'Crypto',
     cell: (info) => {
-      const status = info.getValue();
+      const status = info.getValue() || 'pending';
       const styles = {
         completed: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25 shadow-emerald-500/5',
         processing: 'bg-amber-500/10 text-amber-400 border-amber-500/25 shadow-amber-500/5',
@@ -122,9 +125,22 @@ export const swapColumns = [
         pending: 'bg-zinc-800/60 text-zinc-400 border-zinc-700/50',
       };
       return (
-        <span className={`px-2 py-1 text-[10px] font-extrabold rounded-md border shadow-sm uppercase tracking-widest ${styles[status] || styles.pending}`}>
+        <span className={`px-2 py-1 text-[10px] font-extrabold rounded-md border shadow-sm uppercase tracking-widest ${styles[status.toLowerCase()] || styles.pending}`}>
           {status}
         </span>
+      );
+    },
+  },
+  {
+    accessorKey: 'created_at',
+    header: 'Request at',
+    cell: (info) => {
+      const d = new Date(info.getValue());
+      return (
+        <div className="flex flex-col">
+          <span className="text-xs font-semibold text-zinc-200">{d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+          <span className="text-[10px] text-zinc-500 font-medium">{d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+        </div>
       );
     },
   },

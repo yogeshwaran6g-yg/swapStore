@@ -1,13 +1,17 @@
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { swapService } from '../services/swapService';
 
 export const useSwaps = () => {
   const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
+  const limit = 20;
 
-  const { data: swaps = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['swaps'],
-    queryFn: swapService.getAllSwaps,
+  const { data, isLoading, isFetching, error, refetch } = useQuery({
+    queryKey: ['swaps', page],
+    queryFn: () => swapService.getAllSwaps({ page, limit }),
+    keepPreviousData: true,
   });
 
   const updateStatusMutation = useMutation({
@@ -22,10 +26,17 @@ export const useSwaps = () => {
   });
 
   return {
-    swaps,
-    loading: isLoading,
+    swaps: data?.swaps || [],
+    pagination: data?.pagination || null,
+    loading: isLoading || isFetching,
     error,
-    fetchSwaps: refetch,
+    page,
+    setPage,
+    fetchSwaps: async () => {
+      const result = await refetch();
+      if (result.isError) toast.error('Failed to refresh swaps');
+      else toast.success('Swaps refreshed successfully');
+    },
     updateStatus: (orderId, status) => updateStatusMutation.mutateAsync({ orderId, status }),
   };
 };

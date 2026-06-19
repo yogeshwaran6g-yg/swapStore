@@ -11,6 +11,7 @@ import UserManagement from "../../pages/UserManagement";
 import UserDetails from "../../pages/UserDetails";
 import SettingsManagement from "../../pages/SettingsManagement";
 import CronManagement from "../../pages/CronManagement";
+import ContractManagement from "../../pages/ContractManagement";
 
 function AppRoutes() {
   return (
@@ -29,6 +30,7 @@ function AppRoutes() {
           <Route path="/users" element={<UserManagement />} />
           <Route path="/users/:uid" element={<UserDetails />} />
           <Route path="/settings" element={<SettingsManagement />} />
+          <Route path="/contracts" element={<ContractManagement />} />
           <Route path="/cron" element={<CronManagement />} />
         </Route>
       </Route>

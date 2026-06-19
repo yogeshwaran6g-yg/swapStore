@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldAlert, ShieldCheck, User, Copy, Check } from 'lucide-react';
-import UserBalances from './UserBalances';
+import { ShieldAlert, ShieldCheck, User, Copy, Check, ChevronDown, ChevronUp } from 'lucide-react';
 
 const CopyableCell = ({ value, displayValue }) => {
   const [copied, setCopied] = React.useState(false);
@@ -34,6 +33,11 @@ const CopyableCell = ({ value, displayValue }) => {
 
 export const userColumns = [
   {
+    id: 'sno',
+    header: 'S.No',
+    cell: ({ row }) => <span className="text-zinc-500 text-xs font-mono">{row.index + 1}</span>,
+  },
+  {
     accessorKey: 'uid',
     header: 'UID',
     cell: ({ getValue }) => (
@@ -49,9 +53,16 @@ export const userColumns = [
     ),
   },
   {
-    id: 'balances',
-    header: 'Balances',
-    cell: ({ row }) => <UserBalances walletAddress={row.original.wallet_address} />,
+    id: 'expand',
+    header: 'Expand Balance',
+    cell: ({ row, table }) => {
+      const isExpanded = table.options.meta?.expandedRows?.[row.id];
+      return (
+        <div className="flex items-center justify-center text-zinc-500">
+          {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </div>
+      );
+    },
   },
   {
     accessorKey: 'kyc_status',
@@ -93,7 +104,15 @@ export const userColumns = [
   {
     accessorKey: 'created_at',
     header: 'Joined',
-    cell: ({ getValue }) => <span className="text-zinc-400 text-xs">{new Date(getValue()).toLocaleDateString()}</span>,
+    cell: ({ getValue }) => {
+      const d = new Date(getValue());
+      return (
+        <div className="flex flex-col">
+          <span className="text-xs font-semibold text-zinc-200">{d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+          <span className="text-[10px] text-zinc-500 font-medium">{d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+        </div>
+      );
+    },
   },
   {
     id: 'actions',
