@@ -214,3 +214,46 @@ auto repayment and auto interest
 
 swap with network token balance of users 
 the user kyc status from user table wot updates
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+remove the fallback for loan collector
+
+verify the hash

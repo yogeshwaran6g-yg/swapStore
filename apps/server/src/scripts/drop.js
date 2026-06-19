@@ -20,6 +20,11 @@ const drop = async () => {
         await queryRunner('DROP TABLE IF EXISTS admins');
         await queryRunner('DROP TABLE IF EXISTS users');
 
+        await queryRunner('DROP TABLE IF EXISTS loan_cron_runs');        
+        await queryRunner('DROP TABLE IF EXISTS loan_interest_ledger');
+        await queryRunner('DROP TABLE IF EXISTS loan_principal_payments');
+
+
         // Re-enable foreign key checks
         await queryRunner('SET FOREIGN_KEY_CHECKS = 1');
 
