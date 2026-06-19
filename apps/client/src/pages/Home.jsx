@@ -31,25 +31,25 @@ function Home() {
       <div className="max-w-[1400px] mx-auto bg-gradient-to-br from-[#E8EBF5]/90 to-[#DDE3F0]/90 backdrop-blur-xl rounded-[32px] shadow-[0_32px_64px_-12px_rgba(169,156,255,0.15)] border border-white/40 overflow-hidden relative">
 
         {/* --- NAVBAR --- */}
-        <div className="relative z-50 px-4 pt-6 pb-2 lg:px-8">
-          <nav className="w-full flex items-center justify-between bg-white/40 backdrop-blur-2xl border border-white/60 rounded-[24px] px-4 sm:px-6 py-3 sm:py-4 shadow-[0_8px_32px_rgba(14,27,77,0.05)]">
+        <div className="relative z-50 px-2 sm:px-4 pt-4 sm:pt-6 pb-2 lg:px-6 xl:px-8">
+          <nav className="w-full flex items-center justify-between bg-white/40 backdrop-blur-2xl border border-white/60 rounded-[18px] sm:rounded-[24px] px-3 sm:px-5 lg:px-4 xl:px-6 py-2.5 sm:py-3 lg:py-2.5 xl:py-4 shadow-[0_8px_32px_rgba(14,27,77,0.05)]">
             {/* Logo */}
-            <div className="flex items-center gap-2 sm:gap-3 cursor-pointer group">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0E1B4D] to-[#1A2C6B] flex items-center justify-center relative shadow-md group-hover:scale-105 transition-transform duration-300">
-                <span className="text-white font-bold text-[14px] sm:text-[16px]">C</span>
-                <div className="absolute -top-1 -right-1 w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 bg-gradient-to-tr from-[#D9A85C] to-[#FCD34D] rounded-full border-2 border-white shadow-sm"></div>
+            <div className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer group shrink-0">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 lg:w-8 lg:h-8 xl:w-10 xl:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#0E1B4D] to-[#1A2C6B] flex items-center justify-center relative shadow-md group-hover:scale-105 transition-transform duration-300">
+                <span className="text-white font-bold text-[12px] sm:text-[14px] lg:text-[13px] xl:text-[16px]">C</span>
+                <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-2 h-2 sm:w-3 sm:h-3 lg:w-2.5 lg:h-2.5 xl:w-3.5 xl:h-3.5 bg-gradient-to-tr from-[#D9A85C] to-[#FCD34D] rounded-full border-[1.5px] sm:border-2 border-white shadow-sm"></div>
               </div>
-              <span className="text-[19px] sm:text-2xl font-extrabold tracking-tight text-[#0E1B4D]">InstaaCash</span>
+              <span className="text-[15px] sm:text-xl lg:text-[16px] xl:text-2xl font-extrabold tracking-tight text-[#0E1B4D]">InstaaCash</span>
             </div>
 
-            {/* Links */}
-            <div className="hidden lg:flex items-center bg-white/40 border border-white/50 rounded-full px-2 py-1.5 shadow-sm">
-              <a href="#home" className="text-[14px] font-bold text-[#0E1B4D] bg-white shadow-sm rounded-full px-4 py-2 transition-all">Home</a>
-              <a href="#swap" className="text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-4 py-2 transition-all">Swap</a>
-              <a href="#loan-details" className="text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-4 py-2 transition-all">Loan Details</a>
-              <a href="#services" className="text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-4 py-2 transition-all">Services</a>
-              <a href="#reviews" className="text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-4 py-2 transition-all">Reviews</a>
-              <a href="#about" className="text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-4 py-2 transition-all">About</a>
+            {/* Links - only visible on large screens */}
+            <div className="hidden lg:flex items-center bg-white/40 border border-white/50 rounded-full px-1 lg:px-1 xl:px-2 py-1 xl:py-1.5 shadow-sm">
+              <a href="#home" className="text-[11px] lg:text-[11px] xl:text-[14px] font-bold text-[#0E1B4D] bg-white shadow-sm rounded-full px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 transition-all">Home</a>
+              <a href="#swap" className="text-[11px] lg:text-[11px] xl:text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 transition-all">Swap</a>
+              <a href="#loan-details" className="text-[11px] lg:text-[11px] xl:text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 transition-all whitespace-nowrap">Loan Details</a>
+              <a href="#services" className="text-[11px] lg:text-[11px] xl:text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 transition-all">Services</a>
+              <a href="#reviews" className="text-[11px] lg:text-[11px] xl:text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 transition-all">Reviews</a>
+              <a href="#about" className="text-[11px] lg:text-[11px] xl:text-[14px] font-semibold text-[#64748B] hover:text-[#0E1B4D] hover:bg-white/80 rounded-full px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 transition-all">About</a>
             </div>
 
             {/* Action */}
@@ -57,9 +57,9 @@ function Home() {
               <div className="absolute -inset-0.5 bg-gradient-to-r from-[#A99CFF] to-[#D9A85C] rounded-full blur opacity-40 group-hover:opacity-100 transition duration-500 pointer-events-none"></div>
               <button
                 onClick={() => handleConnect('/dashboard')}
-                className="relative flex items-center gap-1.5 sm:gap-2.5 bg-gradient-to-br from-[#0E1B4D] to-[#1A2C6B] text-white px-4 py-2.5 sm:px-8 sm:py-3 rounded-full font-bold text-[13px] sm:text-[15px] transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_10px_40px_-10px_rgba(169,156,255,0.8)] border border-white/20 shadow-inner"
+                className="relative flex items-center gap-1 sm:gap-2 lg:gap-1.5 xl:gap-2.5 bg-gradient-to-br from-[#0E1B4D] to-[#1A2C6B] text-white px-3 py-2 sm:px-6 sm:py-2.5 lg:px-4 lg:py-2 xl:px-8 xl:py-3 rounded-full font-bold text-[11px] sm:text-[14px] lg:text-[12px] xl:text-[15px] transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_10px_40px_-10px_rgba(169,156,255,0.8)] border border-white/20 shadow-inner"
               >
-                <Wallet className="w-4 h-4 sm:w-5 sm:h-5 text-[#A99CFF]" />
+                <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-3.5 lg:h-3.5 xl:w-5 xl:h-5 text-[#A99CFF]" />
                 <span className="hidden sm:inline">Connect Wallet</span>
                 <span className="sm:hidden">Connect</span>
               </button>
@@ -157,7 +157,7 @@ function Home() {
               <div className="hidden sm:block w-px h-6 sm:h-8 bg-gray-300/50"></div>
               <div className="flex items-center gap-2">
                 <span className="text-lg sm:text-xl">💸</span>
-                <p className="text-[#0E1B4D] font-bold text-[12px] sm:text-[13px] md:text-[12px] leading-tight">Zero Hidden Fees</p>
+                <p className="text-[#0E1B4D] font-bold text-[12px] sm:text-[13px] md:text-[12px] leading-tight">No Hidden Fees</p>
               </div>
               <div className="hidden sm:block w-px h-6 sm:h-8 bg-gray-300/50"></div>
               <div className="flex items-center gap-2">
@@ -296,7 +296,7 @@ function Home() {
               <span className="text-base leading-none">🏦</span> Less Documents Required
             </div>
             <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/80 border border-white text-[#0E1B4D] rounded-full px-5 py-3 sm:py-2.5 font-bold text-[13px] sm:text-[14px] shadow-sm">
-              <span className="text-base leading-none">💸</span> Zero Hidden Fees
+              <span className="text-base leading-none">💸</span> No Hidden Fees
             </div>
             <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/80 border border-white text-[#0E1B4D] rounded-full px-5 py-3 sm:py-2.5 font-bold text-[13px] sm:text-[14px] shadow-sm">
               <span className="text-base leading-none">⚡</span> Instant Swap
@@ -348,7 +348,7 @@ function Home() {
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <div className="flex-1 text-left">
-                  <h4 className="text-[#0E1B4D] font-bold text-[17px] mb-1">Zero Hidden Fees</h4>
+                  <h4 className="text-[#0E1B4D] font-bold text-[17px] mb-1">No Hidden Fees</h4>
                   <p className="text-[#64748B] text-[15px] font-medium leading-relaxed">What you see is exactly what you get. No unexpected gas spikes or markup.</p>
                 </div>
               </li>
@@ -431,9 +431,9 @@ function Home() {
                 <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/5 backdrop-blur-md rounded-full px-5 py-3 sm:py-2 border border-white/10 text-white font-bold text-[13px] sm:text-[14px]">
                   <span className="text-base leading-none">🗂</span> Less Documents Required
                 </div>
-               
+
                 <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/5 backdrop-blur-md rounded-full px-5 py-3 sm:py-2 border border-white/10 text-white font-bold text-[13px] sm:text-[14px]">
-                  <span className="text-base leading-none">💸</span> Zero Hidden Fees
+                  <span className="text-base leading-none">💸</span> No Hidden Fees
                 </div>
                 <div className="flex items-center justify-center w-full sm:w-auto whitespace-nowrap gap-2 bg-white/5 backdrop-blur-md rounded-full px-5 py-3 sm:py-2 border border-white/10 text-white font-bold text-[13px] sm:text-[14px]">
                   <span className="text-base leading-none">⚡</span> Instant Loan
@@ -526,14 +526,14 @@ function Home() {
               { name: "Sarah Jenkins", reviews: "5 reviews", rating: 4, title: "Loan in 30 seconds!", text: "I needed liquidity but didn't want to sell my ETH. InstaaCash gave me a loan in 30 seconds. Unbelievable." },
               { name: "Michael Ross", reviews: "1 review", rating: 5, title: "Gorgeous UI & Audited", text: "The UI is gorgeous and the smart contracts are fully audited. Finally, a platform that feels truly premium." },
               { name: "Elena Rodriguez", reviews: "4 reviews", rating: 4.5, title: "Stunning design and easy to use", text: "I've tried many platforms, but this is by far the easiest way to manage my crypto loans. The design is absolutely stunning!" },
-              { name: "David Kim", reviews: "8 reviews", rating: 5, title: "Zero hidden fees", text: "Zero hidden fees is not just a marketing gimmick here. I get exactly what I expect on every swap. 10/10." },
+              { name: "David Kim", reviews: "8 reviews", rating: 5, title: "No Hidden Fees", text: "No Hidden Fees is not just a marketing gimmick here. I get exactly what I expect on every swap. 10/10." },
               { name: "Anita Patel", reviews: "3 reviews", rating: 4.5, title: "My go-to decentralized hub", text: "The cross-chain swap capabilities combined with institutional security make this my go-to decentralized hub." },
               // Duplicate the exact same array to create a seamless infinite scroll loop
               { name: "Alex Chen", reviews: "2 reviews", rating: 5, title: "Instant swap feature is a lifesaver", text: "The instant swap feature is a lifesaver. No slippage and incredibly fast execution. Highly recommended!" },
               { name: "Sarah Jenkins", reviews: "5 reviews", rating: 4, title: "Loan in 30 seconds!", text: "I needed liquidity but didn't want to sell my ETH. InstaaCash gave me a loan in 30 seconds. Unbelievable." },
               { name: "Michael Ross", reviews: "1 review", rating: 5, title: "Gorgeous UI & Audited", text: "The UI is gorgeous and the smart contracts are fully audited. Finally, a platform that feels truly premium." },
               { name: "Elena Rodriguez", reviews: "4 reviews", rating: 4.5, title: "Stunning design and easy to use", text: "I've tried many platforms, but this is by far the easiest way to manage my crypto loans. The design is absolutely stunning!" },
-              { name: "David Kim", reviews: "8 reviews", rating: 5, title: "Zero hidden fees", text: "Zero hidden fees is not just a marketing gimmick here. I get exactly what I expect on every swap. 10/10." },
+              { name: "David Kim", reviews: "8 reviews", rating: 5, title: "No Hidden Fees", text: "No Hidden Fees is not just a marketing gimmick here. I get exactly what I expect on every swap. 10/10." },
               { name: "Anita Patel", reviews: "3 reviews", rating: 4.5, title: "My go-to decentralized hub", text: "The cross-chain swap capabilities combined with institutional security make this my go-to decentralized hub." }
             ].map((review, i) => (
               <div key={i} className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200 flex flex-col gap-3 w-[280px] sm:w-[360px] shrink-0 hover:shadow-md transition-shadow cursor-default text-left">
@@ -597,7 +597,7 @@ function Home() {
 
           {/* Left Text Side */}
           <div className="lg:w-1/2 relative z-10 flex flex-col items-start text-left">
-           
+
 
             <h2 className="text-4xl lg:text-5xl font-[800] text-[#0E1B4D] mb-6 leading-tight tracking-tight">
               ABOUT<br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#A99CFF]">InstaaCash.</span>
@@ -674,30 +674,28 @@ function Home() {
             <div className="flex flex-col gap-4">
               <h4 className="text-white font-bold text-lg mb-2">Company</h4>
               <a href="#about" className="text-[#94A3B8] hover:text-[#A99CFF] hover:translate-x-1 transition-all w-fit">About Us</a>
-              <a href="#" className="text-[#94A3B8] hover:text-[#A99CFF] hover:translate-x-1 transition-all w-fit">Careers</a>
-              <a href="#" className="text-[#94A3B8] hover:text-[#A99CFF] hover:translate-x-1 transition-all w-fit">Privacy Policy</a>
-              <a href="#" className="text-[#94A3B8] hover:text-[#A99CFF] hover:translate-x-1 transition-all w-fit">Terms of Service</a>
+              <a href="/privacy-policy" className="text-[#94A3B8] hover:text-[#A99CFF] hover:translate-x-1 transition-all w-fit">Privacy Policy</a>
+              <a href="/terms-of-service" className="text-[#94A3B8] hover:text-[#A99CFF] hover:translate-x-1 transition-all w-fit">Terms of Service</a>
             </div>
 
-            {/* CTA Col */}
-            <div className="flex flex-col gap-4 lg:col-span-1">
-              <h4 className="text-white font-bold text-lg mb-2">Stay Updated</h4>
-              <p className="text-[#94A3B8] text-[14px]">Join our newsletter for the latest DeFi news and platform updates.</p>
-              <div className="flex mt-2">
-                <input type="email" placeholder="Enter your email" className="bg-white/5 border border-white/10 rounded-l-xl px-4 py-3 text-white focus:outline-none focus:border-[#A99CFF]/50 w-full text-[14px]" />
-                <button className="bg-gradient-to-r from-[#D9A85C] to-[#F59E0B] text-[#0E1B4D] font-bold px-4 py-3 rounded-r-xl text-[14px] hover:opacity-90 transition-opacity">
-                  Subscribe
+            {/* Contact Col */}
+            <div className="flex flex-col gap-3 lg:col-span-1">
+              <h4 className="text-white font-bold text-lg mb-1">Contact Us</h4>
+              <p className="text-[#94A3B8] text-[14px] mb-2">Have questions? We'd love to hear from you.</p>
+              <form className="flex flex-col gap-2.5">
+                <input type="text" placeholder="Name" className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-[#A99CFF]/50 w-full text-[14px] transition-colors" required />
+                <input type="email" placeholder="Email" className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-[#A99CFF]/50 w-full text-[14px] transition-colors" required />
+                <textarea placeholder="Message" rows="2" className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-[#A99CFF]/50 w-full text-[14px] resize-none transition-colors" required></textarea>
+                <button type="submit" className="bg-gradient-to-r from-[#D9A85C] to-[#F59E0B] text-[#0E1B4D] font-bold px-4 py-2.5 rounded-xl text-[14px] hover:opacity-90 transition-opacity shadow-lg shadow-[#D9A85C]/20">
+                  Send Message
                 </button>
-              </div>
+              </form>
             </div>
 
           </div>
 
           <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-[#64748B] text-sm">© 2026 InstaaCash. All rights reserved.</p>
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2 text-[#64748B] text-sm"><span className="w-2 h-2 rounded-full bg-green-500"></span> Systems Operational</div>
-            </div>
+            <p className="text-[#64748B] text-sm">© 2025 InstaaCash. All rights reserved.</p>
           </div>
         </div>
       </footer>
