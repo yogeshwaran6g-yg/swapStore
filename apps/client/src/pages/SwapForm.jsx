@@ -10,6 +10,7 @@ import { USDT_ADDRESSES, USDC_ADDRESSES, DAI_ADDRESSES } from '@/config/constant
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useUserSwaps } from '@/hooks/useUserSwaps';
 import { CustomSelect } from '@/components/ui/CustomSelect';
+import { confirmSwapForm } from '@/services/userApiService';
 
 function SwapForm() {
   const { isAuthenticated, address } = useAuth();
@@ -163,13 +164,15 @@ function SwapForm() {
         if (!swapResult.success) {
           setErrors({ submit: 'Smart contract transaction failed or was cancelled.' });
         } else {
+          // Send txHash to backend immediately to ensure reliable updates
+          await confirmSwapForm({ orderId, txHash: swapResult.txHash }).catch(e => console.error("Confirm error:", e));
           setIsSwapComplete(true);
         }
       } else {
         setErrors({ submit: 'Failed to retrieve order ID from server.' });
       }
     } catch (err) {
-      setErrors({ submit: err?.message || 'Network error or exchange rate unavailable.' });
+      setErrors({ submit: err?.response?.data?.message || err?.response?.data?.error || err?.message || 'Network error or exchange rate unavailable.' });
     }
   };
 

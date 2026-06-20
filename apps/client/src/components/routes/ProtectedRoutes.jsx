@@ -17,9 +17,9 @@ function ProtectedRoute({ redirectTo = "/" }) {
   }
 
   return isAuthenticated ? (
-    <GlobalApprovalGuard>
-      <Outlet />
-    </GlobalApprovalGuard>
+     <GlobalApprovalGuard>
+    <Outlet />
+  </GlobalApprovalGuard>
   ) : (
     <Navigate to={redirectTo} replace />
   );
