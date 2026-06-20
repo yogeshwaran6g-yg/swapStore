@@ -22,15 +22,15 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 px-4 lg:px-12 py-4 backdrop-blur-xl bg-[#06060c]/80 border-b border-white/5 flex items-center justify-between animate-fade-in shadow-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 px-2 sm:px-4 lg:px-12 py-3 lg:py-4 backdrop-blur-xl bg-[#06060c]/80 border-b border-white/5 flex items-center justify-between animate-fade-in shadow-2xl">
         {/* Left Side: Logo */}
         <div className="flex items-center lg:w-[280px]">
           <div
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 cursor-pointer group"
+            className="flex items-center gap-2 cursor-pointer group pl-1"
           >
             <div className="flex items-center group">
-              <img src="/instaa-cash-logo.png" alt="Instaa Cash" className="h-8 sm:h-9 object-contain transform group-hover:scale-105 transition-transform" />
+              <img src="/instaa-cash-logo.png" alt="Instaa Cash" className="h-6 sm:h-8 lg:h-9 object-contain transform group-hover:scale-105 transition-transform" />
             </div>
           </div>
         </div>
@@ -61,8 +61,8 @@ const Navbar = () => {
         </div>
 
         {/* Right Side: Actions */}
-        <div className="flex items-center justify-end gap-3 lg:w-[280px]">
-          <div className="flex items-center gap-2 sm:bg-white/5 sm:p-1.5 sm:rounded-3xl sm:border sm:border-white/10 sm:backdrop-blur-md sm:shadow-inner transition-all">
+        <div className="flex items-center justify-end gap-1.5 sm:gap-3 lg:w-[280px]">
+          <div className="flex items-center gap-1.5 sm:gap-2 sm:bg-white/5 sm:p-1.5 sm:rounded-3xl sm:border sm:border-white/10 sm:backdrop-blur-md sm:shadow-inner transition-all">
             <button
               onClick={disconnect}
               className="hidden sm:flex items-center justify-center gap-2 text-sm font-bold text-red-400 hover:text-white bg-red-500/10 hover:bg-red-500 px-4 py-2 rounded-2xl transition-all border border-transparent hover:border-red-400 hover:shadow-[0_0_15px_rgba(239,68,68,0.4)] group"
@@ -72,14 +72,14 @@ const Navbar = () => {
               <span className="hidden xl:inline">Disconnect</span>
             </button>
 
-            <div className="transform scale-90 sm:scale-100 origin-right transition-transform hover:scale-[1.03]">
+            <div className="transform scale-[0.85] sm:scale-100 origin-right transition-transform hover:scale-[1.03]">
               <WalletConnect />
             </div>
           </div>
 
           {/* Hamburger Menu Toggle */}
           <button
-            className="lg:hidden p-2 text-zinc-400 hover:text-white bg-white/5 rounded-lg"
+            className="lg:hidden p-1.5 sm:p-2 text-zinc-400 hover:text-white bg-white/5 rounded-lg"
             onClick={() => setIsMenuOpen(true)}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
