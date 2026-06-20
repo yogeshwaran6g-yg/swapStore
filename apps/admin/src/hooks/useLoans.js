@@ -36,6 +36,13 @@ export const useLoans = () => {
     }
   });
 
+  const updateLoanDetailsMutation = useMutation({
+    mutationFn: loanService.updateLoanDetails,
+    onError: (error) => {
+      toast.error(error?.response?.data?.error || error?.message || 'Failed to update loan details');
+    }
+  });
+
   return {
     loans: data?.loans || [],
     pagination: data?.pagination || null,
@@ -50,5 +57,6 @@ export const useLoans = () => {
     },
     approveLoan: (payload) => approveLoanMutation.mutateAsync(payload),
     rejectLoan: (uid) => rejectLoanMutation.mutateAsync(uid),
+    updateLoanDetails: (payload) => updateLoanDetailsMutation.mutateAsync(payload),
   };
 };

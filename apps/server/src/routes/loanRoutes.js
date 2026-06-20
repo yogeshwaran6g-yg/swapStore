@@ -1,7 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
-import { handleKycUpload, handleLoanRequest, handleGetMyLoans, handleGetEligibility, getPendingKyc, approveKyc, getAllLoans, updateInterestRate, getAdminSettings, adminRunInterestCollection, getCronRunHistory, getActiveLoansUsers, seedTestLoan, deleteTestLoan } from '../controllers/loanController.js';
+import { handleKycUpload, handleLoanRequest, handleGetMyLoans, handleGetEligibility, getPendingKyc, approveKyc, getAllLoans, updateInterestRate, getAdminSettings, adminRunInterestCollection, getCronRunHistory, getActiveLoansUsers, seedTestLoan, deleteTestLoan, updateLoanDetails } from '../controllers/loanController.js';
 import { authMiddleware } from '../config/authMiddleware.js';
 
 const router = express.Router();
@@ -30,6 +30,7 @@ router.get('/my-loans', authMiddleware, handleGetMyLoans);
 router.get('/admin/kyc', authMiddleware, getPendingKyc);
 router.post('/admin/kyc/:id/approve', authMiddleware, approveKyc);
 router.get('/admin/loans', authMiddleware, getAllLoans);
+router.put('/admin/loans/:loanUid/details', authMiddleware, updateLoanDetails);
 router.get('/admin/settings', authMiddleware, getAdminSettings);
 router.post('/admin/settings/interest-rate', authMiddleware, updateInterestRate);
 router.post('/admin/run-interest-collection', authMiddleware, adminRunInterestCollection);

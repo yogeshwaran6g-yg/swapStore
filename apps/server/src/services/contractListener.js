@@ -122,17 +122,23 @@ const startLoanListeners = (networks) => {
             console.log(`💰 [Loan/${name}] LoanIssued | loanId=${hexLoanId} user=${user}`);
 
             try {
+              const loanQuery = await queryRunner(`SELECT loan_term_days FROM loans WHERE loan_id = UNHEX(?) LIMIT 1`, [hexLoanId]);
+              const specificTermDays = loanQuery && loanQuery.length > 0 ? Number(loanQuery[0].loan_term_days) : null;
+
               const frequencyDays = Number(await getSystemSettings('loan_interest_frequency_days')) || 30;
-              const termDays = Number(await getSystemSettings('loan_default_term_days')) || 30;
+              const termDays = specificTermDays || Number(await getSystemSettings('loan_default_term_days')) || 30;
               const nextDebit = new Date(Date.now() + frequencyDays * 24 * 60 * 60 * 1000);
               const maturity = new Date(Date.now() + termDays * 24 * 60 * 60 * 1000);
+
+              const humanNetAmount = Number(netAmount) / 1e18;
+              const humanFee = Number(fee) / 1e18;
 
               const result = await queryRunner(
                 `UPDATE loans 
                  SET status = 'approved', disbursement_tx_hash = ?, disbursed_at = NOW(),
                      disbursed_amount = ?, disbursement_fee = ?, next_debit_date = ?, maturity_date = ?, updated_at = NOW()
                  WHERE loan_id = UNHEX(?) AND status = 'pending'`,
-                [txHash, String(netAmount), String(fee), nextDebit, maturity, hexLoanId]
+                [txHash, String(humanNetAmount), String(humanFee), nextDebit, maturity, hexLoanId]
               );
               if (result?.affectedRows > 0) {
                 console.log(`🎉 [Loan/${name}] Loan ${hexLoanId} approved in DB.`);

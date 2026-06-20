@@ -25,6 +25,19 @@ export const loanService = {
     }
   },
 
+  updateLoanDetails: async ({ uid, interestRate, loanTermDays }) => {
+    try {
+      const response = await apiClient.put(`${endpoints.LOANS.ADMIN}/${uid}/details`, {
+        interestRate,
+        loanTermDays
+      });
+      return response;
+    } catch (err) {
+      console.log("err from loanService updateLoanDetails ", err.message);
+      throw err;
+    }
+  },
+
   rejectLoan: async (uid) => {
     try {
       const response = await apiClient.post(`${endpoints.LOANS.ADMIN}/${uid}/reject`);

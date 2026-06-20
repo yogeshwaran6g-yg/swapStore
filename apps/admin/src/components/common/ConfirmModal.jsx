@@ -10,7 +10,8 @@ export const ConfirmModal = ({
   confirmText = "Confirm",
   cancelText = "Cancel",
   isDestructive = false,
-  isLoading = false
+  isLoading = false,
+  children
 }) => {
   if (!isOpen) return null;
 
@@ -44,9 +45,12 @@ export const ConfirmModal = ({
 
         {/* Content */}
         <div className="p-6">
-          <div className="text-zinc-300 text-sm leading-relaxed whitespace-pre-wrap">
-            {message}
-          </div>
+          {message && (
+            <div className="text-zinc-300 text-sm leading-relaxed whitespace-pre-wrap mb-4">
+              {message}
+            </div>
+          )}
+          {children}
         </div>
 
         {/* Footer */}
