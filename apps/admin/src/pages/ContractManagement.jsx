@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import React, { useState } from 'react';
+import { useReadContract, useWriteContract } from 'wagmi';
 import { useAppKitAccount } from '@reown/appkit/react';
 import toast from 'react-hot-toast';
 import { Network, Cpu, ShieldAlert, Save, RefreshCw, Wallet } from 'lucide-react';
@@ -7,7 +7,7 @@ import { CRYPTO_LOAN_ABI, CONTRACT_ADDRESSES, SWAP_ABI, SWAP_CONTRACT_ADDRESSES 
 import { ConfirmModal } from '../components/common/ConfirmModal';
 
 const ContractManagement = () => {
-  const { isConnected, address } = useAppKitAccount();
+  const { isConnected } = useAppKitAccount();
   const [network, setNetwork] = useState('bsc'); // 'bsc' or 'polygon'
   const [contractType, setContractType] = useState('loan'); // 'loan' or 'swap'
   
@@ -24,8 +24,6 @@ const ContractManagement = () => {
 
   const [swapForms, setSwapForms] = useState({
     setAdmin: '',
-    updateFeeWallet: '',
-    updateTreasuryWallet: '',
   });
 
   // ── Contract Addresses ──
@@ -90,7 +88,7 @@ const ContractManagement = () => {
     try {
       toast.loading(`Executing ${pendingAction.label}...`, { id: 'tx' });
       
-      const txHash = await writeContractAsync({
+      await writeContractAsync({
         address: contractType === 'loan' ? loanAddress : swapAddress,
         abi: contractType === 'loan' ? CRYPTO_LOAN_ABI : SWAP_ABI,
         functionName: pendingAction.functionName,
@@ -121,10 +119,12 @@ const ContractManagement = () => {
   const isLoading = contractType === 'loan' ? isLoanLoading : isSwapLoading;
   const currentConfig = contractType === 'loan' ? loanConfig : swapConfig;
 
-  const renderConfigBox = (label, addressValue) => (
+  const renderConfigBox = (label, value) => (
     <div className="bg-zinc-950/60 p-4 rounded-xl border border-zinc-800/50">
       <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">{label}</p>
-      <p className="font-mono text-sm text-amber-400 break-all">{addressValue || 'Loading or Not Set'}</p>
+      <p className="font-mono text-sm text-amber-400 break-all">
+        {isLoading ? 'Loading...' : formatConfigValue(value)}
+      </p>
     </div>
   );
 
@@ -137,7 +137,9 @@ const ContractManagement = () => {
             <Cpu className="text-amber-500 w-6 h-6" />
             <span>On-Chain Contracts</span>
           </h1>
-          <p className="text-zinc-400 text-sm mt-1">Manage admin access and fee wallets directly on-chain</p>
+          <p className="text-zinc-400 text-sm mt-1">
+            Manage contract configuration directly on-chain.
+          </p>
         </div>
         
         <div className="flex items-center space-x-2 bg-zinc-950 p-1.5 rounded-xl border border-zinc-800">
@@ -228,9 +230,11 @@ const ContractManagement = () => {
                 </>
               ) : (
                 <>
-                  {renderConfigBox('Admin Address', currentConfig?.[0])}
-                  {renderConfigBox('Fee Wallet', currentConfig?.[1])}
-                  {renderConfigBox('Treasury Wallet', currentConfig?.[2])}
+                  {renderConfigBox('Owner Address', currentConfig?.[0])}
+                  {renderConfigBox('Admin Address', currentConfig?.[1])}
+                  {renderConfigBox('Pending Owner', currentConfig?.[2])}
+                  {renderConfigBox('Paused', currentConfig?.[3])}
+                  {renderConfigBox('Accepted Token Count', currentConfig?.[4])}
                 </>
               )}
             </div>
@@ -238,7 +242,9 @@ const ContractManagement = () => {
 
           {/* Update Forms */}
           <div className="bg-zinc-900/80 rounded-2xl border border-zinc-800/50 p-6 backdrop-blur-xl space-y-6">
-            <h2 className="text-lg font-bold text-zinc-100 mb-4">Modify Assignments</h2>
+            <h2 className="text-lg font-bold text-zinc-100 mb-4">
+              {contractType === 'loan' ? 'Modify Assignments' : 'Modify Swap Admin'}
+            </h2>
 
             {contractType === 'loan' ? (
               <>
@@ -277,33 +283,15 @@ const ContractManagement = () => {
                 />
               </>
             ) : (
-              <>
-                <UpdateField
-                  label="Set New Admin"
-                  value={swapForms.setAdmin}
-                  onChange={(v) => handleInputChange('swap', 'setAdmin', v)}
-                  onSave={() => handlePreSubmit('setAdmin', 'Update Admin')}
-                  isSaving={isWriting}
-                  placeholder="0x..."
-                  isDestructive
-                />
-                <UpdateField
-                  label="Update Fee Wallet"
-                  value={swapForms.updateFeeWallet}
-                  onChange={(v) => handleInputChange('swap', 'updateFeeWallet', v)}
-                  onSave={() => handlePreSubmit('updateFeeWallet', 'Update Fee Wallet')}
-                  isSaving={isWriting}
-                  placeholder="0x..."
-                />
-                <UpdateField
-                  label="Update Treasury Wallet"
-                  value={swapForms.updateTreasuryWallet}
-                  onChange={(v) => handleInputChange('swap', 'updateTreasuryWallet', v)}
-                  onSave={() => handlePreSubmit('updateTreasuryWallet', 'Update Treasury Wallet')}
-                  isSaving={isWriting}
-                  placeholder="0x..."
-                />
-              </>
+              <UpdateField
+                label="Set New Admin"
+                value={swapForms.setAdmin}
+                onChange={(v) => handleInputChange('swap', 'setAdmin', v)}
+                onSave={() => handlePreSubmit('setAdmin', 'Update Admin')}
+                isSaving={isWriting}
+                placeholder="0x..."
+                isDestructive
+              />
             )}
           </div>
         </div>
@@ -324,6 +312,18 @@ const ContractManagement = () => {
       />
     </div>
   );
+};
+
+const formatConfigValue = (value) => {
+  if (value === undefined || value === null || value === '') {
+    return 'Loading or Not Set';
+  }
+
+  if (typeof value === 'boolean') {
+    return value ? 'Yes' : 'No';
+  }
+
+  return value.toString();
 };
 
 // ── Reusable Field Component ──
