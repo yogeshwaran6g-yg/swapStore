@@ -23,7 +23,8 @@ const Navbar = () => {
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 px-4 lg:px-12 py-4 backdrop-blur-xl bg-[#06060c]/80 border-b border-white/5 flex items-center justify-between animate-fade-in shadow-2xl">
-        <div className="flex items-center gap-10">
+        {/* Left Side: Logo */}
+        <div className="flex items-center lg:w-[280px]">
           <div
             onClick={() => navigate('/')}
             className="flex items-center gap-2 cursor-pointer group"
@@ -32,35 +33,48 @@ const Navbar = () => {
               <img src="/instaa-cash-logo.png" alt="Instaa Cash" className="h-8 sm:h-9 object-contain transform group-hover:scale-105 transition-transform" />
             </div>
           </div>
+        </div>
 
-          <div className="hidden lg:flex items-center gap-8 text-sm font-medium text-zinc-400">
-            {navLinks.map((link) => (
-              <span
-                key={link.name}
-                onClick={() => navigate(link.path)}
-                className={`hover:text-white transition-colors cursor-pointer relative ${location.pathname === link.path
-                    ? "text-white after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-purple-500"
-                    : ""
+        {/* Center: Navigation Links */}
+        <div className="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center">
+          <div className="flex items-center gap-1.5 bg-white/5 p-1.5 rounded-2xl border border-white/10 backdrop-blur-md shadow-inner">
+            {navLinks.map((link) => {
+              const isActive = location.pathname === link.path;
+              return (
+                <span
+                  key={link.name}
+                  onClick={() => navigate(link.path)}
+                  className={`px-5 py-2 rounded-xl text-sm font-bold transition-all duration-300 cursor-pointer relative overflow-hidden group ${
+                    isActive
+                      ? "text-white bg-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-white/10"
+                      : "text-zinc-400 hover:text-white hover:bg-white/5"
                   }`}
-              >
-                {link.name}
-              </span>
-            ))}
+                >
+                  {isActive && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 opacity-80"></div>
+                  )}
+                  <span className="relative z-10 tracking-wide">{link.name}</span>
+                </span>
+              );
+            })}
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-3">
+        {/* Right Side: Actions */}
+        <div className="flex items-center justify-end gap-3 lg:w-[280px]">
+          <div className="flex items-center gap-2 sm:bg-white/5 sm:p-1.5 sm:rounded-3xl sm:border sm:border-white/10 sm:backdrop-blur-md sm:shadow-inner transition-all">
             <button
               onClick={disconnect}
-              className="text-sm font-bold text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 px-4 py-2 rounded-xl transition-colors border border-red-500/20"
+              className="hidden sm:flex items-center justify-center gap-2 text-sm font-bold text-red-400 hover:text-white bg-red-500/10 hover:bg-red-500 px-4 py-2 rounded-2xl transition-all border border-transparent hover:border-red-400 hover:shadow-[0_0_15px_rgba(239,68,68,0.4)] group"
+              title="Disconnect Wallet"
             >
-              Disconnect
+              <svg className="w-4 h-4 text-red-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+              <span className="hidden xl:inline">Disconnect</span>
             </button>
-          </div>
 
-          <div className="transform scale-90 sm:scale-100 origin-right">
-            <WalletConnect />
+            <div className="transform scale-90 sm:scale-100 origin-right transition-transform hover:scale-[1.03]">
+              <WalletConnect />
+            </div>
           </div>
 
           {/* Hamburger Menu Toggle */}
@@ -97,20 +111,32 @@ const Navbar = () => {
               </button>
             </div>
 
-            <div className="flex flex-col gap-6 text-lg font-medium text-zinc-400">
-              {navLinks.map((link) => (
-                <span
-                  key={link.name}
-                  onClick={() => {
-                    navigate(link.path);
-                    setIsMenuOpen(false);
-                  }}
-                  className={`hover:text-white transition-colors cursor-pointer ${location.pathname === link.path ? "text-purple-400 font-bold" : ""
+            <div className="flex flex-col gap-3 mt-4 text-base font-bold text-zinc-400">
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <span
+                    key={link.name}
+                    onClick={() => {
+                      navigate(link.path);
+                      setIsMenuOpen(false);
+                    }}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer overflow-hidden relative group ${
+                      isActive 
+                        ? "text-white bg-white/5 border border-white/10" 
+                        : "hover:text-white hover:bg-white/5"
                     }`}
-                >
-                  {link.name}
-                </span>
-              ))}
+                  >
+                    {isActive && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 opacity-80"></div>
+                    )}
+                    <span className="relative z-10 flex items-center gap-3">
+                      {isActive && <div className="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_8px_rgba(192,132,252,0.8)]"></div>}
+                      <span className={isActive ? "" : "ml-4.5"}>{link.name}</span>
+                    </span>
+                  </span>
+                );
+              })}
             </div>
 
             <div className="mt-auto pt-6 border-t border-white/10">

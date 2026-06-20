@@ -143,9 +143,12 @@ export default function Profile() {
 
       <div className="container mx-auto px-6 lg:px-12 pt-36 pb-20 relative z-10 animate-fade-in flex justify-center">
         <div className="w-full max-w-4xl">
-          <div className="mb-10 text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-4 tracking-tight">Your Profile</h1>
-            <p className="text-zinc-400 text-lg">Manage your identity, bank details, and verification documents.</p>
+          <div className="mb-12 text-center flex flex-col items-center">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 mb-6 shadow-[0_0_30px_rgba(99,102,241,0.2)] flex items-center justify-center backdrop-blur-md">
+              <svg className="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+            </div>
+            <h1 className="text-4xl lg:text-5xl font-black mb-4 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">Your Profile</h1>
+            <p className="text-zinc-400 text-lg font-medium">Manage your identity, bank details, and verification documents.</p>
           </div>
 
           <div className="backdrop-blur-xl bg-[#0a0a14]/60 border border-white/10 rounded-[2rem] shadow-2xl relative overflow-hidden">
@@ -156,25 +159,39 @@ export default function Profile() {
             )}
 
             {/* Tabs Header */}
-            <div className="flex border-b border-white/10 overflow-x-auto no-scrollbar">
-              <button 
-                onClick={() => setActiveTab('profile')}
-                className={`flex-1 py-5 px-6 font-bold text-sm uppercase tracking-wider transition-colors ${activeTab === 'profile' ? 'text-indigo-400 border-b-2 border-indigo-500 bg-indigo-500/5' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
-              >
-                Basic Info
-              </button>
-              <button 
-                onClick={() => setActiveTab('bank')}
-                className={`flex-1 py-5 px-6 font-bold text-sm uppercase tracking-wider transition-colors ${activeTab === 'bank' ? 'text-indigo-400 border-b-2 border-indigo-500 bg-indigo-500/5' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
-              >
-                Bank Details
-              </button>
-              <button 
-                onClick={() => setActiveTab('kyc')}
-                className={`flex-1 py-5 px-6 font-bold text-sm uppercase tracking-wider transition-colors ${activeTab === 'kyc' ? 'text-indigo-400 border-b-2 border-indigo-500 bg-indigo-500/5' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
-              >
-                KYC Documents
-              </button>
+            <div className="p-4 sm:p-6 border-b border-white/5 bg-[#0a0a14]/40">
+              <div className="flex bg-[#06060c]/80 p-1.5 rounded-2xl border border-white/5 shadow-inner overflow-x-auto no-scrollbar gap-1">
+                <button 
+                  onClick={() => setActiveTab('profile')}
+                  className={`flex-1 py-3 px-6 font-bold text-sm tracking-wide rounded-xl transition-all duration-300 relative whitespace-nowrap ${activeTab === 'profile' ? 'text-white bg-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-white/10' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
+                >
+                  {activeTab === 'profile' && <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 opacity-80 rounded-xl"></div>}
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                    Basic Info
+                  </span>
+                </button>
+                <button 
+                  onClick={() => setActiveTab('bank')}
+                  className={`flex-1 py-3 px-6 font-bold text-sm tracking-wide rounded-xl transition-all duration-300 relative whitespace-nowrap ${activeTab === 'bank' ? 'text-white bg-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-white/10' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
+                >
+                  {activeTab === 'bank' && <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 opacity-80 rounded-xl"></div>}
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                    Bank Details
+                  </span>
+                </button>
+                <button 
+                  onClick={() => setActiveTab('kyc')}
+                  className={`flex-1 py-3 px-6 font-bold text-sm tracking-wide rounded-xl transition-all duration-300 relative whitespace-nowrap ${activeTab === 'kyc' ? 'text-white bg-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-white/10' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
+                >
+                  {activeTab === 'kyc' && <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 opacity-80 rounded-xl"></div>}
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    KYC Documents
+                  </span>
+                </button>
+              </div>
             </div>
 
             {/* Tabs Content */}
@@ -190,7 +207,7 @@ export default function Profile() {
                         value={profileData.username}
                         onChange={(e) => setProfileData({...profileData, username: e.target.value})}
                         placeholder="Enter username"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:bg-black/60 transition-all"
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-black/60 transition-all font-mono"
                       />
                     </div>
                     <div>
@@ -200,7 +217,7 @@ export default function Profile() {
                         value={profileData.phone}
                         onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
                         placeholder="10-digit mobile number"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:bg-black/60 transition-all"
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-black/60 transition-all font-mono"
                       />
                     </div>
                   </div>
@@ -211,7 +228,7 @@ export default function Profile() {
                       value={profileData.email}
                       onChange={(e) => setProfileData({...profileData, email: e.target.value})}
                       placeholder="Optional email address"
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:bg-black/60 transition-all"
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-black/60 transition-all font-mono"
                     />
                   </div>
                   <button 
@@ -238,7 +255,7 @@ export default function Profile() {
                           if(bankErrors.name) setBankErrors({...bankErrors, name: null});
                         }}
                         placeholder="Enter full name on bank account"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:bg-black/60 transition-all"
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-black/60 transition-all font-mono"
                       />
                       {bankErrors.name && <p className="text-red-400 text-xs mt-2 font-medium">{bankErrors.name}</p>}
                     </div>
