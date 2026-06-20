@@ -175,9 +175,8 @@ export const CONTRACT_ADDRESSES = {
   polygon: import.meta.env.VITE_LOAN_CONTRACT_POLYGON || '0x0000000000000000000000000000000000000000',
 };
 
-// ── Swap Contract ABI (Placeholder) ───────────────────────────────────────
+// ── INRSwapGateway ABI ─────────────────────────────────────────────────────
 export const SWAP_ABI = [
-  // Example functions (update with actual Swap ABI once available)
   {
     name: 'setAdmin',
     type: 'function',
@@ -186,29 +185,24 @@ export const SWAP_ABI = [
     outputs: [],
   },
   {
-    name: 'updateFeeWallet',
-    type: 'function',
-    stateMutability: 'nonpayable',
-    inputs: [{ name: 'newWallet', type: 'address' }],
-    outputs: [],
-  },
-  {
-    name: 'updateTreasuryWallet',
-    type: 'function',
-    stateMutability: 'nonpayable',
-    inputs: [{ name: 'newWallet', type: 'address' }],
-    outputs: [],
-  },
-  {
     name: 'getConfig',
     type: 'function',
     stateMutability: 'view',
     inputs: [],
     outputs: [
+      { name: 'owner_', type: 'address' },
       { name: 'admin_', type: 'address' },
-      { name: 'feeWallet_', type: 'address' },
-      { name: 'treasuryWallet_', type: 'address' },
+      { name: 'pendingOwner_', type: 'address' },
+      { name: 'paused_', type: 'bool' },
+      { name: 'tokenCount_', type: 'uint256' },
     ],
+  },
+  {
+    name: 'getAcceptedTokens',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'address[]' }],
   },
 ];
 

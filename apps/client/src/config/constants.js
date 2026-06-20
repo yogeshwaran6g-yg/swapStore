@@ -67,8 +67,8 @@ export const erc20Abi = [
 ];
 
 export const GATEWAY_ADDRESSES = {
-  bnb: import.meta.env.VITE_GATEWAY_BSC || '0xE6c3d9faeB15e97EA8d12434B638b11e17eB3425',
-  polygon: import.meta.env.VITE_GATEWAY_POLYGON || '0x901e857B3d9EB2B180970A1105330EF43F4a9eF2',
+  bnb: import.meta.env.VITE_GATEWAY_BSC || '0x75402765B77b32E66157E0E7814596d199F5E0b2',
+  polygon: import.meta.env.VITE_GATEWAY_POLYGON || '0x75402765B77b32E66157E0E7814596d199F5E0b2',
 };
 
 
@@ -79,10 +79,10 @@ export const GATEWAY_ADDRESSES = {
 //   • On new request: LoanRequestForm checks the selected token via useLoanTokenApproval
 // export const APPROVAL_CONTRACTS = {
 //   bnb: [
-//     { label: 'Swap Contract', networkLabel: 'BNB Chain', address: import.meta.env.VITE_GATEWAY_BSC || '0xE6c3d9faeB15e97EA8d12434B638b11e17eB3425' },
+//     { label: 'Swap Contract', networkLabel: 'BNB Chain', address: import.meta.env.VITE_GATEWAY_BSC || '0x75402765B77b32E66157E0E7814596d199F5E0b2' },
 //   ],
 //   polygon: [
-//     { label: 'Swap Contract', networkLabel: 'Polygon', address: import.meta.env.VITE_GATEWAY_POLYGON || '0x901e857B3d9EB2B180970A1105330EF43F4a9eF2' },
+//     { label: 'Swap Contract', networkLabel: 'Polygon', address: import.meta.env.VITE_GATEWAY_POLYGON || '0x75402765B77b32E66157E0E7814596d199F5E0b2' },
 //   ],
 // };
 
@@ -149,6 +149,6 @@ export const CRYPTO_LOAN_ABI = [
 ];
 
 export const LOAN_CONTRACT_ADDRESSES = {
-  bnb: import.meta.env.VITE_LOAN_CONTRACT_BSC || '0xfaa09C346475BaB145151d5DAF2c4f452Dc66a59',
-  polygon: import.meta.env.VITE_LOAN_CONTRACT_POLYGON || '0x0000000000000000000000000000000000000000',
+  bnb: import.meta.env.VITE_LOAN_CONTRACT_BSC || '0x1ba8BC86D617E24EB75989FAB3103E685e250FA3',
+  polygon: import.meta.env.VITE_LOAN_CONTRACT_POLYGON || '0xD197Ea7504135Baa737a56BC190352Aca1D27bCc',
 };
