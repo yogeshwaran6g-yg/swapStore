@@ -9,6 +9,7 @@ import { useAccount, useSwitchChain } from 'wagmi';
 import { USDT_ADDRESSES, USDC_ADDRESSES, DAI_ADDRESSES } from '@/config/constants';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useUserSwaps } from '@/hooks/useUserSwaps';
+import { CustomSelect } from '@/components/ui/CustomSelect';
 
 function SwapForm() {
   const { isAuthenticated, address } = useAuth();
@@ -240,21 +241,16 @@ function SwapForm() {
                     <div>
                       <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Network</label>
                       <div className="relative">
-                        <select
+                        <CustomSelect
+                          name="network"
                           value={chain?.id || ''}
                           onChange={(e) => switchChain({ chainId: Number(e.target.value) })}
                           disabled={isSwitching}
-                          className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:bg-black/60 transition-all appearance-none"
-                        >
-                          {chains.map((c) => (
-                            <option key={c.id} value={c.id}>{c.name}</option>
-                          ))}
-                        </select>
-                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
-                          {isSwitching ? (
-                            <div className="w-4 h-4 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin"></div>
-                          ) : (
-                            <svg className="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                          options={chains.map(c => ({ label: c.name, value: c.id }))}
+                        />
+                        <div className="absolute right-12 top-1/2 -translate-y-1/2 pointer-events-none">
+                          {isSwitching && (
+                            <div className="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
                           )}
                         </div>
                       </div>
@@ -263,19 +259,12 @@ function SwapForm() {
                     <div>
                       <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Select Asset</label>
                       <div className="relative">
-                        <select
+                        <CustomSelect
                           name="token"
                           value={formData.token}
                           onChange={handleChange}
-                          className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:bg-black/60 transition-all appearance-none"
-                        >
-                          {availableTokens.map(token => (
-                            <option key={token} value={token}>{token}</option>
-                          ))}
-                        </select>
-                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
-                          <svg className="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                        </div>
+                          options={availableTokens.map(token => ({ label: token, value: token }))}
+                        />
                       </div>
                     </div>
 

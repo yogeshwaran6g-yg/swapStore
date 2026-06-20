@@ -5,6 +5,7 @@ import { useRequestLoan, useLoanEligibility } from '../../hooks/useLoanQueries';
 import { useLoanTokenApproval } from '../../hooks/useLoanTokenApproval';
 import { erc20Abi, USDT_ADDRESSES, USDC_ADDRESSES, DAI_ADDRESSES } from '../../config/constants';
 import { ConfirmModal } from '../ui/ConfirmModal';
+import { CustomSelect } from '../ui/CustomSelect';
 
 export const LoanRequestForm = () => {
   const { address } = useAccount();
@@ -289,45 +290,47 @@ export const LoanRequestForm = () => {
 
   // ── Render ─────────────────────────────────────────────────────────────
   return (
-    <div className="bg-[#13131f] rounded-2xl border border-gray-800 overflow-hidden">
-      <div className="p-8">
-        <div className="flex items-center mb-6">
-          <div className="bg-blue-500/10 p-3 rounded-lg text-blue-400 mr-4">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div className="backdrop-blur-xl bg-[#0a0a14]/60 border border-white/10 rounded-[2rem] shadow-2xl relative overflow-hidden">
+      <div className="p-8 md:p-10">
+        <div className="flex items-center mb-8">
+          <div className="w-14 h-14 bg-gradient-to-tr from-blue-500/20 to-indigo-500/20 border border-blue-500/20 rounded-2xl text-blue-400 flex items-center justify-center mr-5 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
+            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-white">Request Loan</h2>
+          <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Request Loan</h2>
         </div>
 
         <form onSubmit={handleLoanSubmit} className="space-y-6">
           <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-300">Network</label>
-            <select
+            <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Network</label>
+            <CustomSelect
+              name="network"
               value={network}
               onChange={(e) => setNetwork(e.target.value)}
-              className="block w-full px-4 py-3 border border-gray-700 bg-[#0a0a0f] text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="bsc">Binance Smart Chain (BSC)</option>
-              <option value="polygon">Polygon</option>
-            </select>
+              options={[
+                { label: 'Binance Smart Chain (BSC)', value: 'bsc' },
+                { label: 'Polygon', value: 'polygon' }
+              ]}
+            />
           </div>
 
           <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-300">Token</label>
-            <select
+            <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Token</label>
+            <CustomSelect
+              name="token"
               value={tokenSymbol}
               onChange={(e) => setTokenSymbol(e.target.value)}
-              className="block w-full px-4 py-3 border border-gray-700 bg-[#0a0a0f] text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="USDT">USDT</option>
-              <option value="USDC">USDC</option>
-              <option value="DAI">DAI</option>
-            </select>
+              options={[
+                { label: 'USDT', value: 'USDT' },
+                { label: 'USDC', value: 'USDC' },
+                { label: 'DAI', value: 'DAI' }
+              ]}
+            />
           </div>
 
           <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-300">
+            <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">
               Principal Amount ({tokenSymbol})
             </label>
             <div className="relative rounded-md shadow-sm">
@@ -335,7 +338,7 @@ export const LoanRequestForm = () => {
                 type="number"
                 value={principal}
                 onChange={(e) => setPrincipal(e.target.value)}
-                className="block w-full px-4 py-3 border border-gray-700 bg-[#0a0a0f] text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-black/60 transition-all font-mono appearance-none"
                 placeholder="0.00"
                 required
               />
