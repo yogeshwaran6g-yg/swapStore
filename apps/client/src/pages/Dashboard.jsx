@@ -21,6 +21,36 @@ const Dashboard = () => {
     ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
     : 'Not Connected';
 
+  // ── Reusable Quick Actions Card for Responsive Layout ──
+  const quickActionsCard = (
+    <div className="backdrop-blur-xl bg-[#0a0a14]/60 border border-white/10 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden group h-full">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all group-hover:bg-blue-500/20"></div>
+      
+      <h3 className="text-xl font-bold tracking-tight mb-6">Quick Actions</h3>
+      <div className="grid grid-cols-2 gap-4">
+        <button 
+          onClick={() => window.location.href='/swap'}
+          className="flex flex-col items-center justify-center p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-blue-500/30 transition-all group/btn"
+        >
+          <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-3 group-hover/btn:scale-110 transition-transform">
+            <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+          </div>
+          <span className="text-sm font-bold text-zinc-300">Swap</span>
+        </button>
+
+        <button 
+          onClick={() => window.location.href='/loan'}
+          className="flex flex-col items-center justify-center p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-purple-500/30 transition-all group/btn"
+        >
+          <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center mb-3 group-hover/btn:scale-110 transition-transform">
+            <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          </div>
+          <span className="text-sm font-bold text-zinc-300">Loan</span>
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-[#06060c] text-white relative overflow-hidden">
       
@@ -31,13 +61,13 @@ const Dashboard = () => {
       
       
       {/* Main Content Area */}
-      <div className="container mx-auto px-6 lg:px-12 pt-36 pb-20 relative z-10 animate-fade-in">
+      <div className="container mx-auto px-4 lg:px-12 pt-28 lg:pt-36 pb-48 lg:pb-24 relative z-10 animate-fade-in">
         
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-center mb-12 border-b border-white/5 pb-8">
-          <div className="w-full md:w-auto flex flex-col items-start">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-3 tracking-tight">Dashboard</h1>
-            <div className="flex items-center gap-3 mt-2">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8 lg:mb-12 border-b border-white/5 pb-6 lg:pb-8">
+          <div className="w-full md:w-auto flex flex-col items-center md:items-start text-center md:text-left">
+            <h1 className="text-3xl lg:text-5xl font-bold mb-3 tracking-tight">Dashboard</h1>
+            <div className="flex items-center justify-center md:justify-start gap-3 mt-2">
               <button 
                 onClick={handleCopy}
                 className="flex items-center gap-3 bg-[#0a0a14]/80 backdrop-blur-md hover:bg-white/5 transition-all pl-2 pr-4 py-2 rounded-[1.25rem] border border-white/10 hover:border-indigo-500/50 cursor-pointer group relative shadow-lg"
@@ -77,12 +107,17 @@ const Dashboard = () => {
               </button>
             </div>
           </div>
-          <div className="w-full md:w-auto mt-8 md:mt-0 flex flex-col md:items-end">
-            <p className="text-zinc-500 text-xs font-bold uppercase tracking-[0.2em] mb-2">Total Net Worth</p>
-            <h2 className="text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+          <div className="w-full md:w-auto mt-6 md:mt-0 flex flex-col items-center md:items-end text-center md:text-right">
+            <p className="text-zinc-500 text-xs font-bold uppercase tracking-[0.2em] mb-1 md:mb-2">Total Net Worth</p>
+            <h2 className="text-4xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
               0.00
             </h2>
           </div>
+        </div>
+
+        {/* Mobile Quick Actions (Visible only on mobile, before the grid) */}
+        <div className="block lg:hidden mb-8">
+          {quickActionsCard}
         </div>
 
         {/* Dashboard Grid */}
@@ -112,32 +147,9 @@ const Dashboard = () => {
           {/* Right Column: Quick Actions & Stats */}
           <div className="space-y-8">
             
-            {/* Quick Actions Card */}
-            <div className="backdrop-blur-xl bg-[#0a0a14]/60 border border-white/10 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all group-hover:bg-blue-500/20"></div>
-              
-              <h3 className="text-xl font-bold tracking-tight mb-6">Quick Actions</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <button 
-                  onClick={() => window.location.href='/swap'}
-                  className="flex flex-col items-center justify-center p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-blue-500/30 transition-all group/btn"
-                >
-                  <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-3 group-hover/btn:scale-110 transition-transform">
-                    <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
-                  </div>
-                  <span className="text-sm font-bold text-zinc-300">Swap</span>
-                </button>
-
-                <button 
-                  onClick={() => window.location.href='/loan'}
-                  className="flex flex-col items-center justify-center p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-purple-500/30 transition-all group/btn"
-                >
-                  <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center mb-3 group-hover/btn:scale-110 transition-transform">
-                    <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  </div>
-                  <span className="text-sm font-bold text-zinc-300">Loan</span>
-                </button>
-              </div>
+            {/* Desktop Quick Actions (Visible only on desktop) */}
+            <div className="hidden lg:block">
+              {quickActionsCard}
             </div>
 
             {/* Account Health Card */}

@@ -36,7 +36,7 @@ export const submitSwapForm = async (req, res) => {
     if (swapResult.success) {
       return rtnRes(res, 200, 'Order created successfully', { orderId: swapResult.orderId });
     } else {
-      return rtnRes(res, 500, 'Failed to create swap order', { error: swapResult.error });
+      return rtnRes(res, 400, swapResult.error || 'Failed to create swap order', { error: swapResult.error });
     }
   } catch (error) {
     console.error('Error in submitSwapForm:', error);
@@ -64,6 +64,31 @@ export const getUserSwaps = async (req, res) => {
   } catch (error) {
     console.error('Error fetching user swaps:', error);
     return rtnRes(res, 500, 'Internal Server Error', { error: error.message });
+  }
+};
+
+export const confirmSwap = async (req, res) => {
+  try {
+    const { orderId, txHash } = req.body;
+    if (!orderId || !txHash) return rtnRes(res, 400, 'Missing orderId or txHash');
+
+    const hexId = orderId.startsWith('0x') ? orderId.substring(2) : orderId;
+
+    const { queryRunner } = await import('../config/db.js');
+    const result = await queryRunner(
+      `UPDATE swap_orders 
+       SET user_crypto_payment_status = 'completed', tx_hash = ?, updated_at = CURRENT_TIMESTAMP
+       WHERE order_id = UNHEX(?) AND user_crypto_payment_status = 'initiated'`,
+      [txHash, hexId]
+    );
+
+    if (result?.affectedRows > 0) {
+      return rtnRes(res, 200, 'Swap confirmed successfully');
+    }
+    return rtnRes(res, 400, 'Swap order not found or already completed');
+  } catch (error) {
+    console.error('Error confirming swap:', error);
+    return rtnRes(res, 500, 'Failed to confirm swap');
   }
 };
 

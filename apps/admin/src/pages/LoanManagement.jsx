@@ -129,7 +129,7 @@ const loanColumns = [
 ];
 
 const LoanManagement = () => {
-  const { loans, pagination, loading, fetchLoans, rejectLoan, page, setPage } = useLoans();
+  const { loans, pagination, loading, fetchLoans, rejectLoan, updateLoanDetails, page, setPage } = useLoans();
   const { writeContractAsync, isPending: isConfirming } = useWriteContract();
   const { isConnected } = useAppKitAccount();
 
@@ -138,8 +138,24 @@ const LoanManagement = () => {
   const [filterStatus, setFilterStatus] = useState('all');
 
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, loan: null, type: null });
+  const [approvalSettings, setApprovalSettings] = useState({ interestRate: 5, loanTermValue: 30, loanTermUnit: 'days', feeAmount: 0 });
+
+  // Convert duration value + unit → days for API
+  const computeTermDays = (value, unit) => {
+    const v = Number(value) || 1;
+    if (unit === 'months') return Math.round(v * 30);
+    if (unit === 'years')  return Math.round(v * 365);
+    return v; // days
+  };
 
   const handlePreApprove = (loan) => {
+    const existingDays = loan.loan_term_days || 30;
+    setApprovalSettings({
+      interestRate: loan.interest_rate || 5,
+      loanTermValue: existingDays,
+      loanTermUnit: 'days',
+      feeAmount: 0
+    });
     setConfirmModal({ isOpen: true, loan, type: 'approve' });
   };
 
@@ -158,17 +174,21 @@ const LoanManagement = () => {
       return;
     }
 
-    // Automatically setting fee to 0 to disburse the full requested amount
-    const feeStr = "0";
-    const feeValue = 0;
-
     try {
+      toast.loading("Updating loan details...", { id: 'tx' });
+      const finalTermDays = computeTermDays(approvalSettings.loanTermValue, approvalSettings.loanTermUnit);
+      await updateLoanDetails({
+        uid: loan.uid,
+        interestRate: approvalSettings.interestRate,
+        loanTermDays: finalTermDays
+      });
+
       toast.loading("Sending transaction...", { id: 'tx' });
       const loanIdBytes32 = loan.loan_id.startsWith('0x') ? loan.loan_id : `0x${loan.loan_id}`;
       const walletAddr = loan.wallet_address.startsWith('0x') ? loan.wallet_address : `0x${loan.wallet_address}`;
 
       const principalWei = parseUnits(loan.principal_amount.toString(), 18);
-      const feeWei = parseUnits(feeStr, 18);
+      const feeWei = parseUnits(approvalSettings.feeAmount.toString(), 18);
       const contractAddress = CONTRACT_ADDRESSES[loan.network?.toLowerCase()] || CONTRACT_ADDRESSES.bsc;
       console.log(loanIdBytes32,
         walletAddr,
@@ -364,12 +384,66 @@ const LoanManagement = () => {
         onConfirm={confirmModal.type === 'approve' ? handleApprove : handleReject}
         title={confirmModal.type === 'approve' ? "Confirm Loan Approval" : "Confirm Loan Rejection"}
         message={confirmModal.type === 'approve' 
-          ? `Are you sure you want to approve this loan and disburse ${confirmModal.loan?.principal_amount} to ${confirmModal.loan?.wallet_address}?`
+          ? `You are about to approve this loan for ${confirmModal.loan?.principal_amount} ${confirmModal.loan?.token_symbol}. Please confirm the final settings below:`
           : `Are you sure you want to reject this loan request for ${confirmModal.loan?.principal_amount}?`
         }
         confirmText={confirmModal.type === 'approve' ? "Approve & Disburse" : "Reject Loan"}
         isDestructive={confirmModal.type === 'reject'}
-      />
+      >
+        {confirmModal.type === 'approve' && (
+          <div className="mt-4 space-y-4">
+            <div>
+              <label className="block text-xs font-medium text-zinc-400 mb-1">Interest Rate (%)</label>
+              <input 
+                type="number" 
+                step="0.1"
+                min="0"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-amber-500 transition-colors"
+                value={approvalSettings.interestRate}
+                onChange={(e) => setApprovalSettings(prev => ({ ...prev, interestRate: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-zinc-400 mb-1">Loan Duration</label>
+              <div className="flex gap-2">
+                <input 
+                  type="number" 
+                  min="1"
+                  className="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-amber-500 transition-colors"
+                  value={approvalSettings.loanTermValue}
+                  onChange={(e) => setApprovalSettings(prev => ({ ...prev, loanTermValue: e.target.value }))}
+                />
+                <select
+                  className="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-300 focus:outline-none focus:border-amber-500 transition-colors"
+                  value={approvalSettings.loanTermUnit}
+                  onChange={(e) => setApprovalSettings(prev => ({ ...prev, loanTermUnit: e.target.value }))}
+                >
+                  <option value="days">Days</option>
+                  <option value="months">Months</option>
+                  <option value="years">Years</option>
+                </select>
+              </div>
+              <p className="text-[10px] text-zinc-500 mt-1">
+                = {computeTermDays(approvalSettings.loanTermValue, approvalSettings.loanTermUnit)} days total
+              </p>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-zinc-400 mb-1">Disbursement Fee ({confirmModal.loan?.token_symbol})</label>
+              <input 
+                type="number" 
+                step="0.01"
+                min="0"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-amber-500 transition-colors"
+                value={approvalSettings.feeAmount}
+                onChange={(e) => setApprovalSettings(prev => ({ ...prev, feeAmount: e.target.value }))}
+              />
+              <p className="text-[10px] text-zinc-500 mt-1">
+                Amount to deduct from the principal before disbursement.
+              </p>
+            </div>
+          </div>
+        )}
+      </ConfirmModal>
     </div>
   );
 };

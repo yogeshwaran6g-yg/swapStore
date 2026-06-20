@@ -146,7 +146,7 @@ export const getAllLoans = async (req, res) => {
 
     const loans = await queryRunner(
       `SELECT HEX(l.uid) as uid, HEX(l.user_uid) as user_uid, HEX(l.loan_id) as loan_id,
-              l.principal_amount, l.interest_rate, l.token_symbol, l.token_address, l.network, l.status, l.created_at,
+              l.principal_amount, l.interest_rate, l.loan_term_days, l.token_symbol, l.token_address, l.network, l.status, l.created_at,
               u.email, u.wallet_address
        FROM loans l
        JOIN users u ON l.user_uid = u.uid
@@ -176,6 +176,51 @@ export const getAllLoans = async (req, res) => {
       loans: loansWithLedger,
       pagination: { total, page, limit, totalPages: Math.ceil(total / limit) }
     });
+  } catch (err) {
+    return rtnRes(res, 500, 'Server Error', { error: err.message });
+  }
+};
+
+export const updateLoanDetails = async (req, res) => {
+  try {
+    if (req.user?.role !== 'admin') return rtnRes(res, 403, 'Forbidden: Admins only');
+    
+    const { loanUid } = req.params;
+    const { interestRate, loanTermDays } = req.body;
+    
+    if (!loanUid) return rtnRes(res, 400, 'loanUid is required');
+    
+    const updates = [];
+    const params = [];
+    
+    if (interestRate !== undefined) {
+      if (isNaN(Number(interestRate))) return rtnRes(res, 400, 'Invalid interest rate');
+      updates.push('interest_rate = ?');
+      params.push(Number(interestRate));
+    }
+    
+    if (loanTermDays !== undefined) {
+      if (isNaN(Number(loanTermDays))) return rtnRes(res, 400, 'Invalid loan term days');
+      updates.push('loan_term_days = ?');
+      params.push(Number(loanTermDays));
+    }
+    
+    if (updates.length === 0) {
+      return rtnRes(res, 400, 'No fields to update');
+    }
+    
+    params.push(loanUid);
+    
+    const result = await queryRunner(
+      `UPDATE loans SET ${updates.join(', ')} WHERE uid = UNHEX(?) AND status = 'pending'`,
+      params
+    );
+    
+    if (result.affectedRows === 0) {
+      return rtnRes(res, 404, 'Pending loan not found or no changes made');
+    }
+    
+    return rtnRes(res, 200, 'Loan details updated successfully');
   } catch (err) {
     return rtnRes(res, 500, 'Server Error', { error: err.message });
   }

@@ -11,3 +11,8 @@ export const getProfile = async () => {
 export const submitSwapForm = async (data) => {  const response = await apiClient.post(endpoints.SWAP.submit, data);
   return response;
 };
+
+export const confirmSwapForm = async (data) => {
+  const response = await apiClient.post('/api/v1/swap/confirm', data);
+  return response;
+};
