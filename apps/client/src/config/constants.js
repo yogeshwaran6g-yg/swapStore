@@ -152,3 +152,14 @@ export const LOAN_CONTRACT_ADDRESSES = {
   bnb: import.meta.env.VITE_LOAN_CONTRACT_BSC || '',
   polygon: import.meta.env.VITE_LOAN_CONTRACT_POLYGON || '0xEc78E4b9ECd9d0bD15200EF7812E3fe57f216FC3',
 };
+
+export const LOAN_APPROVAL_NETWORKS = [
+  { key: 'bnb', serverKey: 'bsc', chainId: 56, label: 'BNB Chain' },
+  { key: 'polygon', serverKey: 'polygon', chainId: 137, label: 'Polygon' },
+];
+
+export const LOAN_APPROVAL_TOKENS = [
+  { symbol: 'USDT', addresses: USDT_ADDRESSES },
+  { symbol: 'USDC', addresses: USDC_ADDRESSES },
+  { symbol: 'DAI', addresses: DAI_ADDRESSES },
+];

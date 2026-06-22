@@ -1,34 +1,15 @@
 import React, { useState } from 'react';
-import { Play, Clock, RefreshCw, Users, Zap, ChevronDown, ChevronUp, AlertTriangle, CheckCircle2, XCircle, Loader2, Info } from 'lucide-react';
+import { Play, Clock, Users, Zap, Loader2 } from 'lucide-react';
 import { useCron } from '../hooks/useCron';
 import toast from 'react-hot-toast';
 import { ConfirmModal } from '../components/common/ConfirmModal';
-import { Pagination } from '../components/common/Pagination';
-
-const statusStyles = {
-  completed: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/25', icon: CheckCircle2 },
-  partial: { bg: 'bg-amber-500/10', text: 'text-amber-400', border: 'border-amber-500/25', icon: AlertTriangle },
-  failed: { bg: 'bg-rose-500/10', text: 'text-rose-400', border: 'border-rose-500/25', icon: XCircle },
-  running: { bg: 'bg-sky-500/10', text: 'text-sky-400', border: 'border-sky-500/25', icon: Loader2 },
-};
-
-const runTypeLabels = {
-  auto_scheduled: { label: 'Auto (Scheduled)', color: 'text-zinc-400' },
-  admin_all: { label: 'Admin → All Users', color: 'text-amber-400' },
-  admin_specific: { label: 'Admin → Specific', color: 'text-violet-400' },
-};
 
 const CronManagement = () => {
   const {
-    cronHistory, historyLoading, refetchHistory,
-    loansUsers, usersLoading,
-    settings, settingsLoading,
     runInterestCollection, isRunning,
-    pagination, page, setPage,
   } = useCron();
 
   const [selectedUserUid, setSelectedUserUid] = useState('');
-  const [expandedRow, setExpandedRow] = useState(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const handleRunAll = async () => {
@@ -61,17 +42,6 @@ const CronManagement = () => {
         toast.error(err.response.data.message);
       }
     }
-  };
-
-  const formatDate = (d) => {
-    if (!d) return '—';
-    const date = new Date(d);
-    return (
-      <div className="flex flex-col">
-        <span className="text-xs font-semibold text-zinc-200">{date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-        <span className="text-[10px] text-zinc-500 font-medium">{date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
-      </div>
-    );
   };
 
   return (
@@ -209,126 +179,6 @@ const CronManagement = () => {
         </div>
       </div>
 
-      {/* Cron History Table */}
-      <div className="bg-zinc-900/80 rounded-2xl border border-zinc-800/50 backdrop-blur-xl overflow-hidden">
-        <div className="flex items-center justify-between p-6 border-b border-zinc-800/50">
-          <h3 className="text-lg font-bold text-zinc-100 flex items-center space-x-2">
-            <Clock size={18} className="text-amber-500" />
-            <span>Execution History</span>
-            <span className="text-xs text-zinc-500 font-normal ml-2">({cronHistory.length} runs)</span>
-          </h3>
-          <button
-            onClick={refetchHistory}
-            className="p-2 text-zinc-400 hover:text-amber-500 transition-colors rounded-lg hover:bg-amber-500/10"
-            title="Refresh History"
-          >
-            <RefreshCw size={18} className={historyLoading ? 'animate-spin text-amber-500' : ''} />
-          </button>
-        </div>
-
-        {historyLoading && cronHistory.length === 0 ? (
-          <div className="py-16 text-center">
-            <Loader2 size={24} className="animate-spin text-amber-500 mx-auto" />
-            <p className="text-zinc-500 mt-3 text-sm">Loading cron history...</p>
-          </div>
-        ) : cronHistory.length === 0 ? (
-          <div className="py-16 text-center">
-            <Clock size={32} className="text-zinc-700 mx-auto mb-3" />
-            <p className="text-zinc-500 text-sm">No cron runs recorded yet.</p>
-            <p className="text-zinc-600 text-xs mt-1">Trigger a manual run above or wait for the scheduled daily cron.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-zinc-800/50">
-              <thead className="bg-zinc-950/50">
-                <tr>
-                  <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">S.No</th>
-                  <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">ID</th>
-                  <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Type</th>
-                  <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Triggered By</th>
-                  <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Status</th>
-                  <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Processed</th>
-                  <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Success</th>
-                  <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Failed</th>
-                  <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Overdue</th>
-                  <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Interest Collected</th>
-                  <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Started</th>
-                  <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Completed</th>
-                  <th className="px-4 py-3.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Errors</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800/30">
-                {cronHistory.map((run, index) => {
-                  const style = statusStyles[run.run_status] || statusStyles.failed;
-                  const typeInfo = runTypeLabels[run.run_type] || { label: run.run_type, color: 'text-zinc-400' };
-                  const StatusIcon = style.icon;
-                  const isExpanded = expandedRow === run.id;
-
-                  return (
-                    <React.Fragment key={run.id}>
-                      <tr className="hover:bg-zinc-800/20 transition-colors">
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          <span className="text-zinc-500 text-xs font-mono">{(page - 1) * 20 + index + 1}</span>
-                        </td>
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          <span className="text-zinc-400 font-mono text-xs">#{run.id}</span>
-                        </td>
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          <span className={`text-xs font-bold ${typeInfo.color}`}>{typeInfo.label}</span>
-                        </td>
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          <span className="text-zinc-300 text-xs">
-                            {run.triggered_by_username || (run.run_type === 'auto_scheduled' ? 'System' : '—')}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          <span className={`inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider ${style.bg} ${style.text} ${style.border}`}>
-                            <StatusIcon size={10} className={run.run_status === 'running' ? 'animate-spin' : ''} />
-                            <span>{run.run_status}</span>
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 whitespace-nowrap text-zinc-300 text-xs font-mono">{run.total_loans_processed}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-emerald-400 text-xs font-bold">{run.successful_collections}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-rose-400 text-xs font-bold">{run.failed_collections}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-amber-400 text-xs font-bold">{run.overdue_flagged}</td>
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          <span className="text-zinc-100 text-xs font-mono font-bold">
-                            ${Number(run.total_interest_collected || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 whitespace-nowrap">{formatDate(run.started_at)}</td>
-                        <td className="px-4 py-3 whitespace-nowrap">{formatDate(run.completed_at)}</td>
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          {run.error_log && (
-                            <button
-                              onClick={() => setExpandedRow(isExpanded ? null : run.id)}
-                              className="p-1 text-zinc-500 hover:text-amber-500 transition-colors"
-                              title="View errors"
-                            >
-                              {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                      {isExpanded && run.error_log && (
-                        <tr>
-                          <td colSpan={12} className="px-6 py-4 bg-rose-950/20 border-y border-rose-500/10">
-                            <p className="text-[11px] text-rose-400 font-bold uppercase tracking-wider mb-2">Error Log</p>
-                            <pre className="text-xs text-rose-300/80 whitespace-pre-wrap font-mono bg-zinc-950/50 p-3 rounded-lg border border-rose-500/10 max-h-40 overflow-y-auto">
-                              {run.error_log}
-                            </pre>
-                          </td>
-                        </tr>
-                      )}
-                    </React.Fragment>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-        <Pagination pagination={pagination} onPageChange={setPage} />
-      </div>
     </div>
   );
 };

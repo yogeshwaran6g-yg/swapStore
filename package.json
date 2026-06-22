@@ -9,7 +9,13 @@
     "admin": "cd apps/admin && pnpm dev",
     "seed": "cd apps/server && node src/scripts/seed.js",
     "truncate": "cd apps/server && node src/scripts/truncate.js",
-    "drop": "cd apps/server && node src/scripts/drop.js"
+    "drop": "cd apps/server && node src/scripts/drop.js",
+    "cron:loans": "cd apps/server && node test-cron-ready.js",
+    "cron:backdate": "cd apps/server && node test-cron-ready.js backdate",
+    "cron:reset": "cd apps/server && node test-cron-ready.js reset",
+    "cron:user": "cd apps/server && node test-backdate-user.js",
+    "cron:user:backdate": "cd apps/server && node test-backdate-user.js",
+    "cron:user:reset": "cd apps/server && node test-backdate-user.js"
   },
   "keywords": [],
   "author": "",

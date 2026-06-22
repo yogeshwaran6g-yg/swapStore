@@ -20,9 +20,6 @@ const swapRequestedEvent = parseAbiItem(
 );
 
 // ── Loan Events ─────────────────────────────────────────────────────────────
-const loanIssuedEvent = parseAbiItem(
-  'event LoanIssued(bytes32 indexed loanId, address indexed user, address indexed token, uint256 principal, uint256 fee, uint256 netAmount, uint256 timestamp)'
-);
 
 const paymentCollectedEvent = parseAbiItem(
   'event PaymentCollected(bytes32 indexed loanId, address indexed user, address indexed token, uint256 amount, uint256 timestamp)'
@@ -173,45 +170,7 @@ const startLoanListeners = (networks) => {
       const publicClient = buildClient(chain, rpcUrl);
 
       startManualPolling(publicClient, address, [
-        {
-          event: loanIssuedEvent,
-          onLogs: async (logs) => {
-            for (const log of logs) {
-              const { loanId, user, fee, netAmount } = log.args;
-              const txHash = log.transactionHash;
-              const hexLoanId = loanId.substring(2);
-              console.log(`💰 [Loan/${name}] LoanIssued | loanId=${hexLoanId} user=${user}`);
 
-              try {
-                const loanQuery = await queryRunner(`SELECT loan_term_days FROM loans WHERE loan_id = UNHEX(?) LIMIT 1`, [hexLoanId]);
-                const specificTermDays = loanQuery && loanQuery.length > 0 ? Number(loanQuery[0].loan_term_days) : null;
-
-                const frequencyDays = Number(await getSystemSettings('loan_interest_frequency_days')) || 30;
-                const termDays = specificTermDays || Number(await getSystemSettings('loan_default_term_days')) || 30;
-                const nextDebit = new Date(Date.now() + frequencyDays * 24 * 60 * 60 * 1000);
-                const maturity = new Date(Date.now() + termDays * 24 * 60 * 60 * 1000);
-
-                const humanNetAmount = Number(netAmount) / 1e18;
-                const humanFee = Number(fee) / 1e18;
-
-                const result = await queryRunner(
-                  `UPDATE loans 
-                   SET status = 'approved', disbursement_tx_hash = ?, disbursed_at = NOW(),
-                       disbursed_amount = ?, disbursement_fee = ?, next_debit_date = ?, maturity_date = ?, updated_at = NOW()
-                   WHERE loan_id = UNHEX(?) AND status = 'pending'`,
-                  [txHash, String(humanNetAmount), String(humanFee), nextDebit, maturity, hexLoanId]
-                );
-                if (result?.affectedRows > 0) {
-                  console.log(`🎉 [Loan/${name}] Loan ${hexLoanId} approved in DB.`);
-                } else {
-                  console.log(`⚠️  [Loan/${name}] Loan ${hexLoanId} not updated (not found or status mismatch).`);
-                }
-              } catch (err) {
-                console.error(`❌ [Loan/${name}] DB error for LoanIssued ${loanId}:`, err.message);
-              }
-            }
-          }
-        },
         {
           event: paymentCollectedEvent,
           onLogs: async (logs) => {
