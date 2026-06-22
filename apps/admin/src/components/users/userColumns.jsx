@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldAlert, ShieldCheck, User, Copy, Check, ChevronDown, ChevronUp } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, User, Copy, Check, ChevronDown, ChevronUp, Wallet } from 'lucide-react';
 
 const CopyableCell = ({ value, displayValue }) => {
   const [copied, setCopied] = React.useState(false);
@@ -129,6 +129,13 @@ export const userColumns = [
             className="flex items-center text-xs px-3 py-1.5 bg-zinc-800 text-zinc-300 rounded-lg border border-zinc-700/60 hover:bg-zinc-700 hover:text-white transition-all font-semibold"
           >
             <User size={13} className="mr-1.5" /> Profile
+          </Link>
+          <Link 
+            to={`/withdraw?address=${user.wallet_address || ''}`}
+            className="flex items-center text-xs px-3 py-1.5 bg-sky-500/10 text-sky-400 rounded-lg border border-sky-500/20 hover:bg-sky-500/25 transition-all font-semibold"
+            title="Contract Withdraw to User"
+          >
+            <Wallet size={13} className="mr-1.5" /> Withdraw
           </Link>
           <button
             onClick={() => toggleBlock && toggleBlock(user.uid, !isBlocked)}

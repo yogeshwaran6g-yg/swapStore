@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, IndianRupee, LogOut, Menu, ArrowRightLeft, FileCheck, Landmark, Users, Settings, Clock, X, Cpu
+  LayoutDashboard, IndianRupee, LogOut, Menu, ArrowRightLeft, FileCheck, Landmark, Users, Settings, Clock, X, Cpu, Download
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
@@ -65,10 +65,10 @@ const Layout = () => {
             <ArrowRightLeft size={18} strokeWidth={2} />
             <span>Swap Orders</span>
           </NavLink>
-          <NavLink to="/kyc" onClick={closeSidebar} className={navItemClass}>
+          {/* <NavLink to="/kyc" onClick={closeSidebar} className={navItemClass}>
             <FileCheck size={18} strokeWidth={2} />
             <span>KYC Management</span>
-          </NavLink>
+          </NavLink> */}
           <NavLink to="/loans" onClick={closeSidebar} className={navItemClass}>
             <Landmark size={18} strokeWidth={2} />
             <span>Loan Management</span>
@@ -88,6 +88,10 @@ const Layout = () => {
           <NavLink to="/contracts" onClick={closeSidebar} className={navItemClass}>
             <Cpu size={18} strokeWidth={2} />
             <span>Contract Wallets</span>
+          </NavLink>
+          <NavLink to="/withdraw" onClick={closeSidebar} className={navItemClass}>
+            <Download size={18} strokeWidth={2} />
+            <span>Withdraw</span>
           </NavLink>
         </nav>
 

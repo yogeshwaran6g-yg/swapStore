@@ -12,11 +12,10 @@ export const loanService = {
     }
   },
 
-  approveLoan: async ({ uid, txHash, fee }) => {
+  approveLoan: async ({ uid, txHash }) => {
     try {
       const response = await apiClient.post(`${endpoints.LOANS.ADMIN}/${uid}/approve`, {
-        disbursementTxHash: txHash,
-        disbursementFee: fee
+        disbursementTxHash: txHash
       });
       return response;
     } catch (err) {

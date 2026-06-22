@@ -6,7 +6,6 @@ import { ConfirmModal } from '../components/common/ConfirmModal';
 
 const SETTING_KEYS = [
   { key: 'loan_interest_rate', label: 'Interest Rate (%)', type: 'number' },
-  { key: 'loan_fees', label: 'Loan Processing Fees (%)', type: 'number' },
   { key: 'loan_eligibility_tiers', label: 'Loan Eligibility Tiers', type: 'tiers' },
 ];
 

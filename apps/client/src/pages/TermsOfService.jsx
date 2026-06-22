@@ -75,17 +75,9 @@ const TermsOfService = () => {
           </ul>
           <p className="mb-6">Users remain responsible for repayment obligations.</p>
 
-          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">7. Fees</h2>
-          <p className="mb-2">InstaaCash may charge:</p>
-          <ul className="list-disc pl-6 mb-4 space-y-1">
-            <li>Swap Fees</li>
-            <li>Loan Processing Fees</li>
-            <li>Network Fees</li>
-            <li>Service Fees</li>
-          </ul>
-          <p className="mb-6">Applicable fees will be displayed before transaction confirmation whenever possible.</p>
 
-          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">8. Prohibited Activities</h2>
+
+          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">7. Prohibited Activities</h2>
           <p className="mb-2">Users may not:</p>
           <ul className="list-disc pl-6 mb-4 space-y-1">
             <li>Engage in fraud</li>
@@ -98,7 +90,7 @@ const TermsOfService = () => {
           </ul>
           <p className="mb-6">Violations may result in account suspension or termination.</p>
 
-          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">9. Compliance Requirements</h2>
+          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">8. Compliance Requirements</h2>
           <p className="mb-2">InstaaCash reserves the right to:</p>
           <ul className="list-disc pl-6 mb-4 space-y-1">
             <li>Request additional verification</li>
@@ -108,7 +100,7 @@ const TermsOfService = () => {
           </ul>
           <p className="mb-6">When required by law or regulatory obligations.</p>
 
-          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">10. Limitation of Liability</h2>
+          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">9. Limitation of Liability</h2>
           <p className="mb-4">To the fullest extent permitted by law:</p>
           <p className="mb-2">InstaaCash shall not be liable for:</p>
           <ul className="list-disc pl-6 mb-4 space-y-1">
@@ -121,7 +113,7 @@ const TermsOfService = () => {
           </ul>
           <p className="mb-6">Users assume full responsibility for their digital asset decisions.</p>
 
-          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">11. No Financial Advice</h2>
+          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">10. No Financial Advice</h2>
           <p className="mb-4">Information provided on InstaaCash is for informational purposes only.</p>
           <p className="mb-2">Nothing on the platform constitutes:</p>
           <ul className="list-disc pl-6 mb-6 space-y-1">
@@ -132,11 +124,11 @@ const TermsOfService = () => {
           </ul>
           <p className="mb-6">Users should seek professional guidance when necessary.</p>
 
-          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">12. Intellectual Property</h2>
+          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">11. Intellectual Property</h2>
           <p className="mb-4">All content, trademarks, branding, designs, logos, and software associated with InstaaCash remain the property of InstaaCash and its licensors.</p>
           <p className="mb-6">Unauthorized use is prohibited.</p>
 
-          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">13. Suspension and Termination</h2>
+          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">12. Suspension and Termination</h2>
           <p className="mb-2">We reserve the right to:</p>
           <ul className="list-disc pl-6 mb-4 space-y-1">
             <li>Restrict access</li>
@@ -145,14 +137,14 @@ const TermsOfService = () => {
           </ul>
           <p className="mb-6">For violations of these Terms, legal requirements, or security concerns.</p>
 
-          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">14. Amendments</h2>
+          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">13. Amendments</h2>
           <p className="mb-4">InstaaCash may modify these Terms at any time.</p>
           <p className="mb-6">Continued use of the platform after updates constitutes acceptance of the revised Terms.</p>
 
-          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">15. Governing Law</h2>
+          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">14. Governing Law</h2>
           <p className="mb-6">These Terms shall be governed by applicable laws and regulations of the jurisdiction in which InstaaCash operates.</p>
 
-          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">16. Contact Information</h2>
+          <h2 className="text-2xl font-bold text-[#0E1B4D] mt-8 mb-4">15. Contact Information</h2>
           <p className="mb-4">For questions regarding these Terms:</p>
           <div className="bg-[#F1F5F9] p-5 rounded-2xl inline-block border border-gray-200 shadow-sm">
             <p className="font-bold text-[#0E1B4D] mb-1">InstaaCash Support</p>

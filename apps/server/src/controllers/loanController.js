@@ -83,56 +83,6 @@ export const handleGetMyLoans = async (req, res) => {
 
 // ── Admin Controllers ───────────────────────────────────────
 
-export const getPendingKyc = async (req, res) => {
-  try {
-    if (req.user?.role !== 'admin') return rtnRes(res, 403, 'Forbidden: Admins only');
-
-    const page = Math.max(1, parseInt(req.query.page) || 1);
-    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
-    const offset = (page - 1) * limit;
-
-    const [{ total }] = await queryRunner(
-      `SELECT COUNT(*) as total FROM user_kyc_documents`
-    );
-
-    const documents = await queryRunner(
-      `SELECT k.id, HEX(k.user_uid) as user_uid, k.document_type, k.document_url, k.status, k.uploaded_at, u.email, u.username
-       FROM user_kyc_documents k
-       JOIN users u ON k.user_uid = u.uid
-       ORDER BY k.uploaded_at DESC
-       LIMIT ? OFFSET ?`,
-      [limit, offset]
-    );
-    return rtnRes(res, 200, 'Fetched KYC documents', {
-      documents,
-      pagination: { total, page, limit, totalPages: Math.ceil(total / limit) }
-    });
-  } catch (err) {
-    return rtnRes(res, 500, 'Server Error', { error: err.message });
-  }
-};
-
-export const approveKyc = async (req, res) => {
-  try {
-    if (req.user?.role !== 'admin') return rtnRes(res, 403, 'Forbidden: Admins only');
-    const { id } = req.params;
-    const { status } = req.body;
-    if (!['approved', 'rejected'].includes(status)) {
-      return rtnRes(res, 400, 'Invalid status');
-    }
-
-    const docResult = await queryRunner(`SELECT HEX(user_uid) as user_uid FROM user_kyc_documents WHERE id = ?`, [id]);
-    if (!docResult || docResult.length === 0) return rtnRes(res, 404, 'KYC Document not found');
-    const userUid = docResult[0].user_uid;
-
-    await queryRunner(`UPDATE user_kyc_documents SET status = ? WHERE id = ?`, [status, id]);
-    await queryRunner(`UPDATE users SET kyc_status = ? WHERE uid = UNHEX(?)`, [status, userUid]);
-
-    return rtnRes(res, 200, `KYC ${status} successfully`);
-  } catch (err) {
-    return rtnRes(res, 500, 'Server Error', { error: err.message });
-  }
-};
 
 export const getAllLoans = async (req, res) => {
   try {
@@ -146,7 +96,9 @@ export const getAllLoans = async (req, res) => {
 
     const loans = await queryRunner(
       `SELECT HEX(l.uid) as uid, HEX(l.user_uid) as user_uid, HEX(l.loan_id) as loan_id,
-              l.principal_amount, l.interest_rate, l.loan_term_days, l.token_symbol, l.token_address, l.network, l.status, l.created_at,
+              l.principal_amount, l.outstanding_principal, l.pending_interest_due, 
+              l.total_interest_paid, l.total_principal_paid, l.is_overdue,
+              l.interest_rate, l.loan_term_days, l.token_symbol, l.token_address, l.network, l.status, l.created_at,
               u.email, u.wallet_address
        FROM loans l
        JOIN users u ON l.user_uid = u.uid
@@ -166,9 +118,18 @@ export const getAllLoans = async (req, res) => {
          FROM loan_interest_ledger WHERE loan_uid IN (${placeholders}) ORDER BY created_at DESC`,
         loansUids
       );
+      
+      const userUids = [...new Set(loans.map(l => l.user_uid))];
+      const userPlaceholdersStr = userUids.map(() => 'UNHEX(?)').join(',');
+      const kycs = await queryRunner(
+        `SELECT HEX(user_uid) as user_uid, document_type, document_url, status FROM user_kyc_documents WHERE user_uid IN (${userPlaceholdersStr}) ORDER BY uploaded_at DESC`,
+        userUids
+      );
+
       loansWithLedger = loans.map(loan => ({
         ...loan,
-        ledger: ledgers.filter(l => l.loan_uid === loan.uid)
+        ledger: ledgers.filter(l => l.loan_uid === loan.uid),
+        kyc_document: kycs.find(k => k.user_uid === loan.user_uid) || null
       }));
     }
 
@@ -231,10 +192,10 @@ export const adminApproveLoan = async (req, res) => {
     if (req.user?.role !== 'admin') return rtnRes(res, 403, 'Forbidden: Admins only');
     
     const { loanUid } = req.params;
-    const { disbursementTxHash, disbursementFee } = req.body;
+    const { disbursementTxHash } = req.body;
     
-    if (!loanUid || !disbursementTxHash) {
-      return rtnRes(res, 400, 'loanUid and disbursementTxHash are required');
+    if (!loanUid) {
+      return rtnRes(res, 400, 'loanUid is required');
     }
 
     const { getSystemSettings } = await import('../services/loanService.js');
@@ -255,8 +216,7 @@ export const adminApproveLoan = async (req, res) => {
     }
 
     const principal = Number(loan.principal_amount);
-    const fee = Number(disbursementFee || 0);
-    const disbursedAmount = Math.max(0, principal - fee);
+    const disbursedAmount = principal;
 
     const specificTermDays = Number(loan.loan_term_days);
     const frequencyDays = Number(await getSystemSettings('loan_interest_frequency_days')) || 30;
@@ -267,10 +227,10 @@ export const adminApproveLoan = async (req, res) => {
 
     const result = await queryRunner(
       `UPDATE loans 
-       SET status = 'approved', disbursement_tx_hash = ?, disbursed_at = NOW(),
-           disbursed_amount = ?, disbursement_fee = ?, next_debit_date = ?, maturity_date = ?, updated_at = NOW()
+       SET status = 'active', disbursement_tx_hash = 'MANUAL_DISBURSEMENT', disbursed_at = NOW(),
+           disbursed_amount = ?, next_debit_date = ?, maturity_date = ?, updated_at = NOW()
        WHERE uid = UNHEX(?) AND status = 'pending'`,
-      [disbursementTxHash, String(disbursedAmount), String(fee), nextDebit, maturity, loanUid]
+      [String(disbursedAmount), nextDebit, maturity, loanUid]
     );
 
     if (result?.affectedRows > 0) {
