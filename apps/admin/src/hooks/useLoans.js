@@ -43,6 +43,13 @@ export const useLoans = () => {
     }
   });
 
+  const manualCollectMutation = useMutation({
+    mutationFn: loanService.manualCollect,
+    onError: (error) => {
+      toast.error(error?.response?.data?.error || error?.message || 'Manual collection failed');
+    }
+  });
+
   return {
     loans: data?.loans || [],
     pagination: data?.pagination || null,
@@ -58,5 +65,6 @@ export const useLoans = () => {
     approveLoan: (payload) => approveLoanMutation.mutateAsync(payload),
     rejectLoan: (uid) => rejectLoanMutation.mutateAsync(uid),
     updateLoanDetails: (payload) => updateLoanDetailsMutation.mutateAsync(payload),
+    manualCollect: (payload) => manualCollectMutation.mutateAsync(payload),
   };
 };

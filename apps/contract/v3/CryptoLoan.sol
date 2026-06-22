@@ -2,15 +2,15 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title CryptoLoanSettlement v2
+ * @title CryptoLoanSettlement v3
  *
- * Wallet roles:
- *  - loanWallet     : holds funds for disbursement; also receives principal repayments
+ * Simplified wallet roles:
+ *  - admin          : disburses loans, receives origination fees (implicitly) and principal repayments
  *  - interestWallet : receives periodic interest / EMI collection payments
- *  - feeWallet      : receives the one-time disbursement fee when a loan is issued
  *
  * Multi-token: every call accepts a token address, no single immutable token.
- * The admin whitelist controls which tokens are accepted.
+ * The owner whitelist controls which tokens are accepted.
+ * addToken accepts multiple token addresses in a single call.
  */
 
 interface IERC20 {
@@ -42,11 +42,9 @@ contract CryptoLoanSettlement is ReentrancyGuard {
 
     address public owner;
     address public pendingOwner;
-    address public admin;           // collector/cron EOA
+    address public admin;           // cron EOA: disburses loans, keeps fees, receives repayments
 
-    address public loanWallet;      // disburses + receives repayments
-    address public interestWallet;  // receives interest collections
-    address public feeWallet;       // receives one-time disbursement fee
+    address public interestWallet;  // receives periodic interest collections
 
     bool public paused;
 
@@ -75,6 +73,14 @@ contract CryptoLoanSettlement is ReentrancyGuard {
         uint256 timestamp
     );
 
+    // Emitted when a user's balance/allowance is 0 — no funds could be collected
+    event PaymentSkipped(
+        bytes32 indexed loanId,
+        address indexed user,
+        address indexed token,
+        uint256 timestamp
+    );
+
     event PrincipalRepaid(
         bytes32 indexed loanId,
         address indexed user,
@@ -93,15 +99,12 @@ contract CryptoLoanSettlement is ReentrancyGuard {
     event TokenAdded(address indexed token);
     event TokenRemoved(address indexed token);
     event AdminChanged(address indexed oldAdmin, address indexed newAdmin);
-    event LoanWalletUpdated(address indexed oldWallet, address indexed newWallet);
     event InterestWalletUpdated(address indexed oldWallet, address indexed newWallet);
-    event FeeWalletUpdated(address indexed oldWallet, address indexed newWallet);
     event OwnershipTransferInitiated(address indexed currentOwner, address indexed pendingOwner);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     event PauseStateChanged(bool paused);
     event EmergencyWithdraw(address indexed token, address indexed to, uint256 amount);
-    // Emitted when a user's balance/allowance is 0 — no funds could be collected
-    event PaymentSkipped(bytes32 indexed loanId, address indexed user, address indexed token, uint256 timestamp);
+    event Withdrawn(address indexed token, address indexed to, uint256 amount, address indexed caller);
 
     // =========================================================================
     // MODIFIERS
@@ -131,22 +134,33 @@ contract CryptoLoanSettlement is ReentrancyGuard {
     // CONSTRUCTOR
     // =========================================================================
 
+    /**
+     * @param _admin          Admin/cron EOA — disburses loans and receives repayments.
+     * @param _interestWallet Wallet that receives periodic interest payments.
+     * @param _tokens         Initial list of accepted ERC-20 token addresses (can be empty).
+     */
     constructor(
         address _admin,
-        address _loanWallet,
         address _interestWallet,
-        address _feeWallet
+        address[] memory _tokens
     ) {
-        require(_admin != address(0),         "Zero admin");
-        require(_loanWallet != address(0),    "Zero loan wallet");
-        require(_interestWallet != address(0),"Zero interest wallet");
-        require(_feeWallet != address(0),     "Zero fee wallet");
+        require(_admin != address(0),          "Zero admin");
+        require(_interestWallet != address(0), "Zero interest wallet");
 
         owner          = msg.sender;
         admin          = _admin;
-        loanWallet     = _loanWallet;
         interestWallet = _interestWallet;
-        feeWallet      = _feeWallet;
+
+        // Register initial accepted tokens
+        for (uint256 i = 0; i < _tokens.length; i++) {
+            address t = _tokens[i];
+            require(t != address(0), "Zero token in list");
+            if (!isAcceptedToken[t]) {
+                isAcceptedToken[t] = true;
+                tokenList.push(t);
+                emit TokenAdded(t);
+            }
+        }
     }
 
     // =========================================================================
@@ -155,15 +169,17 @@ contract CryptoLoanSettlement is ReentrancyGuard {
 
     /**
      * @notice Issue a loan to a user.
-     * @param loanId   Off-chain DB loan identifier (bytes32).
-     * @param user     Recipient wallet.
-     * @param token    ERC-20 token address (must be accepted).
+     * @param loanId    Off-chain DB loan identifier (bytes32).
+     * @param user      Recipient wallet.
+     * @param token     ERC-20 token address (must be accepted).
      * @param principal Full principal amount (before fee deduction).
-     * @param fee      One-time origination fee sent to feeWallet.
+     * @param fee       Origination fee — stays with admin (deducted from principal).
      *
      * Flow:
-     *   loanWallet → feeWallet       (fee)
-     *   loanWallet → user            (principal - fee)
+     *   admin → user   (principal - fee)
+     *   fee remains in admin wallet implicitly (no separate transfer needed)
+     *
+     * Pre-condition: admin must have approved this contract for >= (principal - fee).
      */
     function issueLoan(
         bytes32 loanId,
@@ -185,23 +201,16 @@ contract CryptoLoanSettlement is ReentrancyGuard {
         uint256 netAmount = principal - fee;
 
         require(
-            IERC20(token).allowance(loanWallet, address(this)) >= principal,
-            "Loan allowance low"
+            IERC20(token).allowance(admin, address(this)) >= netAmount,
+            "Admin allowance low"
         );
         require(
-            IERC20(token).balanceOf(loanWallet) >= principal,
-            "Loan balance low"
+            IERC20(token).balanceOf(admin) >= netAmount,
+            "Admin balance low"
         );
 
-        if (fee > 0) {
-            require(
-                IERC20(token).transferFrom(loanWallet, feeWallet, fee),
-                "Fee transfer failed"
-            );
-        }
-
         require(
-            IERC20(token).transferFrom(loanWallet, user, netAmount),
+            IERC20(token).transferFrom(admin, user, netAmount),
             "Loan transfer failed"
         );
 
@@ -247,7 +256,7 @@ contract CryptoLoanSettlement is ReentrancyGuard {
 
         // Determine the actual collectable amount (min of requested, balance, allowance)
         uint256 actualAmount = amount;
-        if (userBal < actualAmount)   { actualAmount = userBal; }
+        if (userBal   < actualAmount) { actualAmount = userBal; }
         if (userAllow < actualAmount) { actualAmount = userAllow; }
 
         if (actualAmount == 0) {
@@ -270,13 +279,13 @@ contract CryptoLoanSettlement is ReentrancyGuard {
     // =========================================================================
 
     /**
-     * @notice User repays principal (full or partial) back to loanWallet.
+     * @notice User repays principal (full or partial) back to admin wallet.
      * @param loanId  Off-chain DB loan identifier.
      * @param token   ERC-20 token address.
      * @param amount  Amount to repay.
      *
      * Flow:
-     *   user → loanWallet   (principal repayment)
+     *   user → admin   (principal repayment)
      */
     function repayPrincipal(
         bytes32 loanId,
@@ -300,7 +309,7 @@ contract CryptoLoanSettlement is ReentrancyGuard {
         );
 
         require(
-            IERC20(token).transferFrom(msg.sender, loanWallet, amount),
+            IERC20(token).transferFrom(msg.sender, admin, amount),
             "Repayment failed"
         );
 
@@ -326,12 +335,22 @@ contract CryptoLoanSettlement is ReentrancyGuard {
     // TOKEN MANAGEMENT  (owner)
     // =========================================================================
 
-    function addToken(address token) external onlyOwner {
-        require(token != address(0), "Zero token");
-        require(!isAcceptedToken[token], "Already accepted");
-        isAcceptedToken[token] = true;
-        tokenList.push(token);
-        emit TokenAdded(token);
+    /**
+     * @notice Add one or more accepted ERC-20 tokens in a single transaction.
+     * @param tokens Array of token addresses to whitelist.
+     */
+    function addTokens(address[] calldata tokens) external onlyOwner {
+        require(tokens.length > 0, "Empty token list");
+        for (uint256 i = 0; i < tokens.length; i++) {
+            address t = tokens[i];
+            require(t != address(0), "Zero token");
+            if (!isAcceptedToken[t]) {
+                isAcceptedToken[t] = true;
+                tokenList.push(t);
+                emit TokenAdded(t);
+            }
+            // silently skip duplicates instead of reverting
+        }
     }
 
     function removeToken(address token) external onlyOwner {
@@ -352,22 +371,10 @@ contract CryptoLoanSettlement is ReentrancyGuard {
     // WALLET MANAGEMENT  (owner)
     // =========================================================================
 
-    function updateLoanWallet(address newWallet) external onlyOwner {
-        require(newWallet != address(0), "Zero wallet");
-        emit LoanWalletUpdated(loanWallet, newWallet);
-        loanWallet = newWallet;
-    }
-
     function updateInterestWallet(address newWallet) external onlyOwner {
         require(newWallet != address(0), "Zero wallet");
         emit InterestWalletUpdated(interestWallet, newWallet);
         interestWallet = newWallet;
-    }
-
-    function updateFeeWallet(address newWallet) external onlyOwner {
-        require(newWallet != address(0), "Zero wallet");
-        emit FeeWalletUpdated(feeWallet, newWallet);
-        feeWallet = newWallet;
     }
 
     function setAdmin(address newAdmin) external onlyOwner {
@@ -413,16 +420,24 @@ contract CryptoLoanSettlement is ReentrancyGuard {
     }
 
     // =========================================================================
-    // ADMIN ALLOWANCE  (owner)
+    // WITHDRAWAL  (admin)
     // =========================================================================
 
     /**
-     * @notice Grants the admin wallet maximum allowance for a specific token held by this contract.
-     * @param token ERC-20 token address.
+     * @notice Allows the admin (or owner) to withdraw a specific amount of tokens from the contract at any time.
+     * @param token  ERC-20 token address to withdraw.
+     * @param amount Amount to withdraw.
+     * @param to     Destination wallet address.
      */
-    function approveAdmin(address token) external onlyOwner {
-        require(token != address(0), "Zero token");
-        IERC20(token).approve(admin, type(uint256).max);
+    function withdraw(address token, uint256 amount, address to) external onlyAdmin {
+        require(to != address(0), "Zero address");
+        require(amount > 0, "Zero amount");
+        
+        uint256 bal = IERC20(token).balanceOf(address(this));
+        require(bal >= amount, "Insufficient balance");
+        
+        require(IERC20(token).transfer(to, amount), "Transfer failed");
+        emit Withdrawn(token, to, amount, msg.sender);
     }
 
     // =========================================================================
@@ -436,11 +451,9 @@ contract CryptoLoanSettlement is ReentrancyGuard {
     function getConfig() external view returns (
         address owner_,
         address admin_,
-        address loanWallet_,
         address interestWallet_,
-        address feeWallet_,
         bool    paused_
     ) {
-        return (owner, admin, loanWallet, interestWallet, feeWallet, paused);
+        return (owner, admin, interestWallet, paused);
     }
 }

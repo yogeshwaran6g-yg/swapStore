@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { queryRunner } from '../config/db.js';
 import { returnServiceResponse } from '../utils/responseUtils.js';
-import { createPublicClient, createWalletClient, http, fallback, parseAbiItem, parseUnits, parseAbi } from 'viem';
+import { createPublicClient, createWalletClient, http, fallback, parseAbiItem, parseUnits, parseAbi, decodeEventLog } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { bsc, polygon } from 'viem/chains';
 
@@ -12,6 +12,8 @@ const ERC20_ABI = [
 
 const LOAN_ABI = parseAbi([
   'function collectPayment(bytes32 loanId, address user, address token, uint256 amount) external',
+  'event PaymentCollected(bytes32 indexed loanId, address indexed user, address indexed token, uint256 amount, uint256 timestamp)',
+  'event PaymentSkipped(bytes32 indexed loanId, address indexed user, address indexed token, uint256 timestamp)'
 ]);
 
 const LOAN_CONTRACT_ADDRESSES = {
@@ -299,16 +301,68 @@ export const collectInterestForLoan = async (loan, cronRunId = null) => {
       ],
     });
 
+    console.log(`✅ On-chain collectPayment tx submitted: ${txHash}. Waiting for receipt...`);
+
     // Advance next_debit_date immediately so the cron doesn't re-queue this loan.
-    // total_interest_paid is updated by the PaymentCollected listener once the tx confirms.
+    // total_interest_paid is updated after receipt or by the listener.
     const nextDebit = new Date(now.getTime() + frequencyDays * 24 * 60 * 60 * 1000);
     await queryRunner(
       `UPDATE loans SET next_debit_date = ?, updated_at = NOW() WHERE uid = UNHEX(?)`,
       [nextDebit, loan.uid]
     );
 
-    console.log(`✅ On-chain collectPayment tx submitted: ${txHash}`);
-    return { success: true, interestAmount, txHash, failureReason: null };
+    // Wait for the transaction receipt immediately
+    try {
+      const chainConfig = loan.network === 'bsc' ? bsc : polygon;
+      const rpcUrlStr = loan.network === 'bsc' ? process.env.BSC_RPC_URL : process.env.POLYGON_RPC_URL;
+      const rpcUrls = rpcUrlStr ? rpcUrlStr.split(',').map(u => u.trim()).filter(Boolean) : [];
+      const transport = rpcUrls.length > 0 ? fallback(rpcUrls.map(u => http(u))) : http();
+      const publicClient = createPublicClient({ chain: chainConfig, transport });
+
+      const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
+      
+      let humanAmount = 0;
+      let eventName = null;
+
+      if (receipt.status === 'success') {
+        for (const log of receipt.logs) {
+          try {
+            const decoded = decodeEventLog({
+              abi: LOAN_ABI,
+              data: log.data,
+              topics: log.topics
+            });
+            if (decoded.eventName === 'PaymentCollected' || decoded.eventName === 'PaymentSkipped') {
+              eventName = decoded.eventName;
+              if (decoded.eventName === 'PaymentCollected') {
+                humanAmount = Number(decoded.args.amount) / 1e18;
+              }
+              break;
+            }
+          } catch (e) {
+            // ignore logs not matching ABI
+          }
+        }
+
+        if (eventName === 'PaymentCollected') {
+          await resolveInterestCollection(ledgerId, 'collected', humanAmount, txHash);
+          return { success: true, interestAmount: humanAmount, txHash, failureReason: null };
+        } else if (eventName === 'PaymentSkipped') {
+          await resolveInterestCollection(ledgerId, 'missed', 0, txHash);
+          return { success: false, interestAmount: 0, txHash, failureReason: 'PaymentSkipped: Insufficient balance/allowance' };
+        } else {
+          await resolveInterestCollection(ledgerId, 'failed', 0, txHash);
+          return { success: false, interestAmount: 0, txHash, failureReason: 'Unknown event in receipt logs' };
+        }
+      } else {
+        await resolveInterestCollection(ledgerId, 'failed', 0, txHash);
+        return { success: false, interestAmount: 0, txHash, failureReason: 'Transaction reverted' };
+      }
+    } catch (receiptErr) {
+       console.error(`❌ Receipt error for tx ${txHash}:`, receiptErr);
+       // Still return true so cron does not immediately fail it, leaving it in 'collecting' for listener.
+       return { success: true, interestAmount: 0, txHash, failureReason: 'Receipt timeout/error, listener will handle' };
+    }
   } catch (err) {
     await queryRunner(
       `UPDATE loan_interest_ledger SET collection_status = 'failed', failure_reason = ? WHERE id = ?`,
@@ -348,4 +402,91 @@ export const checkAndAutoCloseLoan = async (loan) => {
     return true;
   }
   return false;
+};
+
+/**
+ * Shared resolver for processing interest collection results.
+ * Handles partial payments by splitting the ledger entry.
+ */
+export const resolveInterestCollection = async (ledgerId, status, humanAmount, txHash) => {
+  try {
+    const ledgers = await queryRunner(
+      `SELECT id, HEX(loan_uid) as loan_uid, interest_amount FROM loan_interest_ledger
+       WHERE id = ? AND collection_status = 'collecting'
+       LIMIT 1`,
+      [ledgerId]
+    );
+
+    if (!ledgers || ledgers.length === 0) {
+      // Already resolved by cron/listener race condition or doesn't exist
+      return;
+    }
+
+    const ledger = ledgers[0];
+    const expectedAmount = Number(ledger.interest_amount);
+
+    if (status === 'collected') {
+      if (humanAmount < expectedAmount) {
+        // Partial Payment
+        const shortfall = expectedAmount - humanAmount;
+        
+        await queryRunner(
+          `UPDATE loan_interest_ledger 
+           SET collected_amount = ?, collection_status = 'partial', tx_hash = ?, collected_at = NOW(), updated_at = NOW()
+           WHERE id = ?`,
+          [humanAmount, txHash, ledger.id]
+        );
+
+        // Add to total_interest_paid and pending_interest_due
+        await queryRunner(
+          `UPDATE loans 
+           SET total_interest_paid = total_interest_paid + ?, 
+               pending_interest_due = pending_interest_due + ?,
+               updated_at = NOW()
+           WHERE uid = UNHEX(?)`,
+          [humanAmount, shortfall, ledger.loan_uid]
+        );
+      } else {
+        // Full Payment
+        await queryRunner(
+          `UPDATE loan_interest_ledger 
+           SET collected_amount = ?, collection_status = 'collected', tx_hash = ?, collected_at = NOW(), updated_at = NOW()
+           WHERE id = ?`,
+          [humanAmount, txHash, ledger.id]
+        );
+
+        // Add to total_interest_paid
+        await queryRunner(
+          `UPDATE loans 
+           SET total_interest_paid = total_interest_paid + ?, updated_at = NOW()
+           WHERE uid = UNHEX(?)`,
+          [humanAmount, ledger.loan_uid]
+        );
+      }
+    } else if (status === 'missed') {
+      await queryRunner(
+        `UPDATE loan_interest_ledger 
+         SET collection_status = 'skipped', tx_hash = ?, updated_at = NOW()
+         WHERE id = ?`,
+        [txHash, ledger.id]
+      );
+      
+      // The entire amount is missed, add to pending_interest_due
+      await queryRunner(
+        `UPDATE loans 
+         SET pending_interest_due = pending_interest_due + ?, updated_at = NOW()
+         WHERE uid = UNHEX(?)`,
+        [expectedAmount, ledger.loan_uid]
+      );
+    } else if (status === 'failed') {
+      await queryRunner(
+        `UPDATE loan_interest_ledger 
+         SET collection_status = 'failed', failure_reason = ?, tx_hash = ?, updated_at = NOW()
+         WHERE id = ?`,
+        ['Transaction reverted or failed', txHash, ledger.id]
+      );
+    }
+  } catch (err) {
+    console.error('❌ Error in resolveInterestCollection:', err);
+  }
 };

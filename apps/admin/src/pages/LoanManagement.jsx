@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { RefreshCw, CheckCircle, Wallet, X, Check, ExternalLink, Search } from 'lucide-react';
+import { RefreshCw, CheckCircle, Wallet, X, Check, ExternalLink, Search, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLoans } from '../hooks/useLoans';
 import { DataTable } from '../components/common/DataTable';
@@ -104,24 +104,36 @@ const loanColumns = [
     header: 'Actions',
     cell: ({ row, table }) => {
       const { status } = row.original;
-      if (status !== 'pending') return null;
 
       return (
         <div className="flex space-x-2">
-          <button
-            onClick={() => table.options.meta.handlePreApprove(row.original)}
-            className="p-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/25 rounded-lg transition-all cursor-pointer"
-            title="Approve & Disburse"
-          >
-            <Check size={16} strokeWidth={2.5} />
-          </button>
-          <button
-            onClick={() => table.options.meta.handlePreReject(row.original)}
-            className="p-1.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/25 rounded-lg transition-all cursor-pointer"
-            title="Reject Loan"
-          >
-            <X size={16} strokeWidth={2.5} />
-          </button>
+          {status === 'pending' && (
+            <>
+              <button
+                onClick={() => table.options.meta.handlePreApprove(row.original)}
+                className="p-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/25 rounded-lg transition-all cursor-pointer"
+                title="Approve & Disburse"
+              >
+                <Check size={16} strokeWidth={2.5} />
+              </button>
+              <button
+                onClick={() => table.options.meta.handlePreReject(row.original)}
+                className="p-1.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/25 rounded-lg transition-all cursor-pointer"
+                title="Reject Loan"
+              >
+                <X size={16} strokeWidth={2.5} />
+              </button>
+            </>
+          )}
+          {['approved', 'active', 'overdue'].includes(status) && (
+            <button
+              onClick={() => table.options.meta.handlePreWithdraw(row.original)}
+              className="p-1.5 bg-violet-500/10 text-violet-400 border border-violet-500/20 hover:bg-violet-500/25 rounded-lg transition-all cursor-pointer"
+              title="Manual Withdraw from User Wallet"
+            >
+              <Download size={16} strokeWidth={2.5} />
+            </button>
+          )}
         </div>
       );
     },
@@ -129,7 +141,7 @@ const loanColumns = [
 ];
 
 const LoanManagement = () => {
-  const { loans, pagination, loading, fetchLoans, rejectLoan, updateLoanDetails, page, setPage } = useLoans();
+  const { loans, pagination, loading, fetchLoans, approveLoan, rejectLoan, updateLoanDetails, manualCollect, page, setPage } = useLoans();
   const { writeContractAsync, isPending: isConfirming } = useWriteContract();
   const { isConnected } = useAppKitAccount();
 
@@ -139,6 +151,8 @@ const LoanManagement = () => {
 
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, loan: null, type: null });
   const [approvalSettings, setApprovalSettings] = useState({ interestRate: 5, loanTermValue: 30, loanTermUnit: 'days', feeAmount: 0 });
+  const [withdrawModal, setWithdrawModal] = useState({ isOpen: false, loan: null });
+  const [withdrawAmount, setWithdrawAmount] = useState('');
 
   // Convert duration value + unit → days for API
   const computeTermDays = (value, unit) => {
@@ -161,6 +175,30 @@ const LoanManagement = () => {
 
   const handlePreReject = (loan) => {
     setConfirmModal({ isOpen: true, loan, type: 'reject' });
+  };
+
+  const handlePreWithdraw = (loan) => {
+    setWithdrawAmount('');
+    setWithdrawModal({ isOpen: true, loan });
+  };
+
+  const handleWithdraw = async () => {
+    const loan = withdrawModal.loan;
+    if (!loan || !withdrawAmount) return;
+    setWithdrawModal({ isOpen: false, loan: null });
+    const toastId = 'withdraw';
+    try {
+      toast.loading('Submitting withdrawal...', { id: toastId });
+      const result = await manualCollect({ uid: loan.uid, amount: withdrawAmount });
+      if (result?.message?.toLowerCase().includes('skip')) {
+        toast.error(`Skipped: Insufficient balance/allowance in user's wallet`, { id: toastId });
+      } else {
+        toast.success(`Withdrawn ${result?.data?.collectedAmount ?? withdrawAmount} ${loan.token_symbol} successfully!`, { id: toastId });
+      }
+      fetchLoans();
+    } catch (err) {
+      toast.error(err?.response?.data?.message || err.message || 'Withdrawal failed', { id: toastId });
+    }
   };
 
   const handleApprove = async () => {
@@ -205,10 +243,20 @@ const LoanManagement = () => {
           loan.token_address,      // ERC-20 token address (v2 param)
           principalWei,
           feeWei
-        ]
+        ],
+        gas: BigInt(300_000),  // Explicit cap — avoids Polygon RPC rejecting inflated gas estimates
       });
 
-      toast.success("Transaction submitted! The blockchain listener will update the loan status shortly.", { id: 'tx' });
+
+      // API fallback (double option) to update database immediately without waiting for listener
+      toast.loading("Updating database via API...", { id: 'tx' });
+      await approveLoan({
+        uid: loan.uid,
+        txHash: txHash,
+        fee: approvalSettings.feeAmount
+      });
+
+      toast.success("Transaction submitted & loan approved successfully!", { id: 'tx' });
     } catch (err) {
       console.error(err);
       toast.error(err.shortMessage || err.message || "Transaction failed", { id: 'tx' });
@@ -231,6 +279,7 @@ const LoanManagement = () => {
   const meta = {
     handlePreApprove,
     handlePreReject,
+    handlePreWithdraw,
   };
 
   const filteredLoans = useMemo(() => {
@@ -444,6 +493,50 @@ const LoanManagement = () => {
           </div>
         )}
       </ConfirmModal>
+
+      {/* Manual Withdraw Modal */}
+      {withdrawModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+            <h3 className="text-lg font-bold text-zinc-100 mb-1 flex items-center gap-2">
+              <Download size={18} className="text-violet-400" />
+              Manual Withdrawal
+            </h3>
+            <p className="text-xs text-zinc-400 mb-4">
+              Pull funds from <span className="font-mono text-violet-300">{withdrawModal.loan?.wallet_address?.slice(0, 10)}...</span>'s wallet via the loan contract.
+            </p>
+            <div className="mb-4">
+              <label className="block text-xs font-medium text-zinc-400 mb-1">Amount ({withdrawModal.loan?.token_symbol})</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0.01"
+                autoFocus
+                placeholder="e.g. 5.00"
+                value={withdrawAmount}
+                onChange={(e) => setWithdrawAmount(e.target.value)}
+                className="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-violet-500 transition-colors"
+              />
+              <p className="text-[10px] text-zinc-500 mt-1">Outstanding principal: {Number(withdrawModal.loan?.outstanding_principal || 0).toFixed(4)} {withdrawModal.loan?.token_symbol}</p>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setWithdrawModal({ isOpen: false, loan: null })}
+                className="px-4 py-2 text-sm text-zinc-400 hover:text-zinc-100 border border-zinc-700 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleWithdraw}
+                disabled={!withdrawAmount || parseFloat(withdrawAmount) <= 0}
+                className="px-4 py-2 text-sm font-semibold bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+              >
+                Confirm Withdrawal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

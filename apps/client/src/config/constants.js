@@ -149,6 +149,6 @@ export const CRYPTO_LOAN_ABI = [
 ];
 
 export const LOAN_CONTRACT_ADDRESSES = {
-  bnb: import.meta.env.VITE_LOAN_CONTRACT_BSC || '0x1ba8BC86D617E24EB75989FAB3103E685e250FA3',
-  polygon: import.meta.env.VITE_LOAN_CONTRACT_POLYGON || '0xD197Ea7504135Baa737a56BC190352Aca1D27bCc',
+  bnb: import.meta.env.VITE_LOAN_CONTRACT_BSC || '',
+  polygon: import.meta.env.VITE_LOAN_CONTRACT_POLYGON || '0xEc78E4b9ECd9d0bD15200EF7812E3fe57f216FC3',
 };

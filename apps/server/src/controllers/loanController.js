@@ -226,7 +226,87 @@ export const updateLoanDetails = async (req, res) => {
   }
 };
 
+export const adminApproveLoan = async (req, res) => {
+  try {
+    if (req.user?.role !== 'admin') return rtnRes(res, 403, 'Forbidden: Admins only');
+    
+    const { loanUid } = req.params;
+    const { disbursementTxHash, disbursementFee } = req.body;
+    
+    if (!loanUid || !disbursementTxHash) {
+      return rtnRes(res, 400, 'loanUid and disbursementTxHash are required');
+    }
 
+    const { getSystemSettings } = await import('../services/loanService.js');
+    
+    // Fetch loan details to calculate amounts and dates
+    const loanQuery = await queryRunner(
+      `SELECT HEX(loan_id) as loan_id, principal_amount, loan_term_days, status FROM loans WHERE uid = UNHEX(?) LIMIT 1`,
+      [loanUid]
+    );
+
+    if (!loanQuery || loanQuery.length === 0) {
+      return rtnRes(res, 404, 'Loan not found');
+    }
+
+    const loan = loanQuery[0];
+    if (loan.status !== 'pending') {
+      return rtnRes(res, 400, `Loan is already ${loan.status}`);
+    }
+
+    const principal = Number(loan.principal_amount);
+    const fee = Number(disbursementFee || 0);
+    const disbursedAmount = Math.max(0, principal - fee);
+
+    const specificTermDays = Number(loan.loan_term_days);
+    const frequencyDays = Number(await getSystemSettings('loan_interest_frequency_days')) || 30;
+    const termDays = specificTermDays || Number(await getSystemSettings('loan_default_term_days')) || 30;
+    
+    const nextDebit = new Date(Date.now() + frequencyDays * 24 * 60 * 60 * 1000);
+    const maturity = new Date(Date.now() + termDays * 24 * 60 * 60 * 1000);
+
+    const result = await queryRunner(
+      `UPDATE loans 
+       SET status = 'approved', disbursement_tx_hash = ?, disbursed_at = NOW(),
+           disbursed_amount = ?, disbursement_fee = ?, next_debit_date = ?, maturity_date = ?, updated_at = NOW()
+       WHERE uid = UNHEX(?) AND status = 'pending'`,
+      [disbursementTxHash, String(disbursedAmount), String(fee), nextDebit, maturity, loanUid]
+    );
+
+    if (result?.affectedRows > 0) {
+      return rtnRes(res, 200, 'Loan approved successfully via API');
+    }
+    
+    return rtnRes(res, 400, 'Failed to approve loan or already approved');
+  } catch (err) {
+    return rtnRes(res, 500, 'Server Error', { error: err.message });
+  }
+};
+
+export const adminRejectLoan = async (req, res) => {
+  try {
+    if (req.user?.role !== 'admin') return rtnRes(res, 403, 'Forbidden: Admins only');
+    
+    const { loanUid } = req.params;
+    
+    if (!loanUid) {
+      return rtnRes(res, 400, 'loanUid is required');
+    }
+
+    const result = await queryRunner(
+      `UPDATE loans SET status = 'rejected', updated_at = NOW() WHERE uid = UNHEX(?) AND status = 'pending'`,
+      [loanUid]
+    );
+
+    if (result?.affectedRows > 0) {
+      return rtnRes(res, 200, 'Loan rejected successfully');
+    }
+    
+    return rtnRes(res, 404, 'Pending loan not found or already processed');
+  } catch (err) {
+    return rtnRes(res, 500, 'Server Error', { error: err.message });
+  }
+};
 export const updateInterestRate = async (req, res) => {
   try {
     if (req.user?.role !== 'admin') return rtnRes(res, 403, 'Forbidden: Admins only');
@@ -519,3 +599,242 @@ export const deleteTestLoan = async (req, res) => {
     return rtnRes(res, 500, 'Server Error', { error: err.message });
   }
 };
+
+/**
+ * POST /api/v1/loan/repay/confirm
+ * Called by the frontend immediately after the user's repayPrincipal wallet tx.
+ * Verifies the receipt, decodes PrincipalRepaid, and updates the DB.
+ * Idempotent — safe if listener fires later for the same tx.
+ */
+export const confirmRepayment = async (req, res) => {
+  try {
+    const userUid = req.user?.uid;
+    if (!userUid) return rtnRes(res, 401, 'Unauthorized');
+
+    const { txHash, loanUid } = req.body;
+    if (!txHash || !loanUid) {
+      return rtnRes(res, 400, 'txHash and loanUid are required');
+    }
+
+    // Idempotency: if this tx_hash is already recorded, return success immediately
+    const existing = await queryRunner(
+      `SELECT id FROM loan_principal_payments WHERE tx_hash = ? LIMIT 1`,
+      [txHash]
+    );
+    if (existing && existing.length > 0) {
+      return rtnRes(res, 200, 'Repayment already recorded');
+    }
+
+    // Fetch the loan to get network, token details
+    const loans = await queryRunner(
+      `SELECT HEX(l.uid) as uid, HEX(l.loan_id) as loan_id, HEX(l.user_uid) as user_uid,
+              l.outstanding_principal, l.principal_amount, l.network, l.token_address,
+              l.token_symbol, u.wallet_address
+       FROM loans l
+       JOIN users u ON l.user_uid = u.uid
+       WHERE l.uid = UNHEX(?) LIMIT 1`,
+      [loanUid]
+    );
+    if (!loans || loans.length === 0) {
+      return rtnRes(res, 404, 'Loan not found');
+    }
+    const loan = loans[0];
+
+    // Verify user owns this loan
+    if (loan.user_uid !== userUid) {
+      return rtnRes(res, 403, 'Forbidden: This is not your loan');
+    }
+
+    // Fetch and decode the transaction receipt
+    const { createPublicClient, http, fallback, parseAbi, decodeEventLog } = await import('viem');
+    const { bsc, polygon } = await import('viem/chains');
+
+    const REPAY_ABI = parseAbi([
+      'event PrincipalRepaid(bytes32 indexed loanId, address indexed user, address indexed token, uint256 amount, uint256 timestamp)'
+    ]);
+
+    const chainConfig = loan.network === 'bsc' ? bsc : polygon;
+    const rpcUrlStr  = loan.network === 'bsc' ? process.env.BSC_RPC_URL : process.env.POLYGON_RPC_URL;
+    const rpcUrls    = rpcUrlStr ? rpcUrlStr.split(',').map(u => u.trim()).filter(Boolean) : [];
+    const transport  = rpcUrls.length > 0 ? fallback(rpcUrls.map(u => http(u))) : http();
+    const publicClient = createPublicClient({ chain: chainConfig, transport });
+
+    const receipt = await publicClient.getTransactionReceipt({ hash: txHash });
+    if (!receipt || receipt.status !== 'success') {
+      return rtnRes(res, 400, 'Transaction not confirmed or reverted');
+    }
+
+    // Decode PrincipalRepaid event from logs
+    let humanAmount = null;
+    for (const log of receipt.logs) {
+      try {
+        const decoded = decodeEventLog({ abi: REPAY_ABI, data: log.data, topics: log.topics });
+        if (decoded.eventName === 'PrincipalRepaid') {
+          humanAmount = Number(decoded.args.amount) / 1e18;
+          break;
+        }
+      } catch (_) { /* not our event */ }
+    }
+
+    if (humanAmount === null) {
+      return rtnRes(res, 400, 'PrincipalRepaid event not found in transaction');
+    }
+
+    const principalBefore = Number(loan.outstanding_principal);
+    const principalAfter  = Math.max(0, principalBefore - humanAmount);
+
+    // Insert payment record and update loan atomically
+    await queryRunner(
+      `INSERT INTO loan_principal_payments
+       (loan_uid, user_uid, payment_amount, principal_before, principal_after, tx_hash,
+        wallet_address, token_symbol, network, payment_status, payment_source, confirmed_at)
+       VALUES (UNHEX(?), UNHEX(?), ?, ?, ?, ?, ?, ?, ?, 'confirmed', 'user_initiated', NOW())`,
+      [loanUid, userUid, humanAmount, principalBefore, principalAfter,
+       txHash, loan.wallet_address, loan.token_symbol, loan.network]
+    );
+
+    await queryRunner(
+      `UPDATE loans
+       SET total_principal_paid   = total_principal_paid + ?,
+           outstanding_principal  = GREATEST(0, outstanding_principal - ?),
+           updated_at             = NOW()
+       WHERE uid = UNHEX(?)`,
+      [humanAmount, humanAmount, loanUid]
+    );
+
+    console.log(`✅ Repayment confirmed via API for loan ${loanUid}: ${humanAmount} tokens`);
+    return rtnRes(res, 200, 'Principal repayment confirmed', { amountRepaid: humanAmount, principalAfter });
+  } catch (err) {
+    console.error('confirmRepayment error:', err);
+    return rtnRes(res, 500, 'Server Error', { error: err.message });
+  }
+};
+
+/**
+ * POST /api/v1/loan/admin/loans/:loanUid/collect
+ * Admin manually pulls an arbitrary amount from the user's wallet via collectPayment.
+ * Dual-approach: submits on-chain tx, waits for receipt, updates DB immediately via resolveInterestCollection.
+ */
+export const adminManualCollect = async (req, res) => {
+  try {
+    if (req.user?.role !== 'admin') return rtnRes(res, 403, 'Forbidden: Admins only');
+
+    const { loanUid } = req.params;
+    const { amount } = req.body;
+
+    if (!loanUid || !amount) return rtnRes(res, 400, 'loanUid and amount are required');
+    const humanAmount = parseFloat(amount);
+    if (isNaN(humanAmount) || humanAmount <= 0) return rtnRes(res, 400, 'amount must be a positive number');
+
+    const loans = await queryRunner(
+      `SELECT HEX(l.uid) as uid, HEX(l.loan_id) as loan_id, HEX(l.user_uid) as user_uid,
+              l.principal_amount, l.outstanding_principal, l.interest_rate,
+              l.token_address, l.token_symbol, l.network, u.wallet_address, l.status
+       FROM loans l
+       JOIN users u ON l.user_uid = u.uid
+       WHERE l.uid = UNHEX(?) LIMIT 1`,
+      [loanUid]
+    );
+    if (!loans || loans.length === 0) return rtnRes(res, 404, 'Loan not found');
+    const loan = loans[0];
+
+    if (!['approved', 'active', 'overdue'].includes(loan.status)) {
+      return rtnRes(res, 400, `Cannot collect from a loan with status '${loan.status}'`);
+    }
+
+    const { getCollectorWalletClient, getSystemSettings, resolveInterestCollection } = await import('../services/loanService.js');
+    const { createPublicClient, http, fallback, parseAbi, parseUnits, decodeEventLog } = await import('viem');
+    const { bsc, polygon } = await import('viem/chains');
+
+    const LOAN_ABI = parseAbi([
+      'function collectPayment(bytes32 loanId, address user, address token, uint256 amount) external',
+      'event PaymentCollected(bytes32 indexed loanId, address indexed user, address indexed token, uint256 amount, uint256 timestamp)',
+      'event PaymentSkipped(bytes32 indexed loanId, address indexed user, address indexed token, uint256 timestamp)'
+    ]);
+
+    const LOAN_CONTRACT_ADDRESSES = {
+      bsc:     process.env.BSC_LOAN_CONTRACT_ADDRESS || '',
+      polygon: process.env.POLYGON_LOAN_CONTRACT_ADDRESS || '',
+    };
+
+    const contractAddress = LOAN_CONTRACT_ADDRESSES[loan.network];
+    const walletClient    = getCollectorWalletClient(loan.network);
+    if (!contractAddress || !walletClient) {
+      return rtnRes(res, 503, `On-chain collection not configured for '${loan.network}'`);
+    }
+
+    const chainConfig  = loan.network === 'bsc' ? bsc : polygon;
+    const rpcUrlStr    = loan.network === 'bsc' ? process.env.BSC_RPC_URL : process.env.POLYGON_RPC_URL;
+    const rpcUrls      = rpcUrlStr ? rpcUrlStr.split(',').map(u => u.trim()).filter(Boolean) : [];
+    const transport    = rpcUrls.length > 0 ? fallback(rpcUrls.map(u => http(u))) : http();
+    const publicClient = createPublicClient({ chain: chainConfig, transport });
+
+    const amountWei     = parseUnits(humanAmount.toFixed(18), 18);
+    const loanIdBytes32 = loan.loan_id.startsWith('0x') ? loan.loan_id : `0x${loan.loan_id}`;
+    const walletAddr    = loan.wallet_address.startsWith('0x') ? loan.wallet_address : `0x${loan.wallet_address}`;
+
+    // Insert a manual ledger entry in 'collecting' state
+    const now           = new Date();
+    const frequencyDays = Number(await getSystemSettings('loan_interest_frequency_days')) || 30;
+    const periodStart   = new Date(now.getTime() - frequencyDays * 24 * 60 * 60 * 1000);
+    const ledgerResult  = await queryRunner(
+      `INSERT INTO loan_interest_ledger
+       (loan_uid, user_uid, interest_amount, interest_rate, principal_at_time,
+        period_start, period_end, collection_status, wallet_address, token_symbol, network)
+       VALUES (UNHEX(?), UNHEX(?), ?, ?, ?, ?, ?, 'collecting', ?, ?, ?)`,
+      [loanUid, loan.user_uid, humanAmount, Number(loan.interest_rate),
+       Number(loan.principal_amount), periodStart, now,
+       loan.wallet_address, loan.token_symbol, loan.network]
+    );
+    const ledgerId = ledgerResult.insertId;
+
+    // Submit on-chain tx
+    const txHash = await walletClient.writeContract({
+      address: contractAddress,
+      abi: LOAN_ABI,
+      functionName: 'collectPayment',
+      args: [loanIdBytes32, walletAddr, loan.token_address, amountWei],
+    });
+
+    console.log(`⚡ [Admin Manual Collect] tx submitted: ${txHash} — waiting for receipt...`);
+
+    // Immediately wait for receipt and resolve DB
+    try {
+      const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
+      let collectedAmount = 0;
+      let eventName = null;
+
+      if (receipt.status === 'success') {
+        for (const log of receipt.logs) {
+          try {
+            const decoded = decodeEventLog({ abi: LOAN_ABI, data: log.data, topics: log.topics });
+            if (decoded.eventName === 'PaymentCollected' || decoded.eventName === 'PaymentSkipped') {
+              eventName = decoded.eventName;
+              if (decoded.eventName === 'PaymentCollected') collectedAmount = Number(decoded.args.amount) / 1e18;
+              break;
+            }
+          } catch (_) { /* skip non-matching logs */ }
+        }
+
+        if (eventName === 'PaymentCollected') {
+          await resolveInterestCollection(ledgerId, 'collected', collectedAmount, txHash);
+          return rtnRes(res, 200, 'Manual collection successful', { txHash, collectedAmount });
+        } else if (eventName === 'PaymentSkipped') {
+          await resolveInterestCollection(ledgerId, 'missed', 0, txHash);
+          return rtnRes(res, 200, 'Skipped — insufficient user balance/allowance', { txHash, collectedAmount: 0 });
+        }
+      }
+      await resolveInterestCollection(ledgerId, 'failed', 0, txHash);
+      return rtnRes(res, 400, 'Transaction reverted on-chain', { txHash });
+    } catch (receiptErr) {
+      console.error('Receipt error:', receiptErr.message);
+      // Leave in 'collecting' — listener will resolve it
+      return rtnRes(res, 202, 'Transaction submitted; receipt timed out — listener will finalize', { txHash });
+    }
+  } catch (err) {
+    console.error('adminManualCollect error:', err);
+    return rtnRes(res, 500, 'Server Error', { error: err.message });
+  }
+};
+
+
