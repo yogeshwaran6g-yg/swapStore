@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useReadContract, useWriteContract } from 'wagmi';
+import { parseUnits } from 'viem';
 import { useAppKitAccount } from '@reown/appkit/react';
 import toast from 'react-hot-toast';
 import { Network, Cpu, ShieldAlert, Save, RefreshCw, Wallet } from 'lucide-react';
@@ -24,6 +25,12 @@ const ContractManagement = () => {
 
   const [swapForms, setSwapForms] = useState({
     setAdmin: '',
+  });
+
+  const [withdrawForm, setWithdrawForm] = useState({
+    token: '',
+    amount: '',
+    to: ''
   });
 
   // ── Contract Addresses ──
@@ -62,6 +69,34 @@ const ContractManagement = () => {
 
   const validateAddress = (addr) => {
     return /^0x[a-fA-F0-9]{40}$/.test(addr);
+  };
+
+  const handleWithdrawPreSubmit = () => {
+    if (!isConnected) {
+      toast.error('Please connect your admin wallet first.');
+      return;
+    }
+    if (!validateAddress(withdrawForm.token) || !validateAddress(withdrawForm.to)) {
+      toast.error('Please enter valid EVM addresses (0x...)');
+      return;
+    }
+    if (!withdrawForm.amount || isNaN(Number(withdrawForm.amount)) || Number(withdrawForm.amount) <= 0) {
+      toast.error('Please enter a valid amount greater than 0');
+      return;
+    }
+
+    try {
+      const amountWei = parseUnits(withdrawForm.amount.toString(), 18);
+      setPendingAction({ 
+        functionName: 'withdraw', 
+        args: [withdrawForm.token, amountWei, withdrawForm.to], 
+        label: 'Withdraw Funds',
+        value: `${withdrawForm.amount} tokens to ${withdrawForm.to.substring(0,6)}...`
+      });
+      setIsConfirmModalOpen(true);
+    } catch (e) {
+      toast.error('Invalid amount format');
+    }
   };
 
   const handlePreSubmit = (functionName, label) => {
@@ -105,7 +140,11 @@ const ContractManagement = () => {
         toast.success(`${pendingAction.label} successful!`, { id: 'tx' });
         
         // Reset form
-        handleInputChange(contractType, pendingAction.functionName, '');
+        if (pendingAction.functionName === 'withdraw') {
+          setWithdrawForm({ token: '', amount: '', to: '' });
+        } else {
+          handleInputChange(contractType, pendingAction.functionName, '');
+        }
       }, 5000);
 
     } catch (error) {
@@ -294,6 +333,56 @@ const ContractManagement = () => {
               />
             )}
           </div>
+
+          {/* Withdraw Section */}
+          {contractType === 'loan' && (
+            <div className="bg-zinc-900/80 rounded-2xl border border-zinc-800/50 p-6 backdrop-blur-xl space-y-6">
+              <h2 className="text-lg font-bold text-zinc-100 flex items-center space-x-2">
+                <Wallet className="text-amber-500" size={20} />
+                <span>Withdraw Contract Funds</span>
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Token Address</label>
+                  <input
+                    type="text"
+                    value={withdrawForm.token}
+                    onChange={(e) => setWithdrawForm({ ...withdrawForm, token: e.target.value })}
+                    placeholder="0x..."
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-zinc-200 font-mono focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Amount</label>
+                  <input
+                    type="number"
+                    value={withdrawForm.amount}
+                    onChange={(e) => setWithdrawForm({ ...withdrawForm, amount: e.target.value })}
+                    placeholder="e.g. 100"
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-zinc-200 font-mono focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Destination</label>
+                  <input
+                    type="text"
+                    value={withdrawForm.to}
+                    onChange={(e) => setWithdrawForm({ ...withdrawForm, to: e.target.value })}
+                    placeholder="0x..."
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-zinc-200 font-mono focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                  />
+                </div>
+              </div>
+              <button
+                onClick={handleWithdrawPreSubmit}
+                disabled={isWriting || !withdrawForm.token || !withdrawForm.amount || !withdrawForm.to}
+                className="w-full flex items-center justify-center space-x-2 px-5 py-3 rounded-xl font-bold text-sm bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 border border-amber-500/20 transition-all disabled:opacity-50"
+              >
+                <Save size={16} />
+                <span>Execute Withdrawal</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

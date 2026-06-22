@@ -46,5 +46,16 @@ export const loanService = {
       console.log("err from loanService rejectLoan ", err.message);
       throw err;
     }
+  },
+
+  manualCollect: async ({ uid, amount }) => {
+    try {
+      const response = await apiClient.post(`${endpoints.LOANS.ADMIN}/${uid}/collect`, { amount });
+      return response?.data;
+    } catch (err) {
+      console.log("err from loanService manualCollect ", err.message);
+      throw err;
+    }
   }
 };
+

@@ -100,6 +100,17 @@ export const CRYPTO_LOAN_ABI = [
     inputs: [{ name: 'token', type: 'address' }],
     outputs: [],
   },
+  {
+    name: 'withdraw',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'token', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+      { name: 'to', type: 'address' }
+    ],
+    outputs: [],
+  },
   // ── View Functions ───────────────────────────────────────────────────────
   {
     name: 'getConfig',
