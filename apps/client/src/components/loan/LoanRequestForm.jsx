@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAccount, useReadContract } from 'wagmi';
-import { bsc, polygon } from 'wagmi/chains';
+import { bsc } from 'wagmi/chains';
 import { useRequestLoan, useLoanEligibility } from '../../hooks/useLoanQueries';
 import { useLoanTokenApproval } from '../../hooks/useLoanTokenApproval';
 import { erc20Abi, USDT_ADDRESSES, USDC_ADDRESSES, DAI_ADDRESSES } from '../../config/constants';
@@ -36,11 +36,11 @@ export const LoanRequestForm = () => {
   }, [network, tokenSymbol, principal]);
 
   // Derive chainId from the selected network string
-  const chainId = network === 'bsc' ? bsc.id : polygon.id;
+  const chainId = bsc.id;
 
   // Resolve the ERC20 address for the currently selected token + network
   const tokenAddr = useMemo(() => {
-    const netKey = network === 'bsc' ? 'bnb' : 'polygon';
+    const netKey = 'bnb';
     if (tokenSymbol === 'USDT') return USDT_ADDRESSES[netKey];
     if (tokenSymbol === 'USDC') return USDC_ADDRESSES[netKey];
     if (tokenSymbol === 'DAI')  return DAI_ADDRESSES[netKey];
@@ -356,8 +356,7 @@ export const LoanRequestForm = () => {
               value={network}
               onChange={(e) => setNetwork(e.target.value)}
               options={[
-                { label: 'Binance Smart Chain (BSC)', value: 'bsc' },
-                { label: 'Polygon', value: 'polygon' }
+                { label: 'Binance Smart Chain (BEP20)', value: 'bsc' }
               ]}
             />
           </div>

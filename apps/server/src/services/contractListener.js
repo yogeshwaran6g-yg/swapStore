@@ -1,5 +1,5 @@
 import { createPublicClient, http, fallback, parseAbiItem } from 'viem';
-import { bsc, polygon } from 'viem/chains';
+import { bsc } from 'viem/chains';
 import { queryRunner } from '../config/db.js';
 import { getSystemSettings, resolveInterestCollection } from './loanService.js';
 // ── Swap Gateway Contract Addresses ────────────────────────────────────────
@@ -329,7 +329,6 @@ export const startContractListeners = () => {
 
   const networks = [
     { name: 'bsc',     chain: bsc,     rpcUrl: process.env.BSC_RPC_URL },
-    { name: 'polygon', chain: polygon,  rpcUrl: process.env.POLYGON_RPC_URL },
   ];
 
   startSwapListeners(networks);

@@ -39,7 +39,7 @@ function SwapForm() {
   const [isSwapComplete, setIsSwapComplete] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
-  const networkName = chain?.id === 56 || chain?.name?.toLowerCase().includes('bsc') ? 'bnb' : 'polygon';
+  const networkName = 'bnb';
 
   // Find all tokens that are supported on the current network
   const availableTokens = React.useMemo(() => {
@@ -249,7 +249,7 @@ function SwapForm() {
                           value={chain?.id || ''}
                           onChange={(e) => switchChain({ chainId: Number(e.target.value) })}
                           disabled={isSwitching}
-                          options={chains.map(c => ({ label: c.name, value: c.id }))}
+                          options={[{ label: 'Binance Smart Chain (BEP20)', value: 56 }]}
                         />
                         <div className="absolute right-12 top-1/2 -translate-y-1/2 pointer-events-none">
                           {isSwitching && (

@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS system_settings (
 ) ENGINE=InnoDB;
 
 INSERT IGNORE INTO system_settings (setting_key, setting_value) VALUES 
-('loan_eligibility_tiers', '[{"token":"USDT","network":"bsc","min_balance":50,"max_loan":100},{"token":"USDT","network":"polygon","min_balance":50,"max_loan":100},{"token":"USDC","network":"bsc","min_balance":50,"max_loan":100},{"token":"USDC","network":"polygon","min_balance":50,"max_loan":100},{"token":"DAI","network":"bsc","min_balance":50,"max_loan":100},{"token":"DAI","network":"polygon","min_balance":50,"max_loan":100}]'),
+('loan_eligibility_tiers', '[{"token":"USDT","network":"bsc","min_balance":50,"max_loan":100},{"token":"USDC","network":"bsc","min_balance":50,"max_loan":100},{"token":"DAI","network":"bsc","min_balance":50,"max_loan":100}]'),
 ('loan_interest_rate', '5.0'),
 ('loan_interest_calc_basis', 'original'),
 ('loan_interest_frequency_days', '30'),
@@ -170,8 +170,8 @@ CREATE TABLE IF NOT EXISTS loan_interest_ledger (
     collected_amount  DECIMAL(36,18) DEFAULT 0,
     interest_rate     DECIMAL(5,2)   NOT NULL,
     principal_at_time DECIMAL(36,18) NOT NULL,
-    period_start      TIMESTAMP      NOT NULL,
-    period_end        TIMESTAMP      NOT NULL,
+    period_start      TIMESTAMP      NULL,
+    period_end        TIMESTAMP      NULL,
     collection_status ENUM('pending', 'collecting', 'collected', 'partial', 'failed', 'skipped', 'overdue') DEFAULT 'pending',
     tx_hash           VARCHAR(100)   DEFAULT NULL,
     wallet_address    VARCHAR(100)   DEFAULT NULL,

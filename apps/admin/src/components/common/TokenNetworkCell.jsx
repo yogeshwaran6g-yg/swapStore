@@ -8,7 +8,6 @@ const TOKEN_LOGOS = {
 
 const NETWORK_LOGOS = {
   bnb:     'https://cryptologos.cc/logos/bnb-bnb-logo.png',
-  polygon: 'https://cryptologos.cc/logos/polygon-matic-logo.png',
 };
 
 export const TokenNetworkCell = ({ token, network }) => (
