@@ -38,7 +38,6 @@ const Truncate = ({ value, maxLen = 12, color = 'text-zinc-300' }) => {
 const getBscScanUrl = (hash, network) => {
   if (!hash) return null;
   const cleanHash = hash.startsWith('0x') ? hash : `0x${hash}`;
-  if (network?.toLowerCase() === 'polygon') return `https://polygonscan.com/tx/${cleanHash}`;
   return `https://bscscan.com/tx/${cleanHash}`;
 };
 
