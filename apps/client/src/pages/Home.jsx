@@ -96,15 +96,14 @@ function Home() {
 
             {/* Subheading */}
             <p className="text-[#475569] text-base md:text-[15px] lg:text-xl font-medium leading-relaxed max-w-[550px] mx-auto lg:mx-0 -mt-4 lg:mt-0 relative z-20">
-              Trade USDT, USDC, DAI, Polygon & BNB in seconds. Access crypto-backed loans instantly with secure approvals. Enjoy seamless cash processing with absolutely <span className="font-bold text-[#0E1B4D]">zero risk of bank account freezes</span>.
+              Trade USDT, USDC, DAI & BNB in seconds. Access crypto-backed loans instantly with secure approvals. Enjoy seamless cash processing with absolutely <span className="font-bold text-[#0E1B4D]">zero risk of bank account freezes</span>.
             </p>
 
 
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 lg:gap-4 mt-2">
               <div className="flex items-center gap-2 lg:gap-3 bg-white/70 backdrop-blur-xl px-4 py-2.5 lg:px-6 lg:py-3.5 rounded-xl lg:rounded-2xl shadow-[0_8px_20px_rgba(14,27,77,0.06)] hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-default">
                 <div className="flex items-center">
-                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#8247E5] flex items-center justify-center text-[4px] lg:text-[5px] text-white font-bold z-30 border border-white shadow-sm">POL</div>
-                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[4px] lg:text-[5px] text-[#0E1B4D] font-bold z-20 -ml-1 border border-white shadow-sm">BNB</div>
+                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[4px] lg:text-[5px] text-[#0E1B4D] font-bold z-20 border border-white shadow-sm">BNB</div>
                   <div className="w-5 h-5 lg:w-7 lg:h-7 rounded-full bg-[#26A17B] flex items-center justify-center text-[6px] lg:text-[8px] text-white font-bold z-10 -ml-1 border-2 border-white shadow-sm">USDT</div>
                   <div className="w-5 h-5 lg:w-7 lg:h-7 rounded-full bg-[#0E1B4D] flex items-center justify-center text-[6px] lg:text-[8px] text-white font-bold -ml-2 border-2 border-white shadow-sm">INR</div>
                 </div>
@@ -112,8 +111,7 @@ function Home() {
               </div>
               <div className="flex items-center gap-2 lg:gap-3 bg-white/70 backdrop-blur-xl px-4 py-2.5 lg:px-6 lg:py-3.5 rounded-xl lg:rounded-2xl shadow-[0_8px_20px_rgba(14,27,77,0.06)] hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-default">
                 <div className="flex items-center">
-                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#8247E5] flex items-center justify-center text-[4px] lg:text-[5px] text-white font-bold z-30 border border-white shadow-sm">POL</div>
-                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[4px] lg:text-[5px] text-[#0E1B4D] font-bold z-20 -ml-1 border border-white shadow-sm">BNB</div>
+                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[4px] lg:text-[5px] text-[#0E1B4D] font-bold z-20 border border-white shadow-sm">BNB</div>
                   <div className="w-5 h-5 lg:w-7 lg:h-7 rounded-full bg-[#2775CA] flex items-center justify-center text-[6px] lg:text-[8px] text-white font-bold z-10 -ml-1 border-2 border-white shadow-sm">USDC</div>
                   <div className="w-5 h-5 lg:w-7 lg:h-7 rounded-full bg-[#0E1B4D] flex items-center justify-center text-[6px] lg:text-[8px] text-white font-bold -ml-2 border-2 border-white shadow-sm">INR</div>
                 </div>
@@ -121,8 +119,7 @@ function Home() {
               </div>
               <div className="flex items-center gap-2 lg:gap-3 bg-white/70 backdrop-blur-xl px-4 py-2.5 lg:px-6 lg:py-3.5 rounded-xl lg:rounded-2xl shadow-[0_8px_20px_rgba(14,27,77,0.06)] hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-default">
                 <div className="flex items-center">
-                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#8247E5] flex items-center justify-center text-[4px] lg:text-[5px] text-white font-bold z-30 border border-white shadow-sm">POL</div>
-                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[4px] lg:text-[5px] text-[#0E1B4D] font-bold z-20 -ml-1 border border-white shadow-sm">BNB</div>
+                  <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[4px] lg:text-[5px] text-[#0E1B4D] font-bold z-20 border border-white shadow-sm">BNB</div>
                   <div className="w-5 h-5 lg:w-7 lg:h-7 rounded-full bg-[#F5AC37] flex items-center justify-center text-[6px] lg:text-[8px] text-white font-bold z-10 -ml-1 border-2 border-white shadow-sm">DAI</div>
                   <div className="w-5 h-5 lg:w-7 lg:h-7 rounded-full bg-[#0E1B4D] flex items-center justify-center text-[6px] lg:text-[8px] text-white font-bold -ml-2 border-2 border-white shadow-sm">INR</div>
                 </div>
@@ -232,7 +229,7 @@ function Home() {
             </div>
             <div>
               <h4 className="text-[#0E1B4D] font-[800] text-lg mb-1.5 tracking-tight">Instant Swap</h4>
-              <p className="text-[#64748B] text-[13px] font-medium leading-relaxed">Swap USDT, USDC, DAI, BNB & Polygon instantly without hidden fees.</p>
+              <p className="text-[#64748B] text-[13px] font-medium leading-relaxed">Swap USDT, USDC, DAI & BNB instantly without hidden fees.</p>
             </div>
           </div>
 
@@ -309,8 +306,7 @@ function Home() {
           <div className="flex flex-wrap items-center justify-center gap-4 mt-2 z-10 relative">
             <div className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white px-5 py-3 rounded-[14px] shadow-sm text-[#0E1B4D] font-bold text-[14px]">
               <div className="flex items-center">
-                <div className="w-4 h-4 rounded-full bg-[#8247E5] flex items-center justify-center text-[5px] text-white font-bold z-30 border border-white shadow-sm">POL</div>
-                <div className="w-4 h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[5px] text-[#0E1B4D] font-bold z-20 -ml-1 border border-white shadow-sm">BNB</div>
+                <div className="w-4 h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[5px] text-[#0E1B4D] font-bold z-20 border border-white shadow-sm">BNB</div>
                 <div className="w-6 h-6 rounded-full bg-[#26A17B] flex items-center justify-center text-[8px] text-white font-bold z-10 -ml-1 border-2 border-white shadow-sm">USDT</div>
                 <div className="w-6 h-6 rounded-full bg-[#0E1B4D] flex items-center justify-center text-[8px] text-white font-bold -ml-2 border-2 border-white shadow-sm">INR</div>
               </div>
@@ -318,8 +314,7 @@ function Home() {
             </div>
             <div className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white px-5 py-3 rounded-[14px] shadow-sm text-[#0E1B4D] font-bold text-[14px]">
               <div className="flex items-center">
-                <div className="w-4 h-4 rounded-full bg-[#8247E5] flex items-center justify-center text-[5px] text-white font-bold z-30 border border-white shadow-sm">POL</div>
-                <div className="w-4 h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[5px] text-[#0E1B4D] font-bold z-20 -ml-1 border border-white shadow-sm">BNB</div>
+                <div className="w-4 h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[5px] text-[#0E1B4D] font-bold z-20 border border-white shadow-sm">BNB</div>
                 <div className="w-6 h-6 rounded-full bg-[#2775CA] flex items-center justify-center text-[8px] text-white font-bold z-10 -ml-1 border-2 border-white shadow-sm">USDC</div>
                 <div className="w-6 h-6 rounded-full bg-[#0E1B4D] flex items-center justify-center text-[8px] text-white font-bold -ml-2 border-2 border-white shadow-sm">INR</div>
               </div>
@@ -327,8 +322,7 @@ function Home() {
             </div>
             <div className="flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white px-5 py-3 rounded-[14px] shadow-sm text-[#0E1B4D] font-bold text-[14px]">
               <div className="flex items-center">
-                <div className="w-4 h-4 rounded-full bg-[#8247E5] flex items-center justify-center text-[5px] text-white font-bold z-30 border border-white shadow-sm">POL</div>
-                <div className="w-4 h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[5px] text-[#0E1B4D] font-bold z-20 -ml-1 border border-white shadow-sm">BNB</div>
+                <div className="w-4 h-4 rounded-full bg-[#F3BA2F] flex items-center justify-center text-[5px] text-[#0E1B4D] font-bold z-20 border border-white shadow-sm">BNB</div>
                 <div className="w-6 h-6 rounded-full bg-[#F5AC37] flex items-center justify-center text-[8px] text-white font-bold z-10 -ml-1 border-2 border-white shadow-sm">DAI</div>
                 <div className="w-6 h-6 rounded-full bg-[#0E1B4D] flex items-center justify-center text-[8px] text-white font-bold -ml-2 border-2 border-white shadow-sm">INR</div>
               </div>
@@ -362,8 +356,8 @@ function Home() {
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <div className="flex-1 text-left">
-                  <h4 className="text-[#0E1B4D] font-bold text-[17px] mb-1">Polygon & BNB Supported</h4>
-                  <p className="text-[#64748B] text-[15px] font-medium leading-relaxed">Cross-chain swaps natively built in for fast Polygon and BNB interoperability.</p>
+                  <h4 className="text-[#0E1B4D] font-bold text-[17px] mb-1">BNB Supported</h4>
+                  <p className="text-[#64748B] text-[15px] font-medium leading-relaxed">Swaps natively built in for fast BNB processing.</p>
                 </div>
               </li>
               <li className="flex items-start gap-4">
