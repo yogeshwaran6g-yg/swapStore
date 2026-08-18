@@ -12,6 +12,12 @@ const ContractManagement = () => {
   const [network, setNetwork] = useState('bsc'); // 'bsc' or 'polygon'
   const [contractType, setContractType] = useState('loan'); // 'loan' or 'swap'
   
+  // Define chain IDs for the supported networks
+  const chainIds = {
+    bsc: 56,
+    polygon: 137
+  };
+  
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState(null); // { functionName, args, label }
 
@@ -38,19 +44,21 @@ const ContractManagement = () => {
   const swapAddress = SWAP_CONTRACT_ADDRESSES[network];
 
   // ── Read Configurations ──
-  const { data: loanConfig, refetch: refetchLoan, isLoading: isLoanLoading } = useReadContract({
+  const { data: loanConfig, refetch: refetchLoan, isLoading: isLoanLoading, isError: isLoanError } = useReadContract({
     address: loanAddress,
     abi: CRYPTO_LOAN_ABI,
     functionName: 'getConfig',
+    chainId: chainIds[network],
     query: {
       enabled: !!loanAddress && contractType === 'loan',
     }
   });
 
-  const { data: swapConfig, refetch: refetchSwap, isLoading: isSwapLoading } = useReadContract({
+  const { data: swapConfig, refetch: refetchSwap, isLoading: isSwapLoading, isError: isSwapError } = useReadContract({
     address: swapAddress,
     abi: SWAP_ABI,
     functionName: 'getConfig',
+    chainId: chainIds[network],
     query: {
       enabled: !!swapAddress && contractType === 'swap',
     }
@@ -128,6 +136,7 @@ const ContractManagement = () => {
         abi: contractType === 'loan' ? CRYPTO_LOAN_ABI : SWAP_ABI,
         functionName: pendingAction.functionName,
         args: pendingAction.args,
+        chainId: chainIds[network],
       });
 
       toast.success(`${pendingAction.label} transaction submitted. Waiting for confirmation...`, { id: 'tx' });
@@ -156,13 +165,14 @@ const ContractManagement = () => {
   };
 
   const isLoading = contractType === 'loan' ? isLoanLoading : isSwapLoading;
+  const isError = contractType === 'loan' ? isLoanError : isSwapError;
   const currentConfig = contractType === 'loan' ? loanConfig : swapConfig;
 
   const renderConfigBox = (label, value) => (
     <div className="bg-zinc-950/60 p-4 rounded-xl border border-zinc-800/50">
       <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">{label}</p>
       <p className="font-mono text-sm text-amber-400 break-all">
-        {isLoading ? 'Loading...' : formatConfigValue(value)}
+        {isLoading ? 'Loading...' : isError ? 'Error Fetching Data' : formatConfigValue(value)}
       </p>
     </div>
   );
