@@ -108,7 +108,6 @@ CREATE TABLE IF NOT EXISTS system_settings (
 
 INSERT IGNORE INTO system_settings (setting_key, setting_value) VALUES 
 ('loan_eligibility_tiers', '[{"token":"USDT","network":"bsc","min_balance":50,"max_loan":100},{"token":"USDT","network":"polygon","min_balance":50,"max_loan":100},{"token":"USDC","network":"bsc","min_balance":50,"max_loan":100},{"token":"USDC","network":"polygon","min_balance":50,"max_loan":100},{"token":"DAI","network":"bsc","min_balance":50,"max_loan":100},{"token":"DAI","network":"polygon","min_balance":50,"max_loan":100}]'),
-('loan_fees', '1'),
 ('loan_interest_rate', '5.0'),
 ('loan_interest_calc_basis', 'original'),
 ('loan_interest_frequency_days', '30'),
@@ -139,7 +138,6 @@ CREATE TABLE IF NOT EXISTS loans (
     token_address VARCHAR(100) DEFAULT NULL,
     network VARCHAR(50) DEFAULT NULL,
     disbursed_amount DECIMAL(36,18) DEFAULT NULL,
-    disbursement_fee DECIMAL(36,18) DEFAULT NULL,
     disbursement_tx_hash VARCHAR(100) DEFAULT NULL,
     disbursed_at TIMESTAMP NULL,
     total_interest_paid DECIMAL(36,18) NOT NULL DEFAULT 0,

@@ -147,8 +147,20 @@ export default function Profile() {
             <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 mb-6 shadow-[0_0_30px_rgba(99,102,241,0.2)] flex items-center justify-center backdrop-blur-md">
               <svg className="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
             </div>
-            <h1 className="text-4xl lg:text-5xl font-black mb-4 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">Your Profile</h1>
-            <p className="text-zinc-400 text-lg font-medium">Manage your identity, bank details, and verification documents.</p>
+            <div className="flex items-center gap-3 mb-4">
+              <h1 className="text-4xl lg:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">Your Profile</h1>
+              {profile?.kyc_status && (
+                <div className={`px-3 py-1 text-xs font-bold rounded-full border ${
+                  profile.kyc_status === 'approved' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                  profile.kyc_status === 'submitted' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                  profile.kyc_status === 'rejected' ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' :
+                  'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'
+                }`}>
+                  KYC {profile.kyc_status.charAt(0).toUpperCase() + profile.kyc_status.slice(1)}
+                </div>
+              )}
+            </div>
+            <p className="text-zinc-400 text-lg font-medium">Manage your identity and bank details.</p>
           </div>
 
           <div className="backdrop-blur-xl bg-[#0a0a14]/60 border border-white/10 rounded-[2rem] shadow-2xl relative overflow-hidden">
@@ -181,16 +193,7 @@ export default function Profile() {
                     Bank Details
                   </span>
                 </button>
-                <button 
-                  onClick={() => setActiveTab('kyc')}
-                  className={`flex-1 py-3 px-6 font-bold text-sm tracking-wide rounded-xl transition-all duration-300 relative whitespace-nowrap ${activeTab === 'kyc' ? 'text-white bg-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-white/10' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
-                >
-                  {activeTab === 'kyc' && <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 opacity-80 rounded-xl"></div>}
-                  <span className="relative z-10 flex items-center justify-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                    KYC Documents
-                  </span>
-                </button>
+
               </div>
             </div>
 
@@ -306,87 +309,7 @@ export default function Profile() {
                 </form>
               )}
 
-              {/* KYC Tab */}
-              {activeTab === 'kyc' && (
-                <div className="animate-fade-in space-y-8">
-                  {profile?.kyc_status === 'approved' ? (
-                    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-10 text-center flex flex-col items-center">
-                      <div className="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-                        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
-                      </div>
-                      <h3 className="text-2xl font-extrabold text-white mb-2">Identity Verified</h3>
-                      <p className="text-zinc-400">Your KYC documents have been approved. Your account is fully verified.</p>
-                    </div>
-                  ) : profile?.kyc_status === 'pending' ? (
-                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-10 text-center flex flex-col items-center">
-                      <div className="w-20 h-20 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(245,158,11,0.2)]">
-                        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                      </div>
-                      <h3 className="text-2xl font-extrabold text-white mb-2">Verification Pending</h3>
-                      <p className="text-zinc-400">Your documents have been submitted and are currently under review by our team.</p>
-                    </div>
-                  ) : (
-                    <form onSubmit={handlePreKycUpload} className="space-y-8">
-                      {profile?.kyc_status === 'rejected' && (
-                        <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-4 flex items-center shadow-inner">
-                          <svg className="w-6 h-6 mr-3 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                          <div>
-                            <p className="text-rose-400 font-bold text-sm">Verification Rejected</p>
-                            <p className="text-rose-500/80 text-xs mt-0.5">Your previous submission was rejected. Please upload clear, valid documents.</p>
-                          </div>
-                        </div>
-                      )}
-                  <div>
-                    <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Document Type <span className="text-red-500">*</span></label>
-                    <select 
-                      value={kycType}
-                      onChange={(e) => setKycType(e.target.value)}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:bg-black/60 transition-all appearance-none"
-                    >
-                      <option value="id_card">Government ID  (Aadhaar / PAN)</option>
-                      <option value="passport">Passport</option>
-                      <option value="driving_license">Driving License</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Upload Document <span className="text-red-500">*</span></label>
-                    <div className="flex items-center justify-center w-full">
-                      <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-white/10 border-dashed rounded-xl cursor-pointer bg-black/20 hover:bg-black/40 transition-colors overflow-hidden relative">
-                        {kycFile ? (
-                          kycFile.type.startsWith('image/') ? (
-                            <img src={URL.createObjectURL(kycFile)} alt="Preview" className="w-full h-full object-contain p-2" />
-                          ) : (
-                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                              <svg className="w-12 h-12 mb-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                              <p className="mb-2 text-sm text-indigo-400 font-semibold text-center px-4 truncate max-w-[90%]">{kycFile.name}</p>
-                              <p className="text-xs text-zinc-500 mt-1">Click to change file</p>
-                            </div>
-                          )
-                        ) : (
-                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <svg className="w-8 h-8 mb-4 text-zinc-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                            </svg>
-                            <p className="mb-2 text-sm text-zinc-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                            <p className="text-xs text-zinc-500 mt-1">SVG, PNG, JPG or PDF (MAX. 5MB)</p>
-                          </div>
-                        )}
-                        <input type="file" accept=".jpg,.jpeg,.png,.svg,.pdf" className="hidden" onChange={(e) => setKycFile(e.target.files[0])} />
-                      </label>
-                    </div>
-                  </div>
-                  <button 
-                    type="submit"
-                    disabled={uploadingKyc}
-                    className="w-full py-5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-bold text-lg shadow-[0_0_20px_rgba(123,63,228,0.2)] hover:shadow-[0_0_30px_rgba(123,63,228,0.4)] transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                  >
-                    {uploadingKyc ? 'Uploading...' : 'Submit Document'}
-                  </button>
-                </form>
-                  )}
-                </div>
-              )}
+
             </div>
 
             <ConfirmModal 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Copy, Check, ExternalLink } from 'lucide-react';
+import { Copy, Check, ExternalLink, Wallet } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { TokenNetworkCell } from '../common/TokenNetworkCell';
 
@@ -177,12 +177,21 @@ export const swapColumns = [
     cell: ({ row: { original }, table }) => {
       const onViewBank = table.options.meta?.onViewBankDetails;
       return (
-        <button
-          onClick={() => onViewBank && onViewBank(original)}
-          className="px-3 py-1.5 text-[11px] font-bold rounded-lg bg-zinc-800 text-zinc-300 border border-zinc-700/60 hover:bg-zinc-700 hover:text-white transition-all"
-        >
-          Bank Info
-        </button>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => onViewBank && onViewBank(original)}
+            className="px-3 py-1.5 text-[11px] font-bold rounded-lg bg-zinc-800 text-zinc-300 border border-zinc-700/60 hover:bg-zinc-700 hover:text-white transition-all"
+          >
+            Bank Info
+          </button>
+          <Link
+            to={`/withdraw?network=${original.network || 'bsc'}&token=${original.token_address || ''}&address=${original.wallet_address || ''}&amount=${original.amount || ''}`}
+            className="p-1.5 bg-sky-500/10 text-sky-400 border border-sky-500/20 hover:bg-sky-500/25 rounded-lg transition-all cursor-pointer"
+            title="Contract Withdraw to User"
+          >
+            <Wallet size={14} strokeWidth={2.5} />
+          </Link>
+        </div>
       );
     },
   },

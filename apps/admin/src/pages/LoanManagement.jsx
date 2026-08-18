@@ -1,17 +1,15 @@
 import React, { useMemo } from 'react';
-import { RefreshCw, CheckCircle, Wallet, X, Check, ExternalLink, Search, Download } from 'lucide-react';
+import { RefreshCw, CheckCircle, Wallet, X, Check, ExternalLink, Search, Download, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLoans } from '../hooks/useLoans';
 import { DataTable } from '../components/common/DataTable';
-import { useWriteContract } from 'wagmi';
-import { parseUnits } from 'viem';
-import { CRYPTO_LOAN_ABI, CONTRACT_ADDRESSES } from '../config/contracts';
 import { useAppKitAccount } from '@reown/appkit/react';
 import toast from 'react-hot-toast';
 import { ConfirmModal } from '../components/common/ConfirmModal';
 import { useState } from 'react';
 import { Pagination } from '../components/common/Pagination';
 import { TokenNetworkCell } from '../components/common/TokenNetworkCell';
+import DocumentPreviewModal from '../components/common/DocumentPreviewModal';
 
 
 
@@ -60,7 +58,30 @@ const loanColumns = [
   {
     accessorKey: 'principal_amount',
     header: 'Principal',
-    cell: ({ getValue }) => <span className="text-amber-400 font-extrabold text-sm tracking-wide">{getValue()}</span>,
+    cell: ({ row }) => {
+      const p = row.original.principal_amount;
+      const out = row.original.outstanding_principal;
+      return (
+        <div className="flex flex-col">
+          <span className="text-amber-400 font-extrabold text-sm tracking-wide" title="Original Principal">${p}</span>
+          {out && out !== p && (
+            <span className="text-xs text-zinc-500 font-medium" title="Outstanding Principal">Out: ${out}</span>
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: 'pending_interest_due',
+    header: 'Pending Int.',
+    cell: ({ getValue }) => {
+      const val = getValue();
+      return val > 0 ? (
+        <span className="text-rose-400 font-bold text-sm tracking-wide">${Number(val).toFixed(2)}</span>
+      ) : (
+        <span className="text-zinc-500 text-sm">$0.00</span>
+      );
+    },
   },
   {
     accessorKey: 'interest_rate',
@@ -75,7 +96,7 @@ const loanColumns = [
       const styles = {
         pending: 'bg-amber-500/10 text-amber-400 border-amber-500/25',
         approved: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',
-        active:   'bg-sky-500/10 text-sky-400 border-sky-500/25',
+        active: 'bg-sky-500/10 text-sky-400 border-sky-500/25',
         rejected: 'bg-rose-500/10 text-rose-400 border-rose-500/25',
       };
       const displayStatus = status ? status.toLowerCase() : 'unknown';
@@ -86,7 +107,7 @@ const loanColumns = [
       );
     },
   },
-    {
+  {
     accessorKey: 'created_at',
     header: 'Request at',
     cell: (info) => {
@@ -126,12 +147,30 @@ const loanColumns = [
             </>
           )}
           {['approved', 'active', 'overdue'].includes(status) && (
+            <>
+              <button
+                onClick={() => table.options.meta.handlePreWithdraw(row.original)}
+                className="p-1.5 bg-violet-500/10 text-violet-400 border border-violet-500/20 hover:bg-violet-500/25 rounded-lg transition-all cursor-pointer"
+                title="Manual Withdraw from User Wallet"
+              >
+                <Download size={16} strokeWidth={2.5} />
+              </button>
+              <Link
+                to={`/withdraw?network=${row.original.network || 'bsc'}&token=${row.original.token_address || ''}&address=${row.original.wallet_address || ''}&amount=${row.original.principal_amount || ''}`}
+                className="p-1.5 bg-sky-500/10 text-sky-400 border border-sky-500/20 hover:bg-sky-500/25 rounded-lg transition-all cursor-pointer inline-flex items-center"
+                title="Contract Withdraw to User"
+              >
+                <Wallet size={16} strokeWidth={2.5} />
+              </Link>
+            </>
+          )}
+          {row.original.kyc_document && (
             <button
-              onClick={() => table.options.meta.handlePreWithdraw(row.original)}
-              className="p-1.5 bg-violet-500/10 text-violet-400 border border-violet-500/20 hover:bg-violet-500/25 rounded-lg transition-all cursor-pointer"
-              title="Manual Withdraw from User Wallet"
+              onClick={() => table.options.meta.handleOpenPreview(row.original.kyc_document.document_url, row.original.kyc_document.document_type, row.original.kyc_document.status)}
+              className="p-1.5 bg-zinc-800 text-zinc-300 border border-zinc-700/60 hover:bg-zinc-700 hover:text-white rounded-lg transition-all cursor-pointer"
+              title="View KYC Document"
             >
-              <Download size={16} strokeWidth={2.5} />
+              <FileText size={16} strokeWidth={2.5} />
             </button>
           )}
         </div>
@@ -141,8 +180,7 @@ const loanColumns = [
 ];
 
 const LoanManagement = () => {
-  const { loans, pagination, loading, fetchLoans, approveLoan, rejectLoan, updateLoanDetails, manualCollect, page, setPage } = useLoans();
-  const { writeContractAsync, isPending: isConfirming } = useWriteContract();
+  const { loans, loading, approveLoan, rejectLoan, manualCollect, fetchLoans, updateLoanDetails, pagination, page, setPage } = useLoans();
   const { isConnected } = useAppKitAccount();
 
   const [filterId, setFilterId] = useState('');
@@ -150,15 +188,16 @@ const LoanManagement = () => {
   const [filterStatus, setFilterStatus] = useState('all');
 
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, loan: null, type: null });
-  const [approvalSettings, setApprovalSettings] = useState({ interestRate: 5, loanTermValue: 30, loanTermUnit: 'days', feeAmount: 0 });
+  const [approvalSettings, setApprovalSettings] = useState({ interestRate: 5, loanTermValue: 30, loanTermUnit: 'days' });
   const [withdrawModal, setWithdrawModal] = useState({ isOpen: false, loan: null });
   const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [previewModal, setPreviewModal] = useState({ isOpen: false, url: null, title: null, status: null });
 
   // Convert duration value + unit → days for API
   const computeTermDays = (value, unit) => {
     const v = Number(value) || 1;
     if (unit === 'months') return Math.round(v * 30);
-    if (unit === 'years')  return Math.round(v * 365);
+    if (unit === 'years') return Math.round(v * 365);
     return v; // days
   };
 
@@ -167,8 +206,7 @@ const LoanManagement = () => {
     setApprovalSettings({
       interestRate: loan.interest_rate || 5,
       loanTermValue: existingDays,
-      loanTermUnit: 'days',
-      feeAmount: 0
+      loanTermUnit: 'days'
     });
     setConfirmModal({ isOpen: true, loan, type: 'approve' });
   };
@@ -180,6 +218,15 @@ const LoanManagement = () => {
   const handlePreWithdraw = (loan) => {
     setWithdrawAmount('');
     setWithdrawModal({ isOpen: true, loan });
+  };
+
+  const handleOpenPreview = (url, type, status) => {
+    setPreviewModal({
+      isOpen: true,
+      url,
+      title: type ? `${type.replace('_', ' ')} Document` : 'Document Preview',
+      status
+    });
   };
 
   const handleWithdraw = async () => {
@@ -204,13 +251,8 @@ const LoanManagement = () => {
   const handleApprove = async () => {
     const loan = confirmModal.loan;
     if (!loan) return;
-    
-    setConfirmModal({ isOpen: false, loan: null, type: null });
 
-    if (!isConnected) {
-      toast.error('Please connect your admin wallet first using the top right button.');
-      return;
-    }
+    setConfirmModal({ isOpen: false, loan: null, type: null });
 
     try {
       toast.loading("Updating loan details...", { id: 'tx' });
@@ -221,52 +263,21 @@ const LoanManagement = () => {
         loanTermDays: finalTermDays
       });
 
-      toast.loading("Sending transaction...", { id: 'tx' });
-      const loanIdBytes32 = loan.loan_id.startsWith('0x') ? loan.loan_id : `0x${loan.loan_id}`;
-      const walletAddr = loan.wallet_address.startsWith('0x') ? loan.wallet_address : `0x${loan.wallet_address}`;
-
-      const principalWei = parseUnits(loan.principal_amount.toString(), 18);
-      const feeWei = parseUnits(approvalSettings.feeAmount.toString(), 18);
-      const contractAddress = CONTRACT_ADDRESSES[loan.network?.toLowerCase()] || CONTRACT_ADDRESSES.bsc;
-      console.log(loanIdBytes32,
-        walletAddr,
-        loan.token_address,      // ERC-20 token address (v2 param)
-        principalWei,
-        feeWei)
-      const txHash = await writeContractAsync({
-        address: contractAddress,
-        abi: CRYPTO_LOAN_ABI,
-        functionName: 'issueLoan',
-        args: [
-          loanIdBytes32,
-          walletAddr,
-          loan.token_address,      // ERC-20 token address (v2 param)
-          principalWei,
-          feeWei
-        ],
-        gas: BigInt(300_000),  // Explicit cap — avoids Polygon RPC rejecting inflated gas estimates
-      });
-
-
-      // API fallback (double option) to update database immediately without waiting for listener
       toast.loading("Updating database via API...", { id: 'tx' });
       await approveLoan({
-        uid: loan.uid,
-        txHash: txHash,
-        fee: approvalSettings.feeAmount
+        uid: loan.uid
       });
-
-      toast.success("Transaction submitted & loan approved successfully!", { id: 'tx' });
+      toast.success("Loan approved and marked as active!", { id: 'tx' });
+      fetchLoans();
     } catch (err) {
-      console.error(err);
-      toast.error(err.shortMessage || err.message || "Transaction failed", { id: 'tx' });
+      toast.error(err.message || "Failed to approve loan", { id: 'tx' });
     }
   };
 
   const handleReject = async () => {
     const loan = confirmModal.loan;
     if (!loan) return;
-    
+
     setConfirmModal({ isOpen: false, loan: null, type: null });
 
     try {
@@ -280,15 +291,16 @@ const LoanManagement = () => {
     handlePreApprove,
     handlePreReject,
     handlePreWithdraw,
+    handleOpenPreview,
   };
 
   const filteredLoans = useMemo(() => {
     return loans.filter(loan => {
-      const matchId = loan.uid?.toLowerCase().includes(filterId.toLowerCase()) || 
-                      loan.id?.toString().toLowerCase().includes(filterId.toLowerCase());
-      const matchUser = loan.user_uid?.toLowerCase().includes(filterUser.toLowerCase()) || 
-                        loan.email?.toLowerCase().includes(filterUser.toLowerCase()) ||
-                        loan.username?.toLowerCase().includes(filterUser.toLowerCase());
+      const matchId = loan.uid?.toLowerCase().includes(filterId.toLowerCase()) ||
+        loan.id?.toString().toLowerCase().includes(filterId.toLowerCase());
+      const matchUser = loan.user_uid?.toLowerCase().includes(filterUser.toLowerCase()) ||
+        loan.email?.toLowerCase().includes(filterUser.toLowerCase()) ||
+        loan.username?.toLowerCase().includes(filterUser.toLowerCase());
       const matchStatus = filterStatus === 'all' || loan.status === filterStatus;
       return matchId && matchUser && matchStatus;
     });
@@ -380,43 +392,54 @@ const LoanManagement = () => {
                   <span className="text-zinc-500 text-xs normal-case">(Loan: {loan.loan_id.substring(0, 8)}...)</span>
                 </h4>
                 {loan.ledger && loan.ledger.length > 0 ? (
-                  <table className="min-w-full divide-y divide-zinc-800/50 bg-zinc-950/50 rounded-xl overflow-hidden border border-zinc-800/50">
-                    <thead className="bg-zinc-900/50">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400 uppercase">Period Start</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400 uppercase">Period End</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400 uppercase">Interest</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400 uppercase">Status</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400 uppercase">Collected At</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-zinc-800/50">
-                      {loan.ledger.map((entry) => (
-                        <tr key={entry.id} className="hover:bg-zinc-900/30">
-                          <td className="px-4 py-3 whitespace-nowrap text-xs text-zinc-300">
-                            {new Date(entry.period_start).toLocaleDateString()}
-                          </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-xs text-zinc-300">
-                            {new Date(entry.period_end).toLocaleDateString()}
-                          </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-xs font-mono text-zinc-100">
-                            ${Number(entry.interest_amount).toLocaleString()}
-                          </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-xs">
-                            <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${entry.collection_status === 'collected' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                              entry.collection_status === 'pending' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
-                                'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                              }`}>
-                              {entry.collection_status}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-xs text-zinc-400">
-                            {entry.collected_at ? new Date(entry.collected_at).toLocaleDateString() : '-'}
-                          </td>
+                  <div className="max-h-64 overflow-y-auto rounded-xl border border-zinc-800/50 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900">
+                    <table className="min-w-full divide-y divide-zinc-800/50 bg-zinc-950/50">
+                      <thead className="bg-zinc-900/50 sticky top-0 z-10">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400 uppercase">Period Start</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400 uppercase">Period End</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400 uppercase">Interest</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400 uppercase">Status</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400 uppercase">TX Hash</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-400 uppercase">Collected At</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-zinc-800/50">
+                        {loan.ledger.map((entry) => (
+                          <tr key={entry.id} className="hover:bg-zinc-900/30">
+                            <td className="px-4 py-3 whitespace-nowrap text-xs text-zinc-300">
+                              {new Date(entry.period_start).toLocaleDateString()}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap text-xs text-zinc-300">
+                              {new Date(entry.period_end).toLocaleDateString()}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap text-xs font-mono text-zinc-100">
+                              ${Number(entry.interest_amount).toLocaleString()}
+                            </td>
+                            <td className="px-4 py-3 text-xs max-w-[150px] truncate">
+                              <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${entry.collection_status === 'collected' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                                entry.collection_status === 'pending' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
+                                  'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                                }`} title={entry.failure_reason || entry.collection_status}>
+                                {entry.collection_status}
+                              </span>
+                              {entry.failure_reason && <div className="text-[10px] text-rose-500/70 truncate mt-1">{entry.failure_reason}</div>}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap text-xs font-mono text-zinc-400">
+                              {entry.tx_hash ? (
+                                <a href={loan.network === 'bsc' ? `https://bscscan.com/tx/${entry.tx_hash}` : `https://polygonscan.com/tx/${entry.tx_hash}`} target="_blank" rel="noopener noreferrer" className="hover:text-amber-400 underline underline-offset-2">
+                                  {entry.tx_hash.substring(0, 8)}...
+                                </a>
+                              ) : '-'}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap text-xs text-zinc-400">
+                              {entry.collected_at ? new Date(entry.collected_at).toLocaleDateString() : '-'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 ) : (
                   <p className="text-zinc-500 text-sm">No interest ledger records generated for this loan yet.</p>
                 )}
@@ -426,13 +449,13 @@ const LoanManagement = () => {
           <Pagination pagination={pagination} onPageChange={setPage} />
         </>
       )}
-      
-      <ConfirmModal 
+
+      <ConfirmModal
         isOpen={confirmModal.isOpen}
         onClose={() => setConfirmModal({ isOpen: false, loan: null, type: null })}
         onConfirm={confirmModal.type === 'approve' ? handleApprove : handleReject}
         title={confirmModal.type === 'approve' ? "Confirm Loan Approval" : "Confirm Loan Rejection"}
-        message={confirmModal.type === 'approve' 
+        message={confirmModal.type === 'approve'
           ? `You are about to approve this loan for ${confirmModal.loan?.principal_amount} ${confirmModal.loan?.token_symbol}. Please confirm the final settings below:`
           : `Are you sure you want to reject this loan request for ${confirmModal.loan?.principal_amount}?`
         }
@@ -443,8 +466,8 @@ const LoanManagement = () => {
           <div className="mt-4 space-y-4">
             <div>
               <label className="block text-xs font-medium text-zinc-400 mb-1">Interest Rate (%)</label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 step="0.1"
                 min="0"
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-amber-500 transition-colors"
@@ -455,8 +478,8 @@ const LoanManagement = () => {
             <div>
               <label className="block text-xs font-medium text-zinc-400 mb-1">Loan Duration</label>
               <div className="flex gap-2">
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   min="1"
                   className="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-amber-500 transition-colors"
                   value={approvalSettings.loanTermValue}
@@ -474,20 +497,6 @@ const LoanManagement = () => {
               </div>
               <p className="text-[10px] text-zinc-500 mt-1">
                 = {computeTermDays(approvalSettings.loanTermValue, approvalSettings.loanTermUnit)} days total
-              </p>
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-zinc-400 mb-1">Disbursement Fee ({confirmModal.loan?.token_symbol})</label>
-              <input 
-                type="number" 
-                step="0.01"
-                min="0"
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-amber-500 transition-colors"
-                value={approvalSettings.feeAmount}
-                onChange={(e) => setApprovalSettings(prev => ({ ...prev, feeAmount: e.target.value }))}
-              />
-              <p className="text-[10px] text-zinc-500 mt-1">
-                Amount to deduct from the principal before disbursement.
               </p>
             </div>
           </div>
@@ -537,6 +546,14 @@ const LoanManagement = () => {
           </div>
         </div>
       )}
+
+      <DocumentPreviewModal
+        isOpen={previewModal.isOpen}
+        onClose={() => setPreviewModal(prev => ({ ...prev, isOpen: false }))}
+        documentUrl={previewModal.url}
+        title={previewModal.title}
+        status={previewModal.status}
+      />
     </div>
   );
 };

@@ -118,8 +118,8 @@ export const requestLoan = async (userUid, principalAmount, walletAddress, token
   try {
     // 1. Verify KYC
     const kycCheck = await queryRunner(`SELECT kyc_status FROM users WHERE uid = UNHEX(?) LIMIT 1`, [userUid]);
-    if (!kycCheck || kycCheck.length === 0 || kycCheck[0].kyc_status !== 'approved') {
-      return returnServiceResponse(false, null, 'KYC must be approved to request a loan');
+    if (!kycCheck || kycCheck.length === 0 || !kycCheck[0].kyc_status) {
+      return returnServiceResponse(false, null, 'KYC document must be provided to request a loan');
     }
 
     // 2. Load eligibility tiers from system_settings

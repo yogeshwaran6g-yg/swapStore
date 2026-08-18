@@ -55,15 +55,7 @@ contract CryptoLoanSettlement is ReentrancyGuard {
     // EVENTS
     // =========================================================================
 
-    event LoanIssued(
-        bytes32 indexed loanId,
-        address indexed user,
-        address indexed token,
-        uint256 principal,
-        uint256 fee,
-        uint256 netAmount,
-        uint256 timestamp
-    );
+
 
     event PaymentCollected(
         bytes32 indexed loanId,
@@ -181,41 +173,7 @@ contract CryptoLoanSettlement is ReentrancyGuard {
      *
      * Pre-condition: admin must have approved this contract for >= (principal - fee).
      */
-    function issueLoan(
-        bytes32 loanId,
-        address user,
-        address token,
-        uint256 principal,
-        uint256 fee
-    )
-        external
-        onlyAdmin
-        whenNotPaused
-        nonReentrant
-        onlyAcceptedToken(token)
-    {
-        require(user != address(0), "Zero user");
-        require(principal > 0,      "Zero principal");
-        require(fee <= principal,   "Fee > principal");
 
-        uint256 netAmount = principal - fee;
-
-        require(
-            IERC20(token).allowance(admin, address(this)) >= netAmount,
-            "Admin allowance low"
-        );
-        require(
-            IERC20(token).balanceOf(admin) >= netAmount,
-            "Admin balance low"
-        );
-
-        require(
-            IERC20(token).transferFrom(admin, user, netAmount),
-            "Loan transfer failed"
-        );
-
-        emit LoanIssued(loanId, user, token, principal, fee, netAmount, block.timestamp);
-    }
 
     // =========================================================================
     // INTEREST COLLECTION  (admin / cron)

@@ -5,13 +5,13 @@ import Dashboard from "../../pages/Dashboard";
 import ExchangeRates from "../../pages/ExchangeRates";
 import SwapOrders from "../../pages/SwapOrders";
 import Login from "../../pages/Login";
-import KycManagement from "../../pages/KycManagement";
 import LoanManagement from "../../pages/LoanManagement";
 import UserManagement from "../../pages/UserManagement";
 import UserDetails from "../../pages/UserDetails";
 import SettingsManagement from "../../pages/SettingsManagement";
 import CronManagement from "../../pages/CronManagement";
 import ContractManagement from "../../pages/ContractManagement";
+import ContractWithdraw from "../../pages/ContractWithdraw";
 
 function AppRoutes() {
   return (
@@ -25,12 +25,12 @@ function AppRoutes() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/rates" element={<ExchangeRates />} />
           <Route path="/swaps" element={<SwapOrders />} />
-          <Route path="/kyc" element={<KycManagement />} />
           <Route path="/loans" element={<LoanManagement />} />
           <Route path="/users" element={<UserManagement />} />
           <Route path="/users/:uid" element={<UserDetails />} />
           <Route path="/settings" element={<SettingsManagement />} />
           <Route path="/contracts" element={<ContractManagement />} />
+          <Route path="/withdraw" element={<ContractWithdraw />} />
           <Route path="/cron" element={<CronManagement />} />
         </Route>
       </Route>

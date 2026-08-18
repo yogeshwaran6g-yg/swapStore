@@ -6,6 +6,9 @@ import { useLoanTokenApproval } from '../../hooks/useLoanTokenApproval';
 import { erc20Abi, USDT_ADDRESSES, USDC_ADDRESSES, DAI_ADDRESSES } from '../../config/constants';
 import { ConfirmModal } from '../ui/ConfirmModal';
 import { CustomSelect } from '../ui/CustomSelect';
+import { useUserProfile } from '../../hooks/useUserProfile';
+import { useUploadKyc } from '../../hooks/useUploadKyc';
+import toast from 'react-hot-toast';
 
 export const LoanRequestForm = () => {
   const { address } = useAccount();
@@ -17,6 +20,15 @@ export const LoanRequestForm = () => {
   const [network, setNetwork]                       = useState('bsc');
   const [eligibilityChecked, setEligibilityChecked] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+
+  const { profile } = useUserProfile();
+  const { mutateAsync: saveKycDocument, isPending: uploadingKyc } = useUploadKyc();
+  
+  const [kycFile, setKycFile] = useState(null);
+  const [kycType, setKycType] = useState('id_card');
+  const [showKycForm, setShowKycForm] = useState(false);
+
+  const needsKyc = !profile?.kyc_status || profile.kyc_status === 'pending' || profile.kyc_status === 'rejected';
 
   // Reset eligibility whenever the user changes any input
   useEffect(() => {
@@ -166,6 +178,17 @@ export const LoanRequestForm = () => {
   const handleLoanSubmit = (e) => {
     e.preventDefault();
     if (!principal || !tokenAddr || !canSubmit) return;
+    
+    if (needsKyc && !showKycForm) {
+      setShowKycForm(true);
+      return;
+    }
+    
+    if (needsKyc && showKycForm && !kycFile) {
+      toast.error('Please select a KYC document to upload');
+      return;
+    }
+
     setIsConfirmModalOpen(true);
   };
 
@@ -177,11 +200,35 @@ export const LoanRequestForm = () => {
     }
   };
 
-  const executeLoanRequest = () => {
+  const executeLoanRequest = async () => {
     setIsConfirmModalOpen(false);
+
+    if (needsKyc && kycFile) {
+      try {
+        const formData = new FormData();
+        formData.append('documentType', kycType);
+        formData.append('kycDocument', kycFile);
+        await saveKycDocument(formData);
+      } catch (err) {
+        toast.error('Failed to upload KYC document');
+        return;
+      }
+    }
+
     submitLoanRequest(
       { principalAmount: requestedAmount, tokenAddress: tokenAddr, network },
-      { onSuccess: () => setPrincipal('') }
+      {
+        onSuccess: () => {
+          toast.success('Loan request submitted successfully!');
+          setPrincipal('');
+          setKycFile(null);
+          setShowKycForm(false);
+        },
+        onError: (err) => {
+          const msg = err?.response?.data?.error || err?.message || 'Loan request failed';
+          toast.error(msg);
+        },
+      }
     );
   };
 
@@ -280,10 +327,10 @@ export const LoanRequestForm = () => {
     return (
       <button
         type="submit"
-        disabled={isPending || !canSubmit}
+        disabled={isPending || uploadingKyc || !canSubmit}
         className="w-full flex justify-center py-3 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all"
       >
-        {isPending ? 'Processing...' : 'Confirm Request'}
+        {isPending || uploadingKyc ? 'Processing...' : (needsKyc && !showKycForm ? 'Provide KYC & Request Loan' : 'Confirm Request')}
       </button>
     );
   };
@@ -369,6 +416,60 @@ export const LoanRequestForm = () => {
             </div>
           )}
 
+          {needsKyc && showKycForm && (
+            <div className="mt-6 pt-6 border-t border-white/10 space-y-6 animate-fade-in">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 border border-purple-500/30">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                </div>
+                <h3 className="text-xl font-bold text-white tracking-wide">KYC Document Verification</h3>
+              </div>
+              <p className="text-sm text-zinc-400 mb-4">Please upload a valid identity document to proceed with your loan request.</p>
+
+              <div>
+                <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Document Type <span className="text-red-500">*</span></label>
+                <select 
+                  value={kycType}
+                  onChange={(e) => setKycType(e.target.value)}
+                  className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:bg-black/60 transition-all appearance-none"
+                >
+                  <option value="id_card">Government ID (Aadhaar / PAN)</option>
+                  <option value="passport">Passport</option>
+                  <option value="driving_license">Driving License</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Upload Document <span className="text-red-500">*</span></label>
+                <div className="flex items-center justify-center w-full">
+                  <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-white/10 border-dashed rounded-xl cursor-pointer bg-black/20 hover:bg-black/40 transition-colors overflow-hidden relative">
+                    {kycFile ? (
+                      kycFile.type.startsWith('image/') ? (
+                        <img src={URL.createObjectURL(kycFile)} alt="Preview" className="w-full h-full object-contain p-2" />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <svg className="w-12 h-12 mb-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                          <p className="mb-2 text-sm text-indigo-400 font-semibold text-center px-4 truncate max-w-[90%]">{kycFile.name}</p>
+                          <p className="text-xs text-zinc-500 mt-1">Click to change file</p>
+                        </div>
+                      )
+                    ) : (
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <svg className="w-8 h-8 mb-4 text-zinc-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                        </svg>
+                        <p className="mb-2 text-sm text-zinc-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                        <p className="text-xs text-zinc-500 mt-1">SVG, PNG, JPG or PDF (MAX. 5MB)</p>
+                      </div>
+                    )}
+                    <input type="file" accept=".jpg,.jpeg,.png,.svg,.pdf" className="hidden" onChange={(e) => setKycFile(e.target.files[0])} />
+                  </label>
+                </div>
+              </div>
+            </div>
+          )}
+
           {renderActionButton()}
         </form>
 
@@ -379,7 +480,7 @@ export const LoanRequestForm = () => {
           title="Confirm Loan Request"
           message={`Are you sure you want to request a loan of ${requestedAmount} ${tokenSymbol} on ${network.toUpperCase()}?`}
           confirmText="Yes, Request Loan"
-          isLoading={isPending}
+          isLoading={isPending || uploadingKyc}
         />
       </div>
     </div>

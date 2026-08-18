@@ -1,6 +1,5 @@
 import React from 'react';
 import { useUserProfile } from '../../hooks/useUserProfile';
-import { KycRequirementPrompt } from './KycRequirementPrompt';
 import { LoanRequestForm } from './LoanRequestForm';
 import { LoanHistoryTable } from './LoanHistoryTable';
 
@@ -31,8 +30,6 @@ export const LoanDashboard = () => {
           <div className="flex justify-center py-20">
             <div className="w-10 h-10 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
-        ) : profile?.kyc_status !== 'approved' ? (
-          <KycRequirementPrompt status={profile?.kyc_status} />
         ) : (
           <>
             {/* Action Cards */}
