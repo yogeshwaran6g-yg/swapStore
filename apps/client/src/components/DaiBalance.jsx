@@ -27,17 +27,16 @@ export default function DaiBalance() {
 
   const polygonIcon = <svg className="w-7 h-7 text-[#7C3AED]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 22l-8-4.5v-9L12 2l8 4.5v9L12 22z" /><circle cx="12" cy="12" r="3" fill="currentColor" /></svg>;
 
-  const sectionIcon = <div className="w-full h-full rounded-full bg-[#F59E0B] text-white flex items-center justify-center font-bold text-lg">D</div>;
+  const sectionIcon = <div className="w-full h-full text-white flex items-center justify-center font-bold text-lg">D</div>;
 
   return (
-    <TokenSection title="DAI Balances" icon={sectionIcon}>
+    <TokenSection title="DAI Balances" icon={sectionIcon} colorTheme="bg-[#F59E0B]">
       <TokenBalanceCard
         networkName="Polygon Network"
         balance={formattedPolygon}
         tokenSymbol="DAI"
         isLoading={isLoadingPolygon}
-        accentColor="text-[#7C3AED]"
-        borderColor="border-[#7C3AED]/20"
+        accentColor="text-[#F59E0B]"
         icon={polygonIcon}
       />
 

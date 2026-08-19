@@ -33,17 +33,16 @@ export default function UsdtBalance() {
 
   const polygonIcon = <svg className="w-7 h-7 text-[#7C3AED]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 22l-8-4.5v-9L12 2l8 4.5v9L12 22z" /><circle cx="12" cy="12" r="3" fill="currentColor" /></svg>;
 
-  const sectionIcon = <div className="w-full h-full rounded-full bg-green-500 text-white flex items-center justify-center font-bold text-lg">₮</div>;
+  const sectionIcon = <div className="w-full h-full text-white flex items-center justify-center font-bold text-lg">₮</div>;
 
   return (
-    <TokenSection title="USDT Balances" icon={sectionIcon}>
+    <TokenSection title="USDT Balances" icon={sectionIcon} colorTheme="bg-[#22C55E]">
       <TokenBalanceCard
         networkName="Polygon Network"
         balance={formattedPolygon}
         tokenSymbol="USDT"
         isLoading={isLoadingPolygon}
-        accentColor="text-[#7C3AED]"
-        borderColor="border-[#7C3AED]/20"
+        accentColor="text-[#22C55E]"
         icon={polygonIcon}
       />
 

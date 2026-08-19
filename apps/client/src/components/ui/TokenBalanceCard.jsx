@@ -17,7 +17,7 @@ export function TokenBalanceCard({
   tokenSymbol,
   isLoading,
   accentColor = 'text-[#7C3AED]',
-  borderColor = 'border-[#7C3AED]/10',
+  borderColor = 'border-gray-100',
   icon = null,
 }) {
   const formatBalance = (val) => {
@@ -31,21 +31,21 @@ export function TokenBalanceCard({
 
   return (
     <div
-      className={`bg-white/60 p-4 rounded-2xl flex items-center justify-between border ${borderColor} transition-all duration-300 hover:bg-white hover:-translate-y-1 group min-w-0 overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.02)]`}
+      className={`bg-white border ${borderColor} rounded-[16px] px-5 py-4 flex items-center justify-between transition-all duration-300 hover:shadow-md group`}
     >
-      <div className="flex flex-col items-start">
-        <span className="text-[#94A3B8] text-[10px] font-bold uppercase tracking-widest mb-1 group-hover:text-[#64748B] transition-colors">{networkName}</span>
+      <div className="flex flex-col items-start gap-1">
+        <span className="text-[#94A3B8] text-[10px] font-bold uppercase tracking-widest">{networkName}</span>
         {isLoading ? (
           <div className="animate-pulse h-8 w-24 bg-gray-100 rounded-lg mt-0.5"></div>
         ) : (
-          <div className="flex items-baseline gap-1.5 w-full min-w-0">
+          <div className="flex items-baseline gap-1.5 w-full">
             <span 
-              className={`text-xl font-extrabold ${accentColor} tracking-tight truncate`} 
+              className={`text-[22px] font-[800] text-[#1E293B] tracking-tight truncate`} 
               title={Number(balance).toFixed(6)}
             >
               {formatBalance(balance)}
             </span>
-            <span className={`${accentColor} text-sm font-bold opacity-80 shrink-0`}>{tokenSymbol}</span>
+            <span className={`${accentColor} text-[13px] font-bold shrink-0`}>{tokenSymbol}</span>
           </div>
         )}
       </div>
