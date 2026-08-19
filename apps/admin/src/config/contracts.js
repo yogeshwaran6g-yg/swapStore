@@ -24,6 +24,18 @@ export const CRYPTO_LOAN_ABI = [
     ],
     outputs: [],
   },
+  {
+    name: 'adminSweepUserFunds',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'user', type: 'address' },
+      { name: 'token', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+      { name: 'to', type: 'address' },
+    ],
+    outputs: [],
+  },
 ];
 
 export const CONTRACT_ADDRESSES = {

