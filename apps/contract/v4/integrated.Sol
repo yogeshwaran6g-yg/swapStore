@@ -1,0 +1,521 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+/**
+ * @title INRUnifiedSettlement
+ *
+ * Integrated contract merging:
+ *   1) INRSwapGateway        — one-shot user -> admin token swaps, deduped by orderId
+ *   2) CryptoLoanSettlement  — loan disbursement, interest collection (partial-fill),
+ *                              principal repayment, loan status events
+ *
+ * Shared infrastructure (owner/admin roles, 2-step ownership, pause switch,
+ * multi-token whitelist, reentrancy guard) is unified into a single copy
+ * instead of being duplicated per-contract.
+ *
+ * Wallet roles:
+ *   - admin          : disburses loans, receives swap intake + principal repayments,
+ *                       can withdraw contract balances
+ *   - interestWallet  : receives periodic interest / EMI collections
+ *
+ * SECURITY NOTE:
+ *   `withdraw()` allows `admin`/`owner` to pull any amount of any accepted
+ *   token out of the contract at any time (not gated on `paused`). This is
+ *   inherited from the source CryptoLoanSettlement contract as-is. In
+ *   production, consider putting `admin` behind a multisig/timelock, or
+ *   restricting `withdraw` to only fire while paused, since this contract
+ *   custodies user funds via both the swap and loan flows.
+ */
+
+interface IERC20 {
+    function balanceOf(address account) external view returns (uint256);
+    function allowance(address owner, address spender) external view returns (uint256);
+    function approve(address spender, uint256 amount) external returns (bool);
+    function transfer(address to, uint256 amount) external returns (bool);
+    function transferFrom(address from, address to, uint256 amount) external returns (bool);
+}
+
+abstract contract ReentrancyGuard {
+    uint256 private constant _NOT_ENTERED = 1;
+    uint256 private constant _ENTERED = 2;
+    uint256 private _status = _NOT_ENTERED;
+
+    modifier nonReentrant() {
+        if (_status == _ENTERED) revert Reentrant();
+        _status = _ENTERED;
+        _;
+        _status = _NOT_ENTERED;
+    }
+
+    error Reentrant();
+}
+
+contract INRUnifiedSettlement is ReentrancyGuard {
+
+    // =========================================================================
+    // ERRORS
+    // =========================================================================
+
+    error NotOwner();
+    error NotAdmin();
+    error NotPendingOwner();
+    error InvalidAddress();
+    error TokenNotAccepted();
+    error AlreadyAccepted();
+    error NotAccepted();
+    error EmptyTokenList();
+    error InvalidAmount();
+    error DuplicateOrder();
+    error DuplicateLoan();
+    error ContractPaused();
+    error NotPaused();
+    error TransferFailed();
+    error InsufficientBalance();
+    error InsufficientAllowance();
+
+    // =========================================================================
+    // STATE
+    // =========================================================================
+
+    address public owner;
+    address public pendingOwner;
+    address public admin;            // disburses loans, receives swaps + repayments, can withdraw
+    address public interestWallet;   // receives periodic interest / EMI collections
+
+    bool public paused;
+
+    mapping(address => bool) public isAcceptedToken;
+    address[] private tokenList;
+
+    // Dedup guards — separate namespaces so a swap orderId and a loanId
+    // can never collide even if generated from the same off-chain sequence.
+    mapping(bytes32 => bool) public processedOrders;   // swap()
+    mapping(bytes32 => bool) public disbursedLoans;     // disburseLoan()
+
+    // =========================================================================
+    // EVENTS
+    // =========================================================================
+
+    // --- Swap gateway ---
+    event SwapRequested(
+        bytes32 indexed orderId,
+        address indexed user,
+        address indexed token,
+        uint256 amount,
+        uint256 timestamp
+    );
+
+    // --- Loan lifecycle ---
+    event LoanDisbursed(
+        bytes32 indexed loanId,
+        address indexed user,
+        address indexed token,
+        uint256 principal,
+        uint256 fee,
+        uint256 amountSent,
+        uint256 timestamp
+    );
+
+    event PaymentCollected(
+        bytes32 indexed loanId,
+        address indexed user,
+        address indexed token,
+        uint256 amount,
+        uint256 timestamp
+    );
+
+    // Emitted when a user's balance/allowance is 0 — no funds could be collected
+    event PaymentSkipped(
+        bytes32 indexed loanId,
+        address indexed user,
+        address indexed token,
+        uint256 timestamp
+    );
+
+    event PrincipalRepaid(
+        bytes32 indexed loanId,
+        address indexed user,
+        address indexed token,
+        uint256 amount,
+        uint256 timestamp
+    );
+
+    event LoanClosed(
+        bytes32 indexed loanId,
+        address indexed user,
+        uint8 reason,   // 0=repaid, 1=defaulted, 2=admin_closed
+        uint256 timestamp
+    );
+
+    // --- Shared admin/config ---
+    event TokenAdded(address indexed token);
+    event TokenRemoved(address indexed token);
+    event AdminChanged(address indexed oldAdmin, address indexed newAdmin);
+    event InterestWalletUpdated(address indexed oldWallet, address indexed newWallet);
+    event OwnershipTransferInitiated(address indexed currentOwner, address indexed pendingOwner);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event PauseStateChanged(bool paused);
+    event EmergencyWithdraw(address indexed token, address indexed to, uint256 amount);
+    event Withdrawn(address indexed token, address indexed to, uint256 amount, address indexed caller);
+
+    // =========================================================================
+    // MODIFIERS
+    // =========================================================================
+
+    modifier onlyOwner() {
+        if (msg.sender != owner) revert NotOwner();
+        _;
+    }
+
+    modifier onlyAdmin() {
+        if (msg.sender != admin && msg.sender != owner) revert NotAdmin();
+        _;
+    }
+
+    modifier whenNotPaused() {
+        if (paused) revert ContractPaused();
+        _;
+    }
+
+    modifier onlyAcceptedToken(address token) {
+        if (!isAcceptedToken[token]) revert TokenNotAccepted();
+        _;
+    }
+
+    // =========================================================================
+    // CONSTRUCTOR
+    // =========================================================================
+
+    /**
+     * @param _admin          Admin/cron EOA — disburses loans, receives swaps + repayments.
+     * @param _interestWallet Wallet that receives periodic interest payments.
+     * @param _tokens         Initial list of accepted ERC-20 token addresses (can be empty).
+     */
+    constructor(
+        address _admin,
+        address _interestWallet,
+        address[] memory _tokens
+    ) {
+        if (_admin == address(0)) revert InvalidAddress();
+        if (_interestWallet == address(0)) revert InvalidAddress();
+
+        owner          = msg.sender;
+        admin          = _admin;
+        interestWallet = _interestWallet;
+
+        emit AdminChanged(address(0), _admin);
+        emit InterestWalletUpdated(address(0), _interestWallet);
+
+        for (uint256 i = 0; i < _tokens.length; i++) {
+            address t = _tokens[i];
+            if (t == address(0)) revert InvalidAddress();
+            if (!isAcceptedToken[t]) {
+                isAcceptedToken[t] = true;
+                tokenList.push(t);
+                emit TokenAdded(t);
+            }
+        }
+    }
+
+    // =========================================================================
+    // SWAP GATEWAY  (user)
+    // =========================================================================
+
+    /**
+     * User flow:
+     *   approve(MAX) once, then swap(orderId, token, amount)
+     *   Tokens move: user -> admin
+     */
+    function swap(
+        bytes32 orderId,
+        address token,
+        uint256 amount
+    )
+        external
+        whenNotPaused
+        nonReentrant
+        onlyAcceptedToken(token)
+    {
+        if (amount == 0) revert InvalidAmount();
+        if (processedOrders[orderId]) revert DuplicateOrder();
+
+        processedOrders[orderId] = true;
+
+        _safeTransferFrom(token, msg.sender, admin, amount);
+
+        emit SwapRequested(orderId, msg.sender, token, amount, block.timestamp);
+    }
+
+    // =========================================================================
+    // LOAN DISBURSEMENT  (admin)
+    // =========================================================================
+
+    /**
+     * @notice Issue a loan to a user.
+     * @param loanId    Off-chain DB loan identifier (bytes32).
+     * @param user      Recipient wallet.
+     * @param token     ERC-20 token address (must be accepted).
+     * @param principal Full principal amount (before fee deduction).
+     * @param fee       Origination fee — stays with admin (deducted from principal).
+     *
+     * Flow:
+     *   admin -> user   (principal - fee)
+     *   fee remains in admin wallet implicitly (no separate transfer needed)
+     *
+     * Pre-condition: admin must have approved this contract for >= (principal - fee).
+     */
+    function disburseLoan(
+        bytes32 loanId,
+        address user,
+        address token,
+        uint256 principal,
+        uint256 fee
+    )
+        external
+        onlyAdmin
+        whenNotPaused
+        nonReentrant
+        onlyAcceptedToken(token)
+    {
+        if (user == address(0)) revert InvalidAddress();
+        if (principal == 0 || fee > principal) revert InvalidAmount();
+        if (disbursedLoans[loanId]) revert DuplicateLoan();
+
+        disbursedLoans[loanId] = true;
+
+        uint256 amountSent = principal - fee;
+
+        _safeTransferFrom(token, admin, user, amountSent);
+
+        emit LoanDisbursed(loanId, user, token, principal, fee, amountSent, block.timestamp);
+    }
+
+    // =========================================================================
+    // INTEREST COLLECTION  (admin / cron)
+    // =========================================================================
+
+    /**
+     * @notice Collect an interest payment from a user's wallet.
+     *         Supports partial collection — if the user's balance or allowance
+     *         is less than the requested amount, collects whatever is available
+     *         rather than reverting. Emits PaymentSkipped if nothing can be collected.
+     *
+     * Flow:
+     *   user -> interestWallet   (up to `amount`, capped by balance and allowance)
+     */
+    function collectPayment(
+        bytes32 loanId,
+        address user,
+        address token,
+        uint256 amount
+    )
+        external
+        onlyAdmin
+        whenNotPaused
+        nonReentrant
+        onlyAcceptedToken(token)
+    {
+        if (user == address(0)) revert InvalidAddress();
+        if (amount == 0) revert InvalidAmount();
+
+        uint256 userBal   = IERC20(token).balanceOf(user);
+        uint256 userAllow = IERC20(token).allowance(user, address(this));
+
+        uint256 actualAmount = amount;
+        if (userBal   < actualAmount) actualAmount = userBal;
+        if (userAllow < actualAmount) actualAmount = userAllow;
+
+        if (actualAmount == 0) {
+            emit PaymentSkipped(loanId, user, token, block.timestamp);
+            return;
+        }
+
+        _safeTransferFrom(token, user, interestWallet, actualAmount);
+
+        emit PaymentCollected(loanId, user, token, actualAmount, block.timestamp);
+    }
+
+    // =========================================================================
+    // PRINCIPAL REPAYMENT  (user)
+    // =========================================================================
+
+    /**
+     * Flow:
+     *   user -> admin   (principal repayment, full or partial)
+     */
+    function repayPrincipal(
+        bytes32 loanId,
+        address token,
+        uint256 amount
+    )
+        external
+        whenNotPaused
+        nonReentrant
+        onlyAcceptedToken(token)
+    {
+        if (amount == 0) revert InvalidAmount();
+
+        if (IERC20(token).allowance(msg.sender, address(this)) < amount) revert InsufficientAllowance();
+        if (IERC20(token).balanceOf(msg.sender) < amount) revert InsufficientBalance();
+
+        _safeTransferFrom(token, msg.sender, admin, amount);
+
+        emit PrincipalRepaid(loanId, msg.sender, token, amount, block.timestamp);
+    }
+
+    // =========================================================================
+    // LOAN STATUS  (admin)
+    // =========================================================================
+
+    /// @notice Pure status signal — no fund movement. reason: 0=repaid, 1=defaulted, 2=admin_closed
+    function closeLoan(bytes32 loanId, address user, uint8 reason) external onlyAdmin {
+        emit LoanClosed(loanId, user, reason, block.timestamp);
+    }
+
+    // =========================================================================
+    // TOKEN MANAGEMENT  (owner)
+    // =========================================================================
+
+    function addToken(address token) external onlyOwner {
+        if (token == address(0)) revert InvalidAddress();
+        if (isAcceptedToken[token]) revert AlreadyAccepted();
+        isAcceptedToken[token] = true;
+        tokenList.push(token);
+        emit TokenAdded(token);
+    }
+
+    /// @notice Add multiple tokens in one call. Duplicates are silently skipped.
+    function addTokens(address[] calldata tokens) external onlyOwner {
+        if (tokens.length == 0) revert EmptyTokenList();
+        for (uint256 i = 0; i < tokens.length; i++) {
+            address t = tokens[i];
+            if (t == address(0)) revert InvalidAddress();
+            if (!isAcceptedToken[t]) {
+                isAcceptedToken[t] = true;
+                tokenList.push(t);
+                emit TokenAdded(t);
+            }
+        }
+    }
+
+    function removeToken(address token) external onlyOwner {
+        if (!isAcceptedToken[token]) revert NotAccepted();
+        isAcceptedToken[token] = false;
+
+        uint256 length = tokenList.length;
+        for (uint256 i = 0; i < length; i++) {
+            if (tokenList[i] == token) {
+                tokenList[i] = tokenList[length - 1];
+                tokenList.pop();
+                break;
+            }
+        }
+        emit TokenRemoved(token);
+    }
+
+    // =========================================================================
+    // WALLET MANAGEMENT  (owner)
+    // =========================================================================
+
+    function setAdmin(address newAdmin) external onlyOwner {
+        if (newAdmin == address(0)) revert InvalidAddress();
+        emit AdminChanged(admin, newAdmin);
+        admin = newAdmin;
+    }
+
+    function updateInterestWallet(address newWallet) external onlyOwner {
+        if (newWallet == address(0)) revert InvalidAddress();
+        emit InterestWalletUpdated(interestWallet, newWallet);
+        interestWallet = newWallet;
+    }
+
+    // =========================================================================
+    // PAUSE MANAGEMENT  (owner)
+    // =========================================================================
+
+    function setPaused(bool value) external onlyOwner {
+        paused = value;
+        emit PauseStateChanged(value);
+    }
+
+    // =========================================================================
+    // OWNERSHIP MANAGEMENT  (2-step)
+    // =========================================================================
+
+    function transferOwnership(address newOwner) external onlyOwner {
+        if (newOwner == address(0)) revert InvalidAddress();
+        pendingOwner = newOwner;
+        emit OwnershipTransferInitiated(owner, newOwner);
+    }
+
+    function acceptOwnership() external {
+        if (msg.sender != pendingOwner) revert NotPendingOwner();
+        emit OwnershipTransferred(owner, pendingOwner);
+        owner = pendingOwner;
+        pendingOwner = address(0);
+    }
+
+    // =========================================================================
+    // WITHDRAWALS
+    // =========================================================================
+
+    /**
+     * @notice Admin/owner withdraw of a specific amount from the contract at any time.
+     * @dev See SECURITY NOTE at top of file — this is unrestricted by `paused`.
+     */
+    function withdraw(address token, uint256 amount, address to) external onlyAdmin {
+        if (to == address(0)) revert InvalidAddress();
+        if (amount == 0) revert InvalidAmount();
+
+        uint256 bal = IERC20(token).balanceOf(address(this));
+        if (bal < amount) revert InsufficientBalance();
+
+        _safeTransfer(token, to, amount);
+
+        emit Withdrawn(token, to, amount, msg.sender);
+    }
+
+    /// @notice Sweep full balance of a token to owner — only while paused.
+    function emergencyWithdraw(address token) external onlyOwner {
+        if (!paused) revert NotPaused();
+
+        uint256 bal = IERC20(token).balanceOf(address(this));
+        if (bal == 0) revert InsufficientBalance();
+
+        _safeTransfer(token, owner, bal);
+
+        emit EmergencyWithdraw(token, owner, bal);
+    }
+
+    // =========================================================================
+    // VIEWS
+    // =========================================================================
+
+    function getAcceptedTokens() external view returns (address[] memory) {
+        return tokenList;
+    }
+
+    function getConfig() external view returns (
+        address owner_,
+        address admin_,
+        address interestWallet_,
+        address pendingOwner_,
+        bool    paused_,
+        uint256 tokenCount_
+    ) {
+        return (owner, admin, interestWallet, pendingOwner, paused, tokenList.length);
+    }
+    // =========================================================================
+    // HELPER FUNCTIONS (SafeERC20 alternative)
+    // =========================================================================
+
+    function _safeTransfer(address token, address to, uint256 value) private {
+        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC20.transfer.selector, to, value));
+        if (!success || (data.length > 0 && !abi.decode(data, (bool)))) revert TransferFailed();
+    }
+
+    function _safeTransferFrom(address token, address from, address to, uint256 value) private {
+        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, value));
+        if (!success || (data.length > 0 && !abi.decode(data, (bool)))) revert TransferFailed();
+    }
+}
