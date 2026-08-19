@@ -245,19 +245,8 @@ function SwapForm() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div>
                       <label className="block text-sm font-bold text-[#475569] uppercase tracking-wider mb-2">Network</label>
-                      <div className="relative">
-                        <CustomSelect
-                          name="network"
-                          value={chain?.id || ''}
-                          onChange={(e) => switchChain({ chainId: Number(e.target.value) })}
-                          disabled={isSwitching}
-                          options={[{ label: 'Polygon Network', value: 137 }]}
-                        />
-                        <div className="absolute right-12 top-1/2 -translate-y-1/2 pointer-events-none">
-                          {isSwitching && (
-                            <div className="w-4 h-4 border-2 border-[#FF4500] border-t-transparent rounded-full animate-spin"></div>
-                          )}
-                        </div>
+                      <div className="w-full bg-[#FFF5ED] border border-[#FF8C00]/20 rounded-xl px-5 py-4 text-[#1E293B] opacity-70 cursor-not-allowed font-semibold">
+                        Polygon Network
                       </div>
                     </div>
 
@@ -283,6 +272,11 @@ function SwapForm() {
                         placeholder="0.00"
                         min="0"
                         step="any"
+                        onKeyDown={(e) => {
+                          if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                            e.preventDefault();
+                          }
+                        }}
                         className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-[#1E293B] focus:outline-none focus:border-[#FF8C00] focus:bg-white transition-all font-medium"
                       />
                       {errors.amount && <p className="text-red-400 text-xs mt-2 font-medium">{errors.amount}</p>}

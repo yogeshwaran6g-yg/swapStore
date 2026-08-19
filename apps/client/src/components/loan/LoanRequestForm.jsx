@@ -283,14 +283,9 @@ export const LoanRequestForm = () => {
         <form onSubmit={handleLoanSubmit} className="space-y-6">
           <div className="space-y-1">
             <label className="block text-sm font-bold text-[#475569] uppercase tracking-wider mb-2">Network</label>
-            <CustomSelect
-              name="network"
-              value={network}
-              onChange={(e) => setNetwork(e.target.value)}
-              options={[
-                { label: 'Polygon Network', value: 'polygon' }
-              ]}
-            />
+            <div className="w-full bg-[#FFF5ED] border border-[#FF8C00]/20 rounded-xl px-5 py-4 text-[#1E293B] opacity-70 cursor-not-allowed font-semibold">
+              Polygon Network
+            </div>
           </div>
 
           <div className="space-y-1">
@@ -314,6 +309,13 @@ export const LoanRequestForm = () => {
             <div className="relative rounded-md shadow-sm">
               <input
                 type="number"
+                min="0"
+                step="any"
+                onKeyDown={(e) => {
+                  if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                    e.preventDefault();
+                  }
+                }}
                 value={principal}
                 onChange={(e) => setPrincipal(e.target.value)}
                 className="w-full bg-[#FFF5ED] border border-[#FF8C00]/20 rounded-xl px-5 py-4 text-[#1E293B] focus:outline-none focus:border-[#FF4500] focus:ring-4 focus:ring-[#FF8C00]/10 focus:bg-white transition-all font-mono appearance-none"

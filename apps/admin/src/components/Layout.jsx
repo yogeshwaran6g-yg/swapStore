@@ -85,10 +85,10 @@ const Layout = () => {
             <Clock size={18} strokeWidth={2} />
             <span>Cron Jobs</span>
           </NavLink>
-          <NavLink to="/contracts" onClick={closeSidebar} className={navItemClass}>
+          {/* <NavLink to="/contracts" onClick={closeSidebar} className={navItemClass}>
             <Cpu size={18} strokeWidth={2} />
             <span>Contract Wallets</span>
-          </NavLink>
+          </NavLink> */}
           <NavLink to="/withdraw" onClick={closeSidebar} className={navItemClass}>
             <Download size={18} strokeWidth={2} />
             <span>Withdraw</span>
