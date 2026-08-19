@@ -109,7 +109,7 @@ function Home() {
 
               {/* Main Image */}
               <div className="relative z-10 w-full flex items-center justify-center transform scale-[1.1] sm:scale-[1.0] md:scale-[0.9] origin-center -translate-x-8">
-                <img src="/wallet-illustration.png" alt="3D Wallet Illustration" className="w-full max-w-[400px] sm:max-w-[500px] md:max-w-[380px] object-contain relative z-20 drop-shadow-2xl animate-float" />
+                <img src="/robot.png" alt="3D Robot Illustration" className="w-full max-w-[400px] sm:max-w-[500px] md:max-w-[380px] object-contain relative z-20 drop-shadow-2xl animate-float" />
               </div>
             </div>
 
@@ -212,8 +212,8 @@ function Home() {
             <div className="relative z-10 w-full flex items-center justify-center transform scale-[1.15] lg:scale-[1.1] origin-center mt-10 lg:-mt-48 -translate-x-2 lg:-translate-x-4">
               {/* Main Image */}
               <img
-                src="/wallet-illustration.png"
-                alt="3D Wallet Illustration"
+                src="/robot.png"
+                alt="3D Robot Illustration"
                 className="w-full max-w-[500px] lg:max-w-[700px] object-contain relative z-20 drop-shadow-2xl animate-float"
               />
 
