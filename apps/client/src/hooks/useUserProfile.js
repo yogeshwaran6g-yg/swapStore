@@ -19,7 +19,7 @@ export function useUserProfile() {
   });
 
   return {
-    profile: data?.user ?? null,
+    profile: data?.data?.user ?? data?.user ?? null,
     isLoading,
     isError,
     error,

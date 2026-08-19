@@ -1,23 +1,32 @@
 {
   "name": "server",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "server.js",
   "type": "module",
   "scripts": {
     "test": "fck.js",
-    "dev": "node src/server.js"
+    "start": "node src/server.js",
+    "seed": "node src/scripts/seed.js",
+    "dev": "nodemon src/server.js",
+    "truncate": "node src/scripts/truncate.js",
+    "drop": "node src/scripts/drop.js"
   },
   "author": "YG",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.1.0",
     "http": "0.0.1-security",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.11.0",
+    "multer": "^2.1.1",
     "mysql2": "^3.22.5",
-    "uuid": "^14.0.0"
+    "node-cron": "^4.2.1",
+    "nodemon": "^3.1.14",
+    "uuid": "^14.0.0",
+    "viem": "^2.52.2"
   }
 }

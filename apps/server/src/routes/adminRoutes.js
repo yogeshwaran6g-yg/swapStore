@@ -1,14 +1,17 @@
 import express from 'express';
-import { adminAuth } from '../config/adminAuthMiddleware.js';
-import { updateRate } from '../controllers/rateController.js';
-
+import { authMiddleware } from '../config/authMiddleware.js';
+import { adminLogin, getAdminProfile, getAllSettings, updateSettings, getDashboardStats } from '../controllers/adminController.js';
 const router = express.Router();
 
-// We will add admin login here eventually
-// router.post('/login', adminLogin);
+router.post('/login', adminLogin);
 
-router.use(adminAuth);
+router.use(authMiddleware);
 
-router.post('/rates', updateRate);
+router.get('/me', getAdminProfile);
+
+router.get('/settings', getAllSettings);
+router.put('/settings', updateSettings);
+
+router.get('/dashboard-stats', getDashboardStats);
 
 export default router;

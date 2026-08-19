@@ -5,6 +5,8 @@ import { config } from './config/wagmi';
 import AppRoutes from "./components/routes/AppRoutes";
 import { AuthProvider } from "./context/AuthContext";
 
+import { Toaster } from "react-hot-toast";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -20,6 +22,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <AuthProvider>
+            <Toaster position="top-center" />
             <AppRoutes />
           </AuthProvider>
         </BrowserRouter>

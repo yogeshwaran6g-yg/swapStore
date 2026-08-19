@@ -3,13 +3,19 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
+import path from "path";
+import { fileURLToPath } from "url";
 import { createServer } from "http";
 import ratesRouter from './routes/rates.js';
-import userRoutes from './routes/userRoutes.js';
+import userRoutes from './routes/authRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import swapRoutes from './routes/swapRoutes.js';
+import loanRoutes from './routes/loanRoutes.js';
 
 const app = express();
 const server = createServer(app);
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const PORT = process.env.PORT || 3000;
 
@@ -18,6 +24,7 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 // ── Routes ─────────────────────────────────────────────────
 app.get("/", (_req, res) => {
@@ -27,6 +34,8 @@ app.get("/", (_req, res) => {
 app.use('/api/v1/rates', ratesRouter);
 app.use('/api/v1/auth', userRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/swap', swapRoutes);
+app.use('/api/v1/loan', loanRoutes);
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", uptime: process.uptime() });
@@ -43,7 +52,16 @@ app.use((err, _req, res, _next) => {
   res.status(err.status || 500).json({ error: err.message || "Internal Server Error" });
 });
 
+import { startContractListeners } from './services/contractListener.js';
+import { startCronJobs } from './services/cronService.js';
+
 // ── Start server ───────────────────────────────────────────
 server.listen(PORT, () => {
   console.log(`✅ Server listening on http://localhost:${PORT}`);
+
+  // Start Blockchain Event Listeners
+  startContractListeners();
+  
+  // Start Cron Jobs
+  startCronJobs();
 });

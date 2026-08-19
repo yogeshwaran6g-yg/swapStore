@@ -1,11 +1,12 @@
 {
   "name": "client",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:staging": "vite build --mode staging",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -14,9 +15,12 @@
     "@reown/appkit-adapter-wagmi": "^1.8.20",
     "@tanstack/react-query": "^5.101.0",
     "axios": "^1.17.0",
+    "lucide-react": "^1.17.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-hot-toast": "^2.6.0",
     "react-router-dom": "^7.6.3",
+    "serve": "^14.2.6",
     "viem": "^2.52.2",
     "wagmi": "^3.6.16"
   },

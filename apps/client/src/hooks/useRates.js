@@ -1,6 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchRates } from '@/services/rateApiService';
 
+const FALLBACK_RATES = { 
+  USDT_bnb: 85, USDC_bnb: 85, DAI_bnb: 85,
+  USDT_polygon: 85, USDC_polygon: 85, DAI_polygon: 85
+};
+
 /**
  * React Query hook to fetch exchange rates.
  * Auto-refetches every 60 seconds.
@@ -13,11 +18,11 @@ export function useRates() {
     queryFn: fetchRates,
     staleTime: 30 * 1000,       // 30s before considered stale
     refetchInterval: 60 * 1000, // refetch every 60s
-    placeholderData: { USDT: 85, USDC: 85, DAI: 85 },
+    placeholderData: FALLBACK_RATES,
   });
 
   return {
-    rates: data ?? { USDT: 85, USDC: 85, DAI: 85 },
+    rates: data ?? FALLBACK_RATES,
     isLoading,
     isError,
     error,
