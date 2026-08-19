@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const PrivacyPolicy = () => {
+const PrivacyInfo = () => {
   const navigate = useNavigate();
 
   return (
@@ -175,4 +175,4 @@ const PrivacyPolicy = () => {
   );
 };
 
-export default PrivacyPolicy;
+export default PrivacyInfo;
