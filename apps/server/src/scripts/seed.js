@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 import 'dotenv/config';
 import { queryRunner } from '../config/db.js';
 
@@ -41,6 +42,10 @@ const seed = async () => {
             ON DUPLICATE KEY UPDATE inr_rate = VALUES(inr_rate), is_active = VALUES(is_active);
         `);
         console.log('Seed data inserted successfully.');
+
+        // 4. Create Admin User
+        console.log('Creating default admin user...');
+        execSync('node src/scripts/createAdmin.js', { stdio: 'inherit', cwd: path.join(__dirname, '..', '..') });
 
         console.log('Database seeding completed!');
         process.exit(0);

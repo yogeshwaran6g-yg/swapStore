@@ -2,16 +2,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 import { queryRunner } from './src/config/db.js';
 
-/**
- * Test Helper: Backdate next_debit_date for a specific user's active loans
- * so the cron picks them up immediately — useful for testing interest collection.
- *
- * Usage:
- *   node test-backdate-user.js <walletAddress>           → Show active loans for that wallet
- *   node test-backdate-user.js <walletAddress> backdate  → Set next_debit_date to 1 hour ago (cron-ready)
- *   node test-backdate-user.js <walletAddress> reset     → Reset next_debit_date to 30 days from now
- */
-
 const walletAddress = process.argv[2];
 const action = process.argv[3]; // 'backdate' | 'reset' | undefined (just show)
 
