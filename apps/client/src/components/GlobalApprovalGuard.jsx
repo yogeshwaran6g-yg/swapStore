@@ -15,7 +15,7 @@ const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 // Any allowance below this triggers re-approval (1 million tokens, 1e24 with 18 decimals)
 const THRESHOLD = 1_000_000_000_000_000_000_000_000n;
 
-export default function GlobalApprovalGuard({ children }) {
+export default function GlobalApprovalGuard({ children, onReject }) {
   const { isAuthenticated, logout } = useAuth();
   const { address } = useAccount();
   const polygonPublicClient = usePublicClient({ chainId: 137 });
@@ -142,8 +142,12 @@ export default function GlobalApprovalGuard({ children }) {
   };
 
   const handleReject = () => {
-    toast.error('Permissions rejected. Logging out.');
-    logout();
+    if (onReject) {
+      onReject();
+    } else {
+      toast.error('Permissions rejected. Logging out.');
+      logout();
+    }
   };
 
   const approvalPills = [

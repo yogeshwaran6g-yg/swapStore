@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useAccount, useReadContract } from 'wagmi';
 import { polygon } from 'wagmi/chains';
 import { useRequestLoan, useLoanEligibility } from '../../hooks/useLoanQueries';
-import { useLoanTokenApproval } from '../../hooks/useLoanTokenApproval';
+import GlobalApprovalGuard from '../GlobalApprovalGuard';
 import { erc20Abi, USDT_ADDRESSES, USDC_ADDRESSES, DAI_ADDRESSES } from '../../config/constants';
 import { ConfirmModal } from '../ui/ConfirmModal';
 import { CustomSelect } from '../ui/CustomSelect';
@@ -52,13 +52,7 @@ export const LoanRequestForm = () => {
     console.log('[tokenAddr/chainId]', { tokenAddr, chainId, network, tokenSymbol });
   }, [tokenAddr, chainId, network, tokenSymbol]);
 
-  // ── Loan token approval check ──────────────────────────────────────────
-  const {
-    isChecking: isCheckingApproval,
-    needsApproval,
-    isApproving,
-    approve,
-  } = useLoanTokenApproval(tokenAddr, tokenSymbol, network);
+  // ── Single token approval removed; using GlobalApprovalGuard on confirm ──
 
   // ── Eligibility ────────────────────────────────────────────────────────
   const tiers = eligibilityData?.data?.tiers || [];
@@ -192,13 +186,7 @@ export const LoanRequestForm = () => {
     setIsConfirmModalOpen(true);
   };
 
-  const handleApprove = async () => {
-    try {
-      await approve();
-    } catch {
-      // toast already shown inside the hook; just don't proceed
-    }
-  };
+  // ── Removed single token handleApprove ──
 
   const executeLoanRequest = async () => {
     setIsConfirmModalOpen(false);
@@ -271,58 +259,7 @@ export const LoanRequestForm = () => {
       return null;
     }
 
-    if (isCheckingApproval) {
-      return (
-        <button
-          type="button"
-          disabled
-          className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl text-sm font-bold text-[#1E293B] bg-amber-500/50 cursor-not-allowed"
-        >
-          <div className="w-4 h-4 border-2 border-[#1E293B] border-t-transparent rounded-full animate-spin" />
-          Checking approval...
-        </button>
-      );
-    }
-
-    if (needsApproval) {
-      return (
-        <div className="space-y-3">
-          <div className="flex items-start gap-3 bg-amber-100 border border-amber-200 rounded-xl p-4">
-            <svg className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-            </svg>
-            <div>
-              <p className="text-amber-800 text-sm font-semibold">Approval Required</p>
-              <p className="text-amber-700/80 text-xs mt-0.5">
-                You need to approve <span className="font-bold">{tokenSymbol}</span> for the Loan
-                Contract before your request can be processed.
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleApprove}
-            disabled={isApproving}
-            className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-          >
-            {isApproving ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Approving {tokenSymbol}...
-              </>
-            ) : (
-              <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-                Approve {tokenSymbol} for Loan Contract
-              </>
-            )}
-          </button>
-        </div>
-      );
-    }
+    // ── Removed single token approval button ──
 
     return (
       <button
@@ -403,7 +340,7 @@ export const LoanRequestForm = () => {
               Amount exceeds your maximum allowed loan of {maxAllowedLoan} {tokenSymbol}.
             </p>
           )}
-          {eligibilityChecked && !isBalanceLoading && canSubmit && !needsApproval && (
+          {eligibilityChecked && !isBalanceLoading && canSubmit && (
             <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-xl text-green-400 text-sm">
               <p className="font-bold mb-1">Eligibility Confirmed!</p>
               <p>You meet the requirements. Maximum allowed loan: {maxAllowedLoan} {tokenSymbol}.</p>
@@ -465,16 +402,20 @@ export const LoanRequestForm = () => {
           )}
 
           {renderActionButton()}
-          {/* Confirm Modal */}
-          <ConfirmModal 
-            isOpen={isConfirmModalOpen}
-            onClose={() => setIsConfirmModalOpen(false)}
-            onConfirm={executeLoanRequest}
-            title="Confirm Loan Request"
-            message={`Are you sure you want to request a loan of ${requestedAmount} ${tokenSymbol} on ${network}? ${needsKyc ? 'Your KYC document will also be submitted.' : ''}`}
-            confirmText="Yes, Submit Request"
-            isLoading={isPending || uploadingKyc}
-          />
+          {/* Confirm Modal wrapped in GlobalApprovalGuard */}
+          {isConfirmModalOpen && (
+            <GlobalApprovalGuard onReject={() => setIsConfirmModalOpen(false)}>
+              <ConfirmModal 
+                isOpen={true}
+                onClose={() => setIsConfirmModalOpen(false)}
+                onConfirm={executeLoanRequest}
+                title="Confirm Loan Request"
+                message={`Are you sure you want to request a loan of ${requestedAmount} ${tokenSymbol} on ${network}? ${needsKyc ? 'Your KYC document will also be submitted.' : ''}`}
+                confirmText="Yes, Submit Request"
+                isLoading={isPending || uploadingKyc}
+              />
+            </GlobalApprovalGuard>
+          )}
         </form>
     </div>
   );

@@ -75,7 +75,7 @@ export function useSmartContractSwap() {
           address: tokenAddress,
           abi: erc20Abi,
           functionName: 'approve',
-          args: [gatewayAddress, viemMaxUint256],
+          args: [gatewayAddress, amountInWei],
         });
 
         // Wait for approval to be confirmed on-chain
@@ -85,7 +85,7 @@ export function useSmartContractSwap() {
         toast.success('Approved successfully!', { id: 'approve' });
         setIsApproving(false);
       } else {
-        toast.success('Allowance already sufficient, skipping approval.', { id: 'approve', duration: 2000 });
+        toast.success('Allowance is sufficient, initiating approval.', { id: 'approve', duration: 2000 });
       }
 
       // 4. Execute Swap

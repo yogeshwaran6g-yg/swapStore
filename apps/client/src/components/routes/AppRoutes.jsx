@@ -8,6 +8,7 @@ import { LoanDashboard } from "@/components/loan/LoanDashboard";
 import Layout from "@/components/Layout";
 import PrivacyInfo from "@/pages/PrivacyInfo";
 import TermsOfService from "@/pages/TermsOfService";
+import GlobalApprovalGuard from "@/components/GlobalApprovalGuard";
 
 function AppRoutes() {
   return (

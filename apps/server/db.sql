@@ -106,15 +106,16 @@ CREATE TABLE IF NOT EXISTS system_settings (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
-INSERT IGNORE INTO system_settings (setting_key, setting_value) VALUES 
-('loan_eligibility_tiers', '[{"token":"USDT","network":"bsc","min_balance":50,"max_loan":100},{"token":"USDC","network":"bsc","min_balance":50,"max_loan":100},{"token":"DAI","network":"bsc","min_balance":50,"max_loan":100}]'),
+INSERT INTO system_settings (setting_key, setting_value) VALUES 
+('loan_eligibility_tiers', '[{"token":"USDT","network":"polygon","min_balance":50,"max_loan":100},{"token":"USDC","network":"polygon","min_balance":50,"max_loan":100},{"token":"DAI","network":"polygon","min_balance":50,"max_loan":100}]'),
 ('loan_interest_rate', '5.0'),
 ('loan_interest_calc_basis', 'original'),
 ('loan_interest_frequency_days', '30'),
 ('loan_default_term_days', '90'),
 ('loan_grace_period_days', '3'),
 ('loan_default_threshold_days', '90'),
-('loan_auto_close_on_maturity', '1');
+('loan_auto_close_on_maturity', '1')
+ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value);
 
 CREATE TABLE IF NOT EXISTS user_kyc_documents (
     id INT AUTO_INCREMENT PRIMARY KEY,
