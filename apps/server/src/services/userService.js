@@ -209,9 +209,9 @@ export const createSwapOrder = async (userUid, { tokenAddress, amount, network, 
       [userUid]
     );
 
-    if (pendingOrders && pendingOrders[0].count >= 5) {
-      return returnServiceResponse(false, null, 'You have too many pending swap requests. Please complete or cancel them before creating a new one.');
-    }
+    // if (pendingOrders && pendingOrders[0].count >= 5) {
+    //   return returnServiceResponse(false, null, 'You have too many pending swap requests. Please complete or cancel them before creating a new one.');
+    // }
 
     const hexOrderId = uuidv4().replace(/-/g, '');
     const orderIdBytes32 = '0x' + hexOrderId + '00000000000000000000000000000000';

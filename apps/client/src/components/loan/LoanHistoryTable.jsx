@@ -142,6 +142,7 @@ export const LoanHistoryTable = () => {
                                       <th className="px-3 py-2 font-medium">Interest</th>
                                       <th className="px-3 py-2 font-medium">Status</th>
                                       <th className="px-3 py-2 font-medium">Collected At</th>
+                                      <th className="px-3 py-2 font-medium">Tx Hash</th>
                                     </tr>
                                   </thead>
                                   <tbody className="divide-y divide-[#FF8C00]/5">
@@ -167,6 +168,19 @@ export const LoanHistoryTable = () => {
                                         </td>
                                         <td className="px-3 py-2.5 text-[#475569]">
                                           {entry.collected_at ? new Date(entry.collected_at).toLocaleDateString() : '-'}
+                                        </td>
+                                        <td className="px-3 py-2.5 text-[#475569]">
+                                          {entry.tx_hash ? (
+                                            <a 
+                                              href={loan.network === 'polygon' ? `https://polygonscan.com/tx/${entry.tx_hash}` : `https://bscscan.com/tx/${entry.tx_hash}`}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="text-[#FF8C00] hover:underline hover:text-[#E67E22]"
+                                              title={entry.tx_hash}
+                                            >
+                                              {entry.tx_hash.slice(0, 6)}...{entry.tx_hash.slice(-4)}
+                                            </a>
+                                          ) : '-'}
                                         </td>
                                       </tr>
                                     ))}

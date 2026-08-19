@@ -67,7 +67,7 @@ async function run() {
       const nextDebit = loan.next_debit_date ? new Date(loan.next_debit_date).toLocaleString() : 'N/A';
       const maturity = loan.maturity_date ? new Date(loan.maturity_date).toLocaleString() : 'N/A';
       const isPastDue = loan.next_debit_date && new Date(loan.next_debit_date) <= new Date();
-      const isActive = ['approved', 'active'].includes(loan.status);
+      const isActive = ['pending', 'approved', 'active'].includes(loan.status);
 
       if (isActive) activeLoans.push(loan);
 
@@ -86,38 +86,37 @@ async function run() {
     console.log(`\n⚡ = next_debit_date is in the past → cron WILL process this loan`);
     console.log(`📌 Active loans (approved/active): ${activeLoans.length} of ${loans.length} total\n`);
 
-    if (activeLoans.length === 0) {
-      console.log('⚠️  No active/approved loans to backdate. Cron only processes active loans.\n');
+    const targetLoan = activeLoans[0];
+
+    if (!targetLoan) {
+      console.log('⚠️  No pending/approved/active loans to backdate.\n');
       process.exit(0);
     }
 
-    // 3. Perform action on active loans only
+    // 3. Perform action on the latest loan only
     if (action === 'backdate') {
       const result = await queryRunner(
-        `UPDATE loans l
-         JOIN users u ON l.user_uid = u.uid
-         SET l.next_debit_date = DATE_SUB(NOW(), INTERVAL 1 HOUR)
-         WHERE LOWER(u.wallet_address) = LOWER(?)
-           AND l.status IN ('approved', 'active')`,
-        [walletAddress]
+        `UPDATE loans 
+         SET next_debit_date = DATE_SUB(NOW(), INTERVAL 1 HOUR),
+             status = IF(status = 'pending', 'approved', status)
+         WHERE uid = UNHEX(?)`,
+        [targetLoan.uid]
       );
 
-      console.log(`✅ Backdated ${result.affectedRows} active loan(s) for this wallet.`);
-      console.log(`   next_debit_date → set to 1 hour ago (cron will pick them up now)\n`);
+      console.log(`✅ Backdated the LATEST loan (${targetLoan.uid.slice(0, 8)}...) for this wallet.`);
+      console.log(`   next_debit_date → set to 1 hour ago (cron will pick it up now)\n`);
       console.log(`👉 Now go to Admin Panel → Cron Jobs → "Run Interest Collection — All Users"\n`);
 
     } else if (action === 'reset') {
       const freqDays = 30;
       const result = await queryRunner(
-        `UPDATE loans l
-         JOIN users u ON l.user_uid = u.uid
-         SET l.next_debit_date = DATE_ADD(NOW(), INTERVAL ${freqDays} DAY)
-         WHERE LOWER(u.wallet_address) = LOWER(?)
-           AND l.status IN ('approved', 'active')`,
-        [walletAddress]
+        `UPDATE loans 
+         SET next_debit_date = DATE_ADD(NOW(), INTERVAL ${freqDays} DAY)
+         WHERE uid = UNHEX(?)`,
+        [targetLoan.uid]
       );
 
-      console.log(`✅ Reset ${result.affectedRows} active loan(s) — next_debit_date set to ${freqDays} days from now.\n`);
+      console.log(`✅ Reset the LATEST loan (${targetLoan.uid.slice(0, 8)}...) — next_debit_date set to ${freqDays} days from now.\n`);
 
     } else {
       console.log('💡 Commands:');

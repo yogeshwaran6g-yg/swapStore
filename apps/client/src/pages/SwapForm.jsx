@@ -178,7 +178,7 @@ function SwapForm() {
 
   const rateKey = `${formData.token}_${networkName}`;
   const currentRate = rates ? (rates[rateKey] || 0) : 0;
-  const inrValue = (Number(formData.amount || 0) * currentRate).toFixed(2);
+  const inrValue = (Math.max(0, Number(formData.amount || 0)) * currentRate).toFixed(2);
 
   if (isSwapComplete) {
     return (
@@ -281,6 +281,8 @@ function SwapForm() {
                         value={formData.amount}
                         onChange={handleChange}
                         placeholder="0.00"
+                        min="0"
+                        step="any"
                         className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-[#1E293B] focus:outline-none focus:border-[#FF8C00] focus:bg-white transition-all font-medium"
                       />
                       {errors.amount && <p className="text-red-400 text-xs mt-2 font-medium">{errors.amount}</p>}
