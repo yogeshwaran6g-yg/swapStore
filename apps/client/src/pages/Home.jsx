@@ -1,14 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Wallet } from 'lucide-react';
 import { useAppKit } from '@reown/appkit/react';
+
 function Home() {
   const { isConnected: isWalletConnected } = useAccount();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { open } = useAppKit();
+  const [activeTab, setActiveTab] = useState('home');
 
   const handleConnect = (destination) => {
     localStorage.setItem('redirectAfterConnect', destination);
@@ -24,15 +26,13 @@ function Home() {
   }, [isWalletConnected, isAuthenticated, navigate]);
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-b from-[#FFDFD6] to-[#FFEBE5] text-[#0F172A] font-sans overflow-x-hidden selection:bg-[#FF4500]/30 pt-6 pb-20 px-4 sm:px-8">
+    <div className="w-full min-h-screen bg-gradient-to-b from-[#FFDFD6] to-[#FFEBE5] text-[#0F172A] font-sans overflow-x-hidden selection:bg-[#FF4500]/30 pt-28 pb-20 px-4 sm:px-8">
       {/* Outer wrapper provides whitespace and gradient */}
 
-      {/* HERO CARD CONTAINER */}
-      <div className="max-w-[1400px] mx-auto bg-gradient-to-br from-[#FFF0EB]/90 to-[#FFEBE5]/90 backdrop-blur-xl rounded-[32px] shadow-[0_32px_64px_-12px_rgba(169,156,255,0.15)] border border-white/40 overflow-hidden relative">
-
-        {/* --- NAVBAR --- */}
-        <div className="relative z-50 px-2 sm:px-4 pt-4 sm:pt-6 pb-2 lg:px-6 xl:px-8">
-          <nav className="w-full flex items-center justify-between bg-white/80 backdrop-blur-2xl border border-white/60 rounded-[18px] sm:rounded-[24px] px-3 sm:px-5 lg:px-4 xl:px-6 py-2.5 sm:py-3 lg:py-2.5 xl:py-4 shadow-[0_8px_32px_rgba(14,27,77,0.05)]">
+      {/* --- FIXED NAVBAR --- */}
+      <div className="fixed top-0 left-0 right-0 z-[100] pointer-events-none">
+        <div className="w-full pointer-events-auto">
+          <nav className="w-full flex items-center justify-between bg-white/80 backdrop-blur-2xl border-b border-white/60 px-4 sm:px-8 lg:px-12 py-3 lg:py-4 shadow-[0_8px_32px_rgba(14,27,77,0.05)]">
             {/* Logo */}
             <div className="flex items-center cursor-pointer group shrink-0">
               <img src="/instaa-cash-logo.png" alt="Instaa Cash" className="h-8 sm:h-10 lg:h-9 xl:h-12 w-auto object-contain group-hover:scale-105 transition-transform duration-300" />
@@ -40,12 +40,27 @@ function Home() {
 
             {/* Links - only visible on large screens */}
             <div className="hidden lg:flex items-center bg-white/40 border border-white/50 rounded-full px-1 lg:px-1 xl:px-2 py-1 xl:py-1.5 shadow-sm">
-              <a href="#home" className="text-[11px] lg:text-[11px] xl:text-[14px] font-bold text-[#E65100] bg-white shadow-sm rounded-full px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 transition-all">Home</a>
-              <a href="#swap" className="text-[11px] lg:text-[11px] xl:text-[14px] font-semibold text-[#64748B] hover:text-[#E65100] hover:bg-white/80 rounded-full px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 transition-all">Swap</a>
-              <a href="#loan-details" className="text-[11px] lg:text-[11px] xl:text-[14px] font-semibold text-[#64748B] hover:text-[#E65100] hover:bg-white/80 rounded-full px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 transition-all whitespace-nowrap">Loan Details</a>
-              <a href="#services" className="text-[11px] lg:text-[11px] xl:text-[14px] font-semibold text-[#64748B] hover:text-[#E65100] hover:bg-white/80 rounded-full px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 transition-all">Services</a>
-              <a href="#reviews" className="text-[11px] lg:text-[11px] xl:text-[14px] font-semibold text-[#64748B] hover:text-[#E65100] hover:bg-white/80 rounded-full px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 transition-all">Reviews</a>
-              <a href="#about" className="text-[11px] lg:text-[11px] xl:text-[14px] font-semibold text-[#64748B] hover:text-[#E65100] hover:bg-white/80 rounded-full px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 transition-all">About</a>
+              {[
+                { id: 'home', label: 'Home' },
+                { id: 'swap', label: 'Swap' },
+                { id: 'loan-details', label: 'Loan Details' },
+                { id: 'services', label: 'Services' },
+                { id: 'reviews', label: 'Reviews' },
+                { id: 'about', label: 'About' }
+              ].map(tab => (
+                <a 
+                  key={tab.id}
+                  href={`#${tab.id}`} 
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`text-[11px] lg:text-[11px] xl:text-[14px] px-2 lg:px-2 xl:px-4 py-1 lg:py-1 xl:py-2 rounded-full transition-all whitespace-nowrap ${
+                    activeTab === tab.id 
+                      ? 'font-bold text-[#E65100] bg-white shadow-sm' 
+                      : 'font-semibold text-[#64748B] hover:text-[#E65100] hover:bg-white/80'
+                  }`}
+                >
+                  {tab.label}
+                </a>
+              ))}
             </div>
 
             {/* Action */}
@@ -62,9 +77,13 @@ function Home() {
             </div>
           </nav>
         </div>
+      </div>
+
+      {/* HERO CARD CONTAINER */}
+      <div className="max-w-[1400px] mx-auto bg-gradient-to-br from-[#FFF0EB]/90 to-[#FFEBE5]/90 backdrop-blur-xl rounded-[32px] shadow-[0_32px_64px_-12px_rgba(169,156,255,0.15)] border border-white/40 overflow-hidden relative">
 
         {/* --- HERO CONTENT --- */}
-        <main id="home" className="relative z-20 px-4 sm:px-8 lg:px-12 pt-8 pb-16 lg:pb-24 grid lg:grid-cols-2 gap-10 lg:gap-8 items-center min-h-[auto] lg:min-h-[700px] scroll-mt-32 overflow-hidden lg:overflow-visible">
+        <main id="home" className="relative z-20 px-4 sm:px-8 lg:px-12 pt-12 pb-16 lg:pb-24 grid lg:grid-cols-2 gap-10 lg:gap-8 items-center min-h-[auto] lg:min-h-[700px] scroll-mt-32 overflow-hidden lg:overflow-visible">
 
           {/* LEFT CONTENT */}
           <div className="flex flex-col space-y-4 md:space-y-5 lg:space-y-8 max-w-full md:max-w-[600px] lg:max-w-[600px] xl:max-w-[650px] z-20 items-center lg:items-start text-center lg:text-left mx-auto lg:mx-0">
@@ -465,10 +484,10 @@ function Home() {
             <div className="mt-4">
               <button
                 onClick={() => handleConnect('/loan')}
-                className="bg-gradient-to-r from-[#FF8C00] to-[#FF4500] text-[#E65100] px-10 py-4 rounded-2xl font-[800] text-[17px] transition-all duration-300 hover:scale-[1.03] shadow-xl shadow-[#D9A85C]/20 inline-flex items-center gap-2 border border-[#F59E0B]/50"
+                className="bg-gradient-to-r from-[#FF8C00] to-[#FF4500] text-white px-10 py-4 rounded-2xl font-[800] text-[17px] transition-all duration-300 hover:scale-[1.03] shadow-xl shadow-[#FF4500]/30 inline-flex items-center gap-2 border border-white/20"
               >
                 Get Loan
-                <svg className="w-5 h-5 text-[#E65100]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
               </button>
             </div>
           </div>
