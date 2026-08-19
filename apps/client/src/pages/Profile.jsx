@@ -141,12 +141,23 @@ export default function Profile() {
       <div className="absolute top-[-10%] right-[-10%] w-[40rem] h-[40rem] bg-indigo-600 rounded-full mix-blend-screen filter blur-[250px] opacity-20 pointer-events-none"></div>
       <div className="absolute bottom-[-10%] left-[-10%] w-[40rem] h-[40rem] bg-purple-600 rounded-full mix-blend-screen filter blur-[250px] opacity-10 pointer-events-none"></div>
 
-      <div className="container mx-auto px-6 lg:px-12 pt-36 pb-20 relative z-10 animate-fade-in flex justify-center">
+      <div className="container mx-auto px-6 lg:px-12 pt-24 pb-20 relative z-10 animate-fade-in flex justify-center">
         <div className="w-full max-w-4xl">
+          
+          <div className="mb-2 flex">
+            <button
+              onClick={() => navigate(-1)}
+              className="inline-flex items-center gap-3 px-5 py-2.5 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-indigo-500/50 rounded-2xl text-zinc-300 hover:text-white backdrop-blur-md transition-all duration-300 group shadow-lg hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] font-semibold text-sm tracking-wide"
+            >
+              <div className="w-8 h-8 rounded-full bg-white/5 group-hover:bg-indigo-500/20 flex items-center justify-center transition-colors">
+                <svg className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform text-zinc-400 group-hover:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              </div>
+              Back
+            </button>
+          </div>
+
           <div className="mb-12 text-center flex flex-col items-center">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 mb-6 shadow-[0_0_30px_rgba(99,102,241,0.2)] flex items-center justify-center backdrop-blur-md">
-              <svg className="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-            </div>
+
             <div className="flex items-center gap-3 mb-4">
               <h1 className="text-4xl lg:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">Your Profile</h1>
               {profile?.kyc_status && (
@@ -163,7 +174,7 @@ export default function Profile() {
             <p className="text-zinc-400 text-lg font-medium">Manage your identity and bank details.</p>
           </div>
 
-          <div className="backdrop-blur-xl bg-[#0a0a14]/60 border border-white/10 rounded-[2rem] shadow-2xl relative overflow-hidden">
+          <div className="backdrop-blur-xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/20 rounded-[2rem] shadow-2xl relative overflow-hidden">
             {loadingProfile && (
               <div className="absolute inset-0 z-20 bg-[#0a0a14]/80 backdrop-blur-sm flex items-center justify-center">
                  <div className="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>

@@ -18,7 +18,7 @@ export const LoanHistoryTable = () => {
   const paginatedLoans = loans.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   return (
-    <div className="mt-8 backdrop-blur-xl bg-[#0a0a14]/60 border border-white/10 rounded-[2rem] p-8 shadow-2xl relative">
+    <div className="mt-8 backdrop-blur-xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/20 rounded-[2rem] p-8 shadow-2xl relative">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">

@@ -24,15 +24,13 @@ export default function UsdcBalance() {
   if (!isConnected) return null;
 
   return (
-    <TokenSection title="USDC Balances" icon="🔵">
-      <TokenBalanceCard
-        networkName="BNB Smart Chain"
-        balance={formattedBnb}
-        tokenSymbol="USDC"
-        isLoading={isLoadingBnb}
-        accentColor="text-blue-400"
-        borderColor="border-blue-500/20"
-      />
-    </TokenSection>
+    <TokenBalanceCard
+      networkName="BNB Smart Chain"
+      balance={formattedBnb}
+      tokenSymbol="USDC"
+      isLoading={isLoadingBnb}
+      accentColor="text-[#2775CA]"
+      borderColor="border-[#2775CA]/20"
+    />
   );
 }

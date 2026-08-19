@@ -24,15 +24,13 @@ export default function DaiBalance() {
   if (!isConnected) return null;
 
   return (
-    <TokenSection title="DAI Balances" icon="🟡">
-      <TokenBalanceCard
-        networkName="BNB Smart Chain"
-        balance={formattedBnb}
-        tokenSymbol="DAI"
-        isLoading={isLoadingBnb}
-        accentColor="text-amber-400"
-        borderColor="border-amber-500/20"
-      />
-    </TokenSection>
+    <TokenBalanceCard
+      networkName="BNB Smart Chain"
+      balance={formattedBnb}
+      tokenSymbol="DAI"
+      isLoading={isLoadingBnb}
+      accentColor="text-[#F5AC37]"
+      borderColor="border-[#F5AC37]/20"
+    />
   );
 }

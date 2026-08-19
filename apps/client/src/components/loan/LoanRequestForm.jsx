@@ -337,10 +337,10 @@ export const LoanRequestForm = () => {
 
   // ── Render ─────────────────────────────────────────────────────────────
   return (
-    <div className="backdrop-blur-xl bg-[#0a0a14]/60 border border-white/10 rounded-[2rem] shadow-2xl relative overflow-hidden">
+    <div className="backdrop-blur-xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/20 rounded-[2rem] shadow-2xl relative overflow-hidden">
       <div className="p-8 md:p-10">
-        <div className="flex items-center mb-8">
-          <div className="w-14 h-14 bg-gradient-to-tr from-blue-500/20 to-indigo-500/20 border border-blue-500/20 rounded-2xl text-blue-400 flex items-center justify-center mr-5 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
+        <div className="flex flex-col items-center justify-center mb-8 text-center">
+          <div className="w-14 h-14 bg-gradient-to-tr from-blue-500/20 to-indigo-500/20 border border-blue-500/20 rounded-2xl text-blue-400 flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
             <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>

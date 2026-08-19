@@ -28,24 +28,42 @@ export function TokenBalanceCard({
     return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(num);
   };
 
+
+
   return (
     <div
-      className={`bg-white/[0.02] backdrop-blur-md p-5 rounded-2xl flex flex-col items-center justify-center border ${borderColor} transition-all duration-300 hover:bg-white/[0.05] hover:shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:-translate-y-1 group min-w-0 overflow-hidden`}
+      className={`w-full bg-[#0a0a14] p-5 sm:p-6 rounded-[2rem] flex flex-col sm:flex-row items-center justify-between border ${borderColor} transition-all duration-300 relative gap-6`}
     >
-      <span className="text-zinc-500 text-xs font-semibold uppercase tracking-widest mb-2 group-hover:text-zinc-400 transition-colors shrink-0">{networkName}</span>
-      {isLoading ? (
-        <div className="animate-pulse h-10 w-28 bg-white/5 rounded-lg mt-1 shrink-0"></div>
-      ) : (
-        <div className="flex items-baseline justify-center gap-1.5 w-full min-w-0">
-          <span 
-            className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight truncate" 
-            title={Number(balance).toFixed(6)}
-          >
-            {formatBalance(balance)}
-          </span>
-          <span className={`${accentColor} text-sm sm:text-lg font-bold opacity-90 shrink-0`}>{tokenSymbol}</span>
+      {/* 3D Image on the right */}
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 w-20 h-20 pointer-events-none hidden sm:flex items-center justify-end z-20">
+        <img src={`/${tokenSymbol.toLowerCase()}.png`} alt={tokenSymbol} className="h-full object-contain drop-shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-transform duration-500" />
+      </div>
+
+      <div className="flex items-center gap-5 w-full sm:w-auto z-10">
+        <div className="flex flex-col">
+          <span className="text-white text-xl font-bold tracking-wide">{tokenSymbol} Balances</span>
+          <span className="text-zinc-500 text-sm font-medium mt-0.5">{networkName}</span>
         </div>
-      )}
+      </div>
+
+      <div className="w-full sm:w-auto z-10 sm:mr-24 lg:mr-32">
+        {isLoading ? (
+          <div className="animate-pulse h-14 w-36 bg-white/5 rounded-2xl border border-white/5 shrink-0"></div>
+        ) : (
+          <div className="flex items-center justify-between sm:justify-center gap-3 w-full min-w-[160px] bg-black/60 border border-white/5 rounded-2xl px-5 py-3 transition-colors">
+            <div className="flex items-baseline gap-2">
+              <span 
+                className="text-3xl font-black text-white tracking-tight" 
+                title={Number(balance).toFixed(6)}
+              >
+                {formatBalance(balance)}
+              </span>
+              <span className={`${accentColor} text-sm font-bold opacity-90`}>{tokenSymbol}</span>
+            </div>
+            <svg className="w-4 h-4 text-zinc-500 transition-colors ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

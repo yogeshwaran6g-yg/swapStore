@@ -30,23 +30,13 @@ export default function UsdtBalance() {
   if (!isConnected) return null;
 
   return (
-    <TokenSection title="USDT Balances" icon="💵">
-      <TokenBalanceCard
-        networkName="BNB Smart Chain"
-        balance={formattedBnb}
-        tokenSymbol="USDT"
-        isLoading={isLoadingBnb}
-        accentColor="text-yellow-400"
-        borderColor="border-yellow-500/20"
-      />
-      {/* <TokenBalanceCard
-        networkName="TRON Network"
-        balance={formattedTron}
-        tokenSymbol="USDT"
-        isLoading={isLoadingTron}
-        accentColor="text-red-400"
-        borderColor="border-red-500/20"
-      /> */}
-    </TokenSection>
+    <TokenBalanceCard
+      networkName="BNB Smart Chain"
+      balance={formattedBnb}
+      tokenSymbol="USDT"
+      isLoading={isLoadingBnb}
+      accentColor="text-[#26A17B]"
+      borderColor="border-[#26A17B]/20"
+    />
   );
 }
