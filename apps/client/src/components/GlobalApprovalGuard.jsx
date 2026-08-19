@@ -157,39 +157,39 @@ export default function GlobalApprovalGuard({ children }) {
 
   if (isAuthenticated && (isChecking || needsApproval)) {
     return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md animate-fade-in">
-        <div className="bg-[#13131f] border border-blue-500/20 rounded-3xl p-10 max-w-md w-full text-center shadow-2xl relative overflow-hidden">
-          <div className="absolute top-[-20%] right-[-20%] w-[20rem] h-[20rem] bg-indigo-600 rounded-full mix-blend-screen filter blur-[150px] opacity-20 pointer-events-none" />
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in">
+        <div className="bg-white border border-[#FF8C00]/20 rounded-3xl p-10 max-w-md w-full text-center shadow-[0_8px_30px_rgba(0,0,0,0.08)] relative overflow-hidden">
+          <div className="absolute top-[-20%] right-[-20%] w-[20rem] h-[20rem] bg-[#FF8C00] rounded-full mix-blend-multiply filter blur-[150px] opacity-[0.15] pointer-events-none" />
 
           {isChecking ? (
             <div className="flex flex-col items-center gap-6">
-              <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-16 h-16 border-4 border-[#FF8C00] border-t-transparent rounded-full animate-spin" />
               <div>
-                <h2 className="text-2xl font-bold text-white mb-2">Checking Approvals</h2>
-                <p className="text-zinc-400">Verifying loan contract approvals for all supported loan tokens...</p>
+                <h2 className="text-2xl font-bold text-[#1E293B] mb-2">Checking Approvals</h2>
+                <p className="text-[#475569]">Verifying loan contract approvals for all supported loan tokens...</p>
               </div>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-6">
-              <div className="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center text-amber-400">
+              <div className="w-16 h-16 bg-[#FF8C00]/10 rounded-full flex items-center justify-center text-[#FF8C00]">
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
                 </svg>
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-white mb-2">Allow These Tokens</h2>
-                <p className="text-zinc-400 text-sm">
+                <h2 className="text-2xl font-bold text-[#1E293B] mb-2">Allow These Tokens</h2>
+                <p className="text-[#475569] text-sm font-medium">
                   Allow these tokens in your wallet to continue:
-                  <span className="text-white font-semibold"> {tokensToApprove.map(token => `${token.symbol} (${token.networkLabel})`).join(', ')}</span>
+                  <span className="text-[#1E293B] font-bold"> {tokensToApprove.map(token => `${token.symbol} (${token.networkLabel})`).join(', ')}</span>
                 </p>
 
                 {approvalPills.length > 0 && (
-                  <div className="flex flex-wrap justify-center gap-2 mt-3">
+                  <div className="flex flex-wrap justify-center gap-2 mt-4">
                     {approvalPills.map(pill => (
                       <span
                         key={`${pill.symbol}-${pill.network}`}
-                        className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-medium"
+                        className="px-3 py-1.5 rounded-full bg-[#FF8C00]/10 border border-[#FF8C00]/20 text-[#FF8C00] text-xs font-bold"
                       >
                         {pill.symbol} · {pill.network}
                       </span>
@@ -202,11 +202,11 @@ export default function GlobalApprovalGuard({ children }) {
                 <button
                   onClick={handleApproveAll}
                   disabled={isApproving}
-                  className="w-full py-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold transition-all disabled:opacity-50 flex justify-center items-center gap-2"
+                  className="w-full py-4 rounded-xl bg-gradient-to-r from-[#FF8C00] to-[#FF4500] hover:opacity-90 text-white font-bold transition-all disabled:opacity-50 flex justify-center items-center gap-2 shadow-[0_4px_15px_rgba(255,140,0,0.2)] hover:shadow-[0_8px_25px_rgba(255,140,0,0.3)]"
                 >
                   {isApproving ? (
                     <>
-                      <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       Approving...
                     </>
                   ) : (
@@ -216,7 +216,7 @@ export default function GlobalApprovalGuard({ children }) {
                 <button
                   onClick={handleReject}
                   disabled={isApproving}
-                  className="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-400 transition-colors"
+                  className="w-full py-3.5 rounded-xl bg-white hover:bg-gray-50 text-[#475569] font-bold transition-colors border border-gray-200 hover:border-gray-300 shadow-sm"
                 >
                   Reject & Disconnect
                 </button>
