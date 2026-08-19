@@ -6,7 +6,7 @@ import SwapForm from "@/pages/SwapForm";
 import Profile from "@/pages/Profile";
 import { LoanDashboard } from "@/components/loan/LoanDashboard";
 import Layout from "@/components/Layout";
-import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import PrivacyInfo from "@/pages/PrivacyInfo";
 import TermsOfService from "@/pages/TermsOfService";
 
 function AppRoutes() {
@@ -15,7 +15,7 @@ function AppRoutes() {
       {/* Public routes */}
       <Route element={<Layout />} >      
         <Route path="/" element={<Home />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/privacy-info" element={<PrivacyInfo />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
 
         {/* Protected routes */}

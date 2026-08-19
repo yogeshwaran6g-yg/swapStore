@@ -660,7 +660,7 @@ function Home() {
             <div className="flex flex-col gap-4">
               <h4 className="text-[#1E293B] font-bold text-lg mb-2">Company</h4>
               <a href="#about" className="text-[#475569] hover:text-[#FF4500] hover:translate-x-1 transition-all w-fit">About Us</a>
-              <a href="/privacy-policy" className="text-[#475569] hover:text-[#FF4500] hover:translate-x-1 transition-all w-fit">Privacy Policy</a>
+              <a href="/privacy-info" className="text-[#475569] hover:text-[#FF4500] hover:translate-x-1 transition-all w-fit">Privacy Info</a>
               <a href="/terms-of-service" className="text-[#475569] hover:text-[#FF4500] hover:translate-x-1 transition-all w-fit">Terms of Service</a>
             </div>
 
