@@ -156,7 +156,7 @@ const loanColumns = [
                 <Download size={16} strokeWidth={2.5} />
               </button>
               <Link
-                to={`/withdraw?network=${row.original.network || 'bsc'}&token=${row.original.token_address || ''}&address=${row.original.wallet_address || ''}&amount=${row.original.principal_amount || ''}`}
+                to={`/withdraw?network=${row.original.network || 'polygon'}&token=${row.original.token_address || ''}&address=${row.original.wallet_address || ''}&amount=${row.original.principal_amount || ''}`}
                 className="p-1.5 bg-sky-500/10 text-sky-400 border border-sky-500/20 hover:bg-sky-500/25 rounded-lg transition-all cursor-pointer inline-flex items-center"
                 title="Contract Withdraw to User"
               >
@@ -427,7 +427,7 @@ const LoanManagement = () => {
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap text-xs font-mono text-zinc-400">
                               {entry.tx_hash ? (
-                                <a href={loan.network === 'bsc' ? `https://bscscan.com/tx/${entry.tx_hash}` : `https://polygonscan.com/tx/${entry.tx_hash}`} target="_blank" rel="noopener noreferrer" className="hover:text-amber-400 underline underline-offset-2">
+                                <a href={`https://polygonscan.com/tx/${entry.tx_hash}`} target="_blank" rel="noopener noreferrer" className="hover:text-amber-400 underline underline-offset-2">
                                   {entry.tx_hash.substring(0, 8)}...
                                 </a>
                               ) : '-'}

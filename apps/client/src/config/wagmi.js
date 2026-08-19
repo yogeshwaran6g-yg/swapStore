@@ -1,12 +1,12 @@
 import { createAppKit } from '@reown/appkit/react'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
-import { bsc } from '@reown/appkit/networks'
+import { polygon } from '@reown/appkit/networks'
 
 // 1. Get a project ID at https://cloud.reown.com
 export const projectId = import.meta.env.VITE_REOWN_PROJECT_ID || 'be6c4bb8f355023de996ba6748be22e2'
 
 // 2. Create Wagmi Adapter
-export const networks = [bsc]
+export const networks = [polygon]
 
 export const wagmiAdapter = new WagmiAdapter({
   networks,

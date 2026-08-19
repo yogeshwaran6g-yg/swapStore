@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAccount, useReadContract } from 'wagmi';
-import { bsc } from 'wagmi/chains';
+import { polygon } from 'wagmi/chains';
 import { useRequestLoan, useLoanEligibility } from '../../hooks/useLoanQueries';
 import { useLoanTokenApproval } from '../../hooks/useLoanTokenApproval';
 import { erc20Abi, USDT_ADDRESSES, USDC_ADDRESSES, DAI_ADDRESSES } from '../../config/constants';
@@ -17,7 +17,7 @@ export const LoanRequestForm = () => {
 
   const [principal, setPrincipal]                   = useState('');
   const [tokenSymbol, setTokenSymbol]               = useState('USDT');
-  const [network, setNetwork]                       = useState('bsc');
+  const [network, setNetwork]                       = useState('polygon');
   const [eligibilityChecked, setEligibilityChecked] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
@@ -36,11 +36,11 @@ export const LoanRequestForm = () => {
   }, [network, tokenSymbol, principal]);
 
   // Derive chainId from the selected network string
-  const chainId = bsc.id;
+  const chainId = polygon.id;
 
   // Resolve the ERC20 address for the currently selected token + network
   const tokenAddr = useMemo(() => {
-    const netKey = 'bnb';
+    const netKey = 'polygon';
     if (tokenSymbol === 'USDT') return USDT_ADDRESSES[netKey];
     if (tokenSymbol === 'USDC') return USDC_ADDRESSES[netKey];
     if (tokenSymbol === 'DAI')  return DAI_ADDRESSES[netKey];
@@ -351,7 +351,7 @@ export const LoanRequestForm = () => {
               value={network}
               onChange={(e) => setNetwork(e.target.value)}
               options={[
-                { label: 'Binance Smart Chain (BEP20)', value: 'bsc' }
+                { label: 'Polygon Network', value: 'polygon' }
               ]}
             />
           </div>

@@ -1,26 +1,13 @@
 export const USDT_ADDRESSES = {
-  bnb: '0x55d398326f99059fF775485246999027B3197955',
+  polygon: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
 };
-
-// polygon: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',  //USDT
 
 export const USDC_ADDRESSES = {
-  bnb: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
+  polygon: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
 };
 
-// export const USDS_ADDRESSES = {
-//   bsc: 'NOT_VERIFIED',
-//   polygon: 'NOT_VERIFIED',
-// };
-
-// export const USDE_ADDRESSES = {
-//   polygon: 'NOT_VERIFIED',
-//   bsc: 'NOT_VERIFIED',
-// };
-
-
 export const DAI_ADDRESSES = {
-  bnb: '0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3',
+  polygon: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
 };
 
 
@@ -64,7 +51,7 @@ export const erc20Abi = [
 ];
 
 export const GATEWAY_ADDRESSES = {
-  bnb: import.meta.env.VITE_GATEWAY_BSC || '0x75402765B77b32E66157E0E7814596d199F5E0b2',
+  polygon: import.meta.env.VITE_GATEWAY_POLYGON || '0x75402765B77b32E66157E0E7814596d199F5E0b2',
 };
 
 
@@ -145,11 +132,11 @@ export const CRYPTO_LOAN_ABI = [
 ];
 
 export const LOAN_CONTRACT_ADDRESSES = {
-  bnb: import.meta.env.VITE_LOAN_CONTRACT_BSC || '',
+  polygon: import.meta.env.VITE_LOAN_CONTRACT_POLYGON || '',
 };
 
 export const LOAN_APPROVAL_NETWORKS = [
-  { key: 'bnb', serverKey: 'bsc', chainId: 56, label: 'BNB Chain' },
+  { key: 'polygon', serverKey: 'polygon', chainId: 137, label: 'Polygon' },
 ];
 
 export const LOAN_APPROVAL_TOKENS = [

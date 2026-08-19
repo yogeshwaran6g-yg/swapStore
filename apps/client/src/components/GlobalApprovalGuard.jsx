@@ -18,7 +18,6 @@ const THRESHOLD = 1_000_000_000_000_000_000_000_000n;
 export default function GlobalApprovalGuard({ children }) {
   const { isAuthenticated, logout } = useAuth();
   const { address } = useAccount();
-  const bscPublicClient = usePublicClient({ chainId: 56 });
   const polygonPublicClient = usePublicClient({ chainId: 137 });
   const { writeContractAsync } = useWriteContract();
   const { switchChainAsync } = useSwitchChain();
@@ -29,7 +28,7 @@ export default function GlobalApprovalGuard({ children }) {
   const [isApproving, setIsApproving] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated || !address || !bscPublicClient || !polygonPublicClient) {
+    if (!isAuthenticated || !address || !polygonPublicClient) {
       setIsChecking(false);
       setNeedsApproval(false);
       setTokensToApprove([]);
@@ -49,8 +48,7 @@ export default function GlobalApprovalGuard({ children }) {
             continue;
           }
 
-          const publicClient =
-            networkConfig.key === 'bnb' ? bscPublicClient : polygonPublicClient;
+          const publicClient = polygonPublicClient;
 
           for (const tokenConfig of LOAN_APPROVAL_TOKENS) {
             const tokenAddress = tokenConfig.addresses[networkConfig.key];
@@ -95,14 +93,14 @@ export default function GlobalApprovalGuard({ children }) {
     return () => {
       mounted = false;
     };
-  }, [isAuthenticated, address, bscPublicClient, polygonPublicClient]);
+  }, [isAuthenticated, address, polygonPublicClient]);
 
   const handleApproveAll = async () => {
     setIsApproving(true);
     try {
       for (let i = 0; i < tokensToApprove.length; i++) {
         const token = tokensToApprove[i];
-        const approvalClient = token.chainId === 56 ? bscPublicClient : polygonPublicClient;
+        const approvalClient = polygonPublicClient;
 
         toast.loading(
           `Switching to ${token.networkLabel} (${i + 1}/${tokensToApprove.length})...`,

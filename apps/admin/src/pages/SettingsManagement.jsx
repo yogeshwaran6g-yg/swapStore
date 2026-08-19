@@ -77,7 +77,7 @@ const SettingsManagement = () => {
   };
 
   const addTier = () => {
-    setTiers([...tiers, { token: 'USDT', network: 'bsc', min_balance: 0, max_loan: 0 }]);
+    setTiers([...tiers, { token: 'USDT', network: 'polygon', min_balance: 0, max_loan: 0 }]);
   };
 
   const removeTier = (index) => {
@@ -185,7 +185,6 @@ const SettingsManagement = () => {
                           onChange={(e) => handleTierChange(index, 'network', e.target.value)}
                           className="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-sm text-zinc-200 focus:outline-none focus:border-amber-500/50"
                         >
-                          <option value="bsc">Binance Smart Chain</option>
                           <option value="polygon">Polygon</option>
                         </select>
                       </div>

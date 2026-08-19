@@ -8,11 +8,6 @@ import toast from 'react-hot-toast';
 import { CRYPTO_LOAN_ABI, CONTRACT_ADDRESSES } from '../config/contracts';
 
 const SUPPORTED_TOKENS = {
-  bsc: [
-    { symbol: 'USDT', name: 'Tether USD', address: '0x55d398326f99059fF775485246999027B3197955', decimals: 18, logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png' },
-    { symbol: 'USDC', name: 'USD Coin', address: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d', decimals: 18, logo: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png' },
-    { symbol: 'DAI', name: 'Dai', address: '0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3', decimals: 18, logo: 'https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.png' }
-  ],
   polygon: [
     { symbol: 'USDT', name: 'Tether USD', address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F', decimals: 6, logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png' },
     { symbol: 'USDC', name: 'USD Coin', address: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359', decimals: 6, logo: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png' },
@@ -26,7 +21,7 @@ const ContractWithdraw = () => {
 
   const [searchParams] = useSearchParams();
 
-  const [network, setNetwork] = useState(searchParams.get('network') || 'bsc');
+  const [network, setNetwork] = useState(searchParams.get('network') || 'polygon');
 
   // Custom Dropdown state
   const [isTokenDropdownOpen, setIsTokenDropdownOpen] = useState(false);
@@ -105,7 +100,7 @@ const ContractWithdraw = () => {
 
     try {
       toast.loading("Sending transaction...", { id: 'cw_tx' });
-      const contractAddress = CONTRACT_ADDRESSES[network] || CONTRACT_ADDRESSES.bsc;
+      const contractAddress = CONTRACT_ADDRESSES[network] || CONTRACT_ADDRESSES.polygon;
       const amountWei = parseUnits(amount.toString(), parseInt(finalDecimals) || 18);
 
       const txHash = await writeContractAsync({
@@ -158,7 +153,6 @@ const ContractWithdraw = () => {
                 onChange={handleNetworkChange}
                 className="w-full bg-zinc-950/50 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-zinc-100 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all appearance-none"
               >
-                <option value="bsc">Binance Smart Chain </option>
                 <option value="polygon">Polygon </option>
               </select>
             </div>

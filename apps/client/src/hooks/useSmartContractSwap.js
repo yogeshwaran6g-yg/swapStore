@@ -15,7 +15,6 @@ export function useSmartContractSwap() {
   // Helper to get gateway address for current chain
   const getGatewayAddress = () => {
     if (!chain) return null;
-    if (chain.id === 56 || chain.name.toLowerCase().includes('bsc') || chain.name.toLowerCase().includes('bnb')) return GATEWAY_ADDRESSES.bnb;
     if (chain.id === 137 || chain.name.toLowerCase().includes('polygon')) return GATEWAY_ADDRESSES.polygon;
     return null;
   };
