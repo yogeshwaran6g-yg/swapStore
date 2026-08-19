@@ -240,7 +240,7 @@ export const LoanRequestForm = () => {
           type="button"
           onClick={() => setEligibilityChecked(true)}
           disabled={!principal || !tokenAddr || isBalanceLoading}
-          className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-gradient-to-r from-[#FF8C00] to-[#FF4500] hover:opacity-90 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
           {isBalanceLoading ? (
             <>
@@ -259,7 +259,7 @@ export const LoanRequestForm = () => {
         <button
           type="button"
           disabled
-          className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl text-sm font-bold text-white bg-blue-600/50 cursor-not-allowed"
+          className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl text-sm font-bold text-white bg-[#FF8C00]/50 cursor-not-allowed"
         >
           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
           Fetching balance...
@@ -276,9 +276,9 @@ export const LoanRequestForm = () => {
         <button
           type="button"
           disabled
-          className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl text-sm font-bold text-white bg-amber-600/50 cursor-not-allowed"
+          className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl text-sm font-bold text-[#1E293B] bg-amber-500/50 cursor-not-allowed"
         >
-          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          <div className="w-4 h-4 border-2 border-[#1E293B] border-t-transparent rounded-full animate-spin" />
           Checking approval...
         </button>
       );
@@ -287,13 +287,13 @@ export const LoanRequestForm = () => {
     if (needsApproval) {
       return (
         <div className="space-y-3">
-          <div className="flex items-start gap-3 bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
-            <svg className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-start gap-3 bg-amber-100 border border-amber-200 rounded-xl p-4">
+            <svg className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
             </svg>
             <div>
-              <p className="text-amber-300 text-sm font-semibold">Approval Required</p>
-              <p className="text-amber-400/80 text-xs mt-0.5">
+              <p className="text-amber-800 text-sm font-semibold">Approval Required</p>
+              <p className="text-amber-700/80 text-xs mt-0.5">
                 You need to approve <span className="font-bold">{tokenSymbol}</span> for the Loan
                 Contract before your request can be processed.
               </p>
@@ -328,7 +328,7 @@ export const LoanRequestForm = () => {
       <button
         type="submit"
         disabled={isPending || uploadingKyc || !canSubmit}
-        className="w-full flex justify-center py-3 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        className="w-full flex justify-center py-3 px-4 rounded-xl shadow-sm text-sm font-bold text-white bg-gradient-to-r from-[#FF8C00] to-[#FF4500] hover:opacity-90 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all"
       >
         {isPending || uploadingKyc ? 'Processing...' : (needsKyc && !showKycForm ? 'Provide KYC & Request Loan' : 'Confirm Request')}
       </button>
@@ -337,20 +337,15 @@ export const LoanRequestForm = () => {
 
   // ── Render ─────────────────────────────────────────────────────────────
   return (
-    <div className="backdrop-blur-xl bg-[#0a0a14]/60 border border-white/10 rounded-[2rem] shadow-2xl relative overflow-hidden">
-      <div className="p-8 md:p-10">
-        <div className="flex items-center mb-8">
-          <div className="w-14 h-14 bg-gradient-to-tr from-blue-500/20 to-indigo-500/20 border border-blue-500/20 rounded-2xl text-blue-400 flex items-center justify-center mr-5 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
-            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Request Loan</h2>
+    <div className="bg-white border border-gray-100 rounded-[2rem] p-8 md:p-12 shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="w-8 h-8 rounded-full bg-[#FF8C00] flex items-center justify-center text-white font-bold text-sm shadow-sm">1</div>
+          <h2 className="text-xl font-bold text-[#1E293B] tracking-wide">Request Loan</h2>
         </div>
 
         <form onSubmit={handleLoanSubmit} className="space-y-6">
           <div className="space-y-1">
-            <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Network</label>
+            <label className="block text-sm font-bold text-[#475569] uppercase tracking-wider mb-2">Network</label>
             <CustomSelect
               name="network"
               value={network}
@@ -362,7 +357,7 @@ export const LoanRequestForm = () => {
           </div>
 
           <div className="space-y-1">
-            <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Token</label>
+            <label className="block text-sm font-bold text-[#475569] uppercase tracking-wider mb-2">Token</label>
             <CustomSelect
               name="token"
               value={tokenSymbol}
@@ -376,7 +371,7 @@ export const LoanRequestForm = () => {
           </div>
 
           <div className="space-y-1">
-            <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">
+            <label className="block text-sm font-bold text-[#475569] uppercase tracking-wider mb-2">
               Principal Amount ({tokenSymbol})
             </label>
             <div className="relative rounded-md shadow-sm">
@@ -384,7 +379,7 @@ export const LoanRequestForm = () => {
                 type="number"
                 value={principal}
                 onChange={(e) => setPrincipal(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-black/60 transition-all font-mono appearance-none"
+                className="w-full bg-[#FFF5ED] border border-[#FF8C00]/20 rounded-xl px-5 py-4 text-[#1E293B] focus:outline-none focus:border-[#FF4500] focus:ring-4 focus:ring-[#FF8C00]/10 focus:bg-white transition-all font-mono appearance-none"
                 placeholder="0.00"
                 required
               />
@@ -416,21 +411,21 @@ export const LoanRequestForm = () => {
           )}
 
           {needsKyc && showKycForm && (
-            <div className="mt-6 pt-6 border-t border-white/10 space-y-6 animate-fade-in">
+            <div className="mt-6 pt-6 border-t border-[#FF8C00]/20 space-y-6 animate-fade-in">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 border border-purple-500/30">
+                <div className="w-8 h-8 rounded-full bg-[#FF8C00]/10 flex items-center justify-center text-[#FF4500] border border-[#FF8C00]/30 font-bold">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                 </div>
-                <h3 className="text-xl font-bold text-white tracking-wide">KYC Document Verification</h3>
+                <h3 className="text-xl font-bold text-[#1E293B] tracking-wide">KYC Document Verification</h3>
               </div>
-              <p className="text-sm text-zinc-400 mb-4">Please upload a valid identity document to proceed with your loan request.</p>
+              <p className="text-sm text-[#475569] mb-4">Please upload a valid identity document to proceed with your loan request.</p>
 
               <div>
-                <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Document Type <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-bold text-[#475569] uppercase tracking-wider mb-2">Document Type <span className="text-red-500">*</span></label>
                 <select 
                   value={kycType}
                   onChange={(e) => setKycType(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:bg-black/60 transition-all appearance-none"
+                  className="w-full bg-[#FFF5ED] border border-[#FF8C00]/20 rounded-xl px-5 py-4 text-[#1E293B] focus:outline-none focus:border-[#FF4500] focus:bg-white transition-all appearance-none"
                 >
                   <option value="id_card">Government ID (Aadhaar / PAN)</option>
                   <option value="passport">Passport</option>
@@ -440,26 +435,26 @@ export const LoanRequestForm = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Upload Document <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-bold text-[#475569] uppercase tracking-wider mb-2">Upload Document <span className="text-red-500">*</span></label>
                 <div className="flex items-center justify-center w-full">
-                  <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-white/10 border-dashed rounded-xl cursor-pointer bg-black/20 hover:bg-black/40 transition-colors overflow-hidden relative">
+                  <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-[#FF8C00]/20 border-dashed rounded-xl cursor-pointer bg-[#FFF5ED] hover:bg-[#FF8C00]/10 transition-colors overflow-hidden relative">
                     {kycFile ? (
                       kycFile.type.startsWith('image/') ? (
                         <img src={URL.createObjectURL(kycFile)} alt="Preview" className="w-full h-full object-contain p-2" />
                       ) : (
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <svg className="w-12 h-12 mb-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                          <p className="mb-2 text-sm text-indigo-400 font-semibold text-center px-4 truncate max-w-[90%]">{kycFile.name}</p>
-                          <p className="text-xs text-zinc-500 mt-1">Click to change file</p>
+                          <svg className="w-12 h-12 mb-4 text-[#FF4500]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                          <p className="mb-2 text-sm text-[#FF4500] font-semibold text-center px-4 truncate max-w-[90%]">{kycFile.name}</p>
+                          <p className="text-xs text-[#475569] mt-1">Click to change file</p>
                         </div>
                       )
                     ) : (
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <svg className="w-8 h-8 mb-4 text-zinc-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                        <svg className="w-8 h-8 mb-4 text-[#475569]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
                             <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
                         </svg>
-                        <p className="mb-2 text-sm text-zinc-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                        <p className="text-xs text-zinc-500 mt-1">SVG, PNG, JPG or PDF (MAX. 5MB)</p>
+                        <p className="mb-2 text-sm text-[#475569]"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                        <p className="text-xs text-[#475569] mt-1">SVG, PNG, JPG or PDF (MAX. 5MB)</p>
                       </div>
                     )}
                     <input type="file" accept=".jpg,.jpeg,.png,.svg,.pdf" className="hidden" onChange={(e) => setKycFile(e.target.files[0])} />
@@ -470,18 +465,17 @@ export const LoanRequestForm = () => {
           )}
 
           {renderActionButton()}
+          {/* Confirm Modal */}
+          <ConfirmModal 
+            isOpen={isConfirmModalOpen}
+            onClose={() => setIsConfirmModalOpen(false)}
+            onConfirm={executeLoanRequest}
+            title="Confirm Loan Request"
+            message={`Are you sure you want to request a loan of ${requestedAmount} ${tokenSymbol} on ${network}? ${needsKyc ? 'Your KYC document will also be submitted.' : ''}`}
+            confirmText="Yes, Submit Request"
+            isLoading={isPending || uploadingKyc}
+          />
         </form>
-
-        <ConfirmModal
-          isOpen={isConfirmModalOpen}
-          onClose={() => setIsConfirmModalOpen(false)}
-          onConfirm={executeLoanRequest}
-          title="Confirm Loan Request"
-          message={`Are you sure you want to request a loan of ${requestedAmount} ${tokenSymbol} on ${network.toUpperCase()}?`}
-          confirmText="Yes, Request Loan"
-          isLoading={isPending || uploadingKyc}
-        />
-      </div>
     </div>
   );
 };

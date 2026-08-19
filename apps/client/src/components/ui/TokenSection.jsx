@@ -10,15 +10,21 @@ import React from 'react';
  */
 export function TokenSection({ title, children, icon }) {
   return (
-    <div className="w-full mt-8 space-y-6">
-      <div className="flex items-center gap-3 border-b border-white/10 pb-3">
-        {icon && <span className="text-2xl filter drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">{icon}</span>}
-        <h3 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-white to-zinc-400 text-transparent bg-clip-text tracking-wide">
+    <div className="w-full mt-4">
+      <div className="flex items-center gap-3 mb-4">
+        {icon && (
+          <div className="w-8 h-8 rounded-full flex items-center justify-center text-white shadow-sm shrink-0">
+            {icon}
+          </div>
+        )}
+        <h3 className="text-lg font-bold text-[#1E293B] tracking-wide">
           {title}
         </h3>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-        {children}
+      <div className="bg-white rounded-3xl p-4 sm:p-5 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] relative overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5 relative z-10">
+          {children}
+        </div>
       </div>
     </div>
   );

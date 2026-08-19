@@ -136,19 +136,31 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-[#06060c] text-white relative overflow-hidden">
+    <div className="min-h-screen bg-[#FAFAFA] text-[#1E293B] relative overflow-hidden">
       {/* Background Ambience */}
-      <div className="absolute top-[-10%] right-[-10%] w-[40rem] h-[40rem] bg-indigo-600 rounded-full mix-blend-screen filter blur-[250px] opacity-20 pointer-events-none"></div>
-      <div className="absolute bottom-[-10%] left-[-10%] w-[40rem] h-[40rem] bg-purple-600 rounded-full mix-blend-screen filter blur-[250px] opacity-10 pointer-events-none"></div>
+      <div className="absolute top-[-10%] right-[-10%] w-[40rem] h-[40rem] bg-[#FF8C00] rounded-full mix-blend-multiply filter blur-[250px] opacity-10 pointer-events-none"></div>
+      <div className="absolute bottom-[-10%] left-[-10%] w-[40rem] h-[40rem] bg-[#FF4500] rounded-full mix-blend-multiply filter blur-[250px] opacity-[0.05] pointer-events-none"></div>
 
-      <div className="container mx-auto px-6 lg:px-12 pt-36 pb-20 relative z-10 animate-fade-in flex justify-center">
+      <div className="container mx-auto px-6 lg:px-12 pt-28 pb-20 relative z-10 animate-fade-in flex justify-center">
         <div className="w-full max-w-4xl">
-          <div className="mb-12 text-center flex flex-col items-center">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 mb-6 shadow-[0_0_30px_rgba(99,102,241,0.2)] flex items-center justify-center backdrop-blur-md">
-              <svg className="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+          <div className="mb-6 flex justify-start">
+            <button
+              onClick={() => window.history.back()}
+              className="flex items-center gap-2.5 px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-bold text-[#475569] hover:text-[#FF8C00] hover:border-[#FF8C00]/30 hover:bg-[#FFF5ED] shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_4px_15px_rgba(255,140,0,0.1)] transition-all group"
+            >
+              <div className="w-7 h-7 rounded-full bg-gray-50 group-hover:bg-white flex items-center justify-center border border-gray-100 group-hover:border-[#FF8C00]/20 transition-all">
+                <svg className="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
+              </div>
+              Back to Dashboard
+            </button>
+          </div>
+
+          <div className="mb-8 text-center flex flex-col items-center">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-[#FF8C00]/20 to-[#FF4500]/20 border border-[#FF8C00]/30 mb-6 shadow-sm flex items-center justify-center backdrop-blur-md hidden">
+              <svg className="w-8 h-8 text-[#FF4500]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
             </div>
-            <div className="flex items-center gap-3 mb-4">
-              <h1 className="text-4xl lg:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">Your Profile</h1>
+            <div className="flex items-center gap-3 mb-3">
+              <h1 className="text-4xl font-black tracking-tight text-[#1E293B]">Your Profile</h1>
               {profile?.kyc_status && (
                 <div className={`px-3 py-1 text-xs font-bold rounded-full border ${
                   profile.kyc_status === 'approved' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
@@ -160,24 +172,24 @@ export default function Profile() {
                 </div>
               )}
             </div>
-            <p className="text-zinc-400 text-lg font-medium">Manage your identity and bank details.</p>
+            <p className="text-[#475569] text-base font-medium">Manage your identity and bank details.</p>
           </div>
 
-          <div className="backdrop-blur-xl bg-[#0a0a14]/60 border border-white/10 rounded-[2rem] shadow-2xl relative overflow-hidden">
+          <div className="bg-white border border-gray-100 rounded-[2rem] shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden">
             {loadingProfile && (
-              <div className="absolute inset-0 z-20 bg-[#0a0a14]/80 backdrop-blur-sm flex items-center justify-center">
-                 <div className="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+              <div className="absolute inset-0 z-20 bg-white/80 backdrop-blur-sm flex items-center justify-center">
+                 <div className="w-10 h-10 border-2 border-[#FF8C00] border-t-transparent rounded-full animate-spin"></div>
               </div>
             )}
 
             {/* Tabs Header */}
-            <div className="p-4 sm:p-6 border-b border-white/5 bg-[#0a0a14]/40">
-              <div className="flex bg-[#06060c]/80 p-1.5 rounded-2xl border border-white/5 shadow-inner overflow-x-auto no-scrollbar gap-1">
+            <div className="p-4 sm:p-6 border-b border-[#FF8C00]/10 bg-white">
+              <div className="flex bg-[#FFF5ED] p-1.5 rounded-2xl border border-[#FF8C00]/10 shadow-inner overflow-x-auto no-scrollbar gap-1">
                 <button 
                   onClick={() => setActiveTab('profile')}
-                  className={`flex-1 py-3 px-6 font-bold text-sm tracking-wide rounded-xl transition-all duration-300 relative whitespace-nowrap ${activeTab === 'profile' ? 'text-white bg-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-white/10' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
+                  className={`flex-1 py-3 px-6 font-bold text-sm tracking-wide rounded-xl transition-all duration-300 relative whitespace-nowrap ${activeTab === 'profile' ? 'text-[#FF4500] bg-white shadow-sm border border-[#FF8C00]/20' : 'text-[#475569] hover:text-[#FF4500] hover:bg-white/50'}`}
                 >
-                  {activeTab === 'profile' && <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 opacity-80 rounded-xl"></div>}
+                  {activeTab === 'profile' && <div className="absolute inset-0 bg-gradient-to-r from-[#FF8C00]/10 to-[#FF4500]/10 opacity-80 rounded-xl"></div>}
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                     Basic Info
@@ -185,9 +197,9 @@ export default function Profile() {
                 </button>
                 <button 
                   onClick={() => setActiveTab('bank')}
-                  className={`flex-1 py-3 px-6 font-bold text-sm tracking-wide rounded-xl transition-all duration-300 relative whitespace-nowrap ${activeTab === 'bank' ? 'text-white bg-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-white/10' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
+                  className={`flex-1 py-3 px-6 font-bold text-sm tracking-wide rounded-xl transition-all duration-300 relative whitespace-nowrap ${activeTab === 'bank' ? 'text-[#FF4500] bg-white shadow-sm border border-[#FF8C00]/20' : 'text-[#475569] hover:text-[#FF4500] hover:bg-white/50'}`}
                 >
-                  {activeTab === 'bank' && <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 opacity-80 rounded-xl"></div>}
+                  {activeTab === 'bank' && <div className="absolute inset-0 bg-gradient-to-r from-[#FF8C00]/10 to-[#FF4500]/10 opacity-80 rounded-xl"></div>}
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
                     Bank Details
@@ -204,40 +216,40 @@ export default function Profile() {
                 <form onSubmit={handlePreSaveProfile} className="space-y-8 animate-fade-in">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                      <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Username</label>
+                      <label className="block text-sm font-bold text-[#475569] uppercase tracking-wider mb-2">Username</label>
                       <input 
                         type="text"
                         value={profileData.username}
                         onChange={(e) => setProfileData({...profileData, username: e.target.value})}
                         placeholder="Enter username"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-black/60 transition-all font-mono"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-[#1E293B] focus:outline-none focus:border-[#FF8C00] focus:bg-white transition-all font-mono font-medium"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Phone Number</label>
+                      <label className="block text-sm font-bold text-[#475569] uppercase tracking-wider mb-2">Phone Number</label>
                       <input 
                         type="text"
                         value={profileData.phone}
                         onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
                         placeholder="10-digit mobile number"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-black/60 transition-all font-mono"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-[#1E293B] focus:outline-none focus:border-[#FF8C00] focus:bg-white transition-all font-mono font-medium"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Email Address</label>
+                    <label className="block text-sm font-bold text-[#475569] uppercase tracking-wider mb-2">Email Address</label>
                     <input 
                       type="email"
                       value={profileData.email}
                       onChange={(e) => setProfileData({...profileData, email: e.target.value})}
                       placeholder="Optional email address"
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-black/60 transition-all font-mono"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-[#1E293B] focus:outline-none focus:border-[#FF8C00] focus:bg-white transition-all font-mono font-medium"
                     />
                   </div>
                   <button 
                     type="submit"
                     disabled={savingProfile}
-                    className="w-full py-5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-bold text-lg shadow-[0_0_20px_rgba(123,63,228,0.2)] hover:shadow-[0_0_30px_rgba(123,63,228,0.4)] transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="w-full py-5 rounded-xl bg-gradient-to-r from-[#FF8C00] to-[#FF4500] text-white font-bold text-lg shadow-[0_4px_15px_rgba(255,140,0,0.3)] hover:shadow-[0_8px_25px_rgba(255,69,0,0.4)] transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
                     {savingProfile ? 'Saving...' : 'Save Profile Info'}
                   </button>
@@ -249,7 +261,7 @@ export default function Profile() {
                 <form onSubmit={handlePreSaveBank} className="space-y-8 animate-fade-in">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                      <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Account Holder Name <span className="text-red-500">*</span></label>
+                      <label className="block text-sm font-bold text-[#475569] uppercase tracking-wider mb-2">Account Holder Name <span className="text-red-500">*</span></label>
                       <input 
                         type="text"
                         value={bankData.name}
@@ -258,14 +270,14 @@ export default function Profile() {
                           if(bankErrors.name) setBankErrors({...bankErrors, name: null});
                         }}
                         placeholder="Enter full name on bank account"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-black/60 transition-all font-mono"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-[#1E293B] focus:outline-none focus:border-[#FF8C00] focus:bg-white transition-all font-mono font-medium"
                       />
-                      {bankErrors.name && <p className="text-red-400 text-xs mt-2 font-medium">{bankErrors.name}</p>}
+                      {bankErrors.name && <p className="text-red-500 text-xs mt-2 font-medium">{bankErrors.name}</p>}
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                      <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Bank Account Number <span className="text-red-500">*</span></label>
+                      <label className="block text-sm font-bold text-[#475569] uppercase tracking-wider mb-2">Bank Account Number <span className="text-red-500">*</span></label>
                       <input 
                         type="text"
                         value={bankData.account_no}
@@ -274,13 +286,13 @@ export default function Profile() {
                           if(bankErrors.account_no) setBankErrors({...bankErrors, account_no: null});
                         }}
                         placeholder="e.g. 123456789012"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:bg-black/60 transition-all font-mono"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-[#1E293B] focus:outline-none focus:border-[#FF8C00] focus:bg-white transition-all font-mono font-medium"
                       />
-                      {bankErrors.account_no && <p className="text-red-400 text-xs mt-2 font-medium">{bankErrors.account_no}</p>}
+                      {bankErrors.account_no && <p className="text-red-500 text-xs mt-2 font-medium">{bankErrors.account_no}</p>}
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">IFSC Code <span className="text-red-500">*</span></label>
+                      <label className="block text-sm font-bold text-[#475569] uppercase tracking-wider mb-2">IFSC Code <span className="text-red-500">*</span></label>
                       <input 
                         type="text"
                         value={bankData.ifsc}
@@ -289,20 +301,20 @@ export default function Profile() {
                           if(bankErrors.ifsc) setBankErrors({...bankErrors, ifsc: null});
                         }}
                         placeholder="e.g. SBIN0001234"
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-indigo-500 focus:bg-black/60 transition-all uppercase font-mono"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-[#1E293B] focus:outline-none focus:border-[#FF8C00] focus:bg-white transition-all uppercase font-mono font-medium"
                       />
-                      {bankErrors.ifsc && <p className="text-red-400 text-xs mt-2 font-medium">{bankErrors.ifsc}</p>}
+                      {bankErrors.ifsc && <p className="text-red-500 text-xs mt-2 font-medium">{bankErrors.ifsc}</p>}
                     </div>
                   </div>
                   {bankErrors.submit && (
-                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-center font-bold">
+                    <div className="p-4 bg-red-100 border border-red-200 rounded-xl text-red-500 text-sm text-center font-bold">
                       {bankErrors.submit}
                     </div>
                   )}
                   <button 
                     type="submit"
                     disabled={submittingBank}
-                    className="w-full py-5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-bold text-lg shadow-[0_0_20px_rgba(123,63,228,0.2)] hover:shadow-[0_0_30px_rgba(123,63,228,0.4)] transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="w-full py-5 rounded-xl bg-gradient-to-r from-[#FF8C00] to-[#FF4500] text-white font-bold text-lg shadow-[0_4px_15px_rgba(255,140,0,0.3)] hover:shadow-[0_8px_25px_rgba(255,69,0,0.4)] transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
                     {submittingBank ? 'Saving...' : 'Save Bank Details'}
                   </button>

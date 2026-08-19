@@ -35,23 +35,29 @@ export default function UsdcBalance() {
 
   if (!isConnected) return null;
 
+  const polygonIcon = <svg className="w-7 h-7 text-[#7C3AED]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 22l-8-4.5v-9L12 2l8 4.5v9L12 22z" /><circle cx="12" cy="12" r="3" fill="currentColor" /></svg>;
+  const bnbIcon = <svg className="w-7 h-7 text-[#F3BA2F]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.5l4 4-4 4-4-4 4-4zm0 8l4 4-4 4-4-4 4-4zm-6 6l4 4-4 4-4-4 4-4zm12 0l4 4-4 4-4-4 4-4z" /></svg>;
+  const sectionIcon = <div className="w-full h-full rounded-full bg-[#3B82F6] text-white flex items-center justify-center font-bold text-lg">$</div>;
+
   return (
-    <TokenSection title="USDC Balances" icon="🔵">
+    <TokenSection title="USDC Balances" icon={sectionIcon}>
       <TokenBalanceCard
         networkName="Polygon Network"
         balance={formattedPolygon}
         tokenSymbol="USDC"
         isLoading={isLoadingPolygon}
-        accentColor="text-blue-400"
-        borderColor="border-blue-500/20"
+        accentColor="text-[#7C3AED]"
+        borderColor="border-[#7C3AED]/20"
+        icon={polygonIcon}
       />
       <TokenBalanceCard
         networkName="BNB Smart Chain"
         balance={formattedBnb}
         tokenSymbol="USDC"
         isLoading={isLoadingBnb}
-        accentColor="text-blue-400"
-        borderColor="border-blue-500/20"
+        accentColor="text-[#F3BA2F]"
+        borderColor="border-[#F3BA2F]/20"
+        icon={bnbIcon}
       />
     </TokenSection>
   );

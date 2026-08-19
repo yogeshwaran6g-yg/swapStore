@@ -26,7 +26,7 @@ createAppKit({
     url: window.location.origin.includes("localhost") ? 'http:localhost:3000' : 'https://ygdev.dpdns.org',
     icons: ['https://avatars.githubusercontent.com/u/179229932']
   },
-  themeMode: 'dark',
+  themeMode: 'light',
   themeVariables: {
     "--w3m-font-family": "Roboto, sans-serif",
     "--w3m-accent-color": "#F5841F",
