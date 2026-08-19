@@ -43,7 +43,6 @@ const CONTRACT_TYPES = {
 };
 
 const NETWORK_LABELS = {
-  bsc: 'BSC',
   polygon: 'Polygon',
 };
 
@@ -51,7 +50,7 @@ const ContractManagement = () => {
   const { isConnected } = useAppKitAccount();
   const { writeContractAsync, isPending: isWriting } = useWriteContract();
 
-  const [network, setNetwork] = useState('bsc');
+  const [network, setNetwork] = useState('polygon');
   const [contractType, setContractType] = useState('loan');
   const [formValues, setFormValues] = useState({
     loan: { setAdmin: '', updateInterestWallet: '' },
@@ -152,14 +151,6 @@ const ContractManagement = () => {
         </div>
 
         <div className="flex items-center space-x-2 bg-zinc-950 p-1.5 rounded-xl border border-zinc-800">
-          <button
-            onClick={() => setNetwork('bsc')}
-            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-              network === 'bsc' ? 'bg-amber-500 text-zinc-950 shadow-md' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
-            }`}
-          >
-            BSC
-          </button>
           <button
             onClick={() => setNetwork('polygon')}
             className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${

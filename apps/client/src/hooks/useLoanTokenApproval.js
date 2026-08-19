@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAccount, usePublicClient, useWriteContract, useSwitchChain } from 'wagmi';
 import { maxUint256 } from 'viem';
-import { bsc, polygon } from '@reown/appkit/networks';
+import { polygon } from '@reown/appkit/networks';
 import { LOAN_CONTRACT_ADDRESSES, erc20Abi } from '@/config/constants';
 import toast from 'react-hot-toast';
 
@@ -39,8 +39,8 @@ export function useLoanTokenApproval(tokenAddress, tokenSymbol, network) {
   // Use the form's selected network prop — not the wallet's connected chain.
   // They can differ (e.g. wallet on BSC, form set to Polygon) causing reads
   // on the wrong chain.
-  const walletNetworkName = network === 'bsc' ? 'bnb' : 'polygon';
-  const targetChainId     = network === 'bsc' ? bsc.id : polygon.id;
+  const walletNetworkName = 'polygon';
+  const targetChainId     = polygon.id;
 
   // Get a public client scoped to the target chain — independent of which
   // chain the wallet is currently connected to.
@@ -98,7 +98,7 @@ export function useLoanTokenApproval(tokenAddress, tokenSymbol, network) {
       // wagmi throws ChainMismatchError if we submit a tx on the wrong chain,
       // so we explicitly switch first. If the wallet is already on the correct
       // chain, switchChainAsync is a no-op.
-      toast.loading(`Switching to ${network === 'bsc' ? 'BSC' : 'Polygon'}...`, { id: 'loanApprove' });
+      toast.loading(`Switching to Polygon...`, { id: 'loanApprove' });
       await switchChainAsync({ chainId: targetChainId });
 
       // ── Step 2: Send the approval tx on the now-correct chain ────────────
