@@ -11,18 +11,6 @@ import { TokenSection } from './ui/TokenSection';
 export default function UsdtBalance() {
   const { address, isConnected } = useAccount();
 
-  // Fetch Polygon USDT Balance (6 decimals)
-  const {
-    formattedBalance: formattedPolygon,
-    isLoading: isLoadingPolygon,
-  } = useERC20Balance({
-    contractAddress: USDT_ADDRESSES.polygon,
-    chainId: polygon.id,
-    decimals: 6,
-    walletAddress: address,
-    enabled: isConnected,
-  });
-
   // Fetch BNB Smart Chain USDT Balance (18 decimals for Binance-Peg BSC-USD)
   const {
     formattedBalance: formattedBnb,
@@ -43,14 +31,6 @@ export default function UsdtBalance() {
 
   return (
     <TokenSection title="USDT Balances" icon="💵">
-      <TokenBalanceCard
-        networkName="Polygon Network"
-        balance={formattedPolygon}
-        tokenSymbol="USDT"
-        isLoading={isLoadingPolygon}
-        accentColor="text-purple-400"
-        borderColor="border-purple-500/20"
-      />
       <TokenBalanceCard
         networkName="BNB Smart Chain"
         balance={formattedBnb}

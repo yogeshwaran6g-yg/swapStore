@@ -186,7 +186,7 @@ const SettingsManagement = () => {
                           className="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-sm text-zinc-200 focus:outline-none focus:border-amber-500/50"
                         >
                           <option value="bsc">Binance Smart Chain</option>
-                          <option value="polygon">Polygon</option>
+
                         </select>
                       </div>
                       <div>

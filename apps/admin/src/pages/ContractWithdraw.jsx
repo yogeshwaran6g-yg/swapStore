@@ -159,7 +159,7 @@ const ContractWithdraw = () => {
                 className="w-full bg-zinc-950/50 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-zinc-100 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all appearance-none"
               >
                 <option value="bsc">Binance Smart Chain </option>
-                <option value="polygon">Polygon </option>
+
               </select>
             </div>
 

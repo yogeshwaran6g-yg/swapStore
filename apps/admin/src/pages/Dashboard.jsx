@@ -1,6 +1,6 @@
 import React from 'react';
 import { Users, UserPlus, ArrowRightLeft, RefreshCw, Banknote, Clock } from 'lucide-react';
-import { useDashboardStats } from '../hooks/useDashboardStats';
+import { useDashboardStats } from '../hooks/useDashboardStats'
 
 const StatCard = ({ title, value, icon: Icon, colorClass }) => (
   <div className="bg-zinc-900/80 p-4 sm:p-6 rounded-2xl sm:rounded-[24px] shadow-lg border border-zinc-800/50 flex items-center justify-between backdrop-blur-md hover:border-zinc-700 transition-colors">
